@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapyyn - Patient Referral System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Sapyyn Patient Referral System</h1>
+            <p>Secure and efficient patient referral management</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('referral')">New Referral</button>
+            <button class="tab-button" onclick="showTab('view')">View Referrals</button>
+            <button class="tab-button" onclick="showTab('upload')">File Upload</button>
+        </div>
+
+        <!-- New Referral Tab -->
+        <div id="referral" class="tab-content active">
+            <div class="card">
+                <h2>Submit Patient Referral</h2>
+                <form id="referralForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="patientName">Patient Name *</label>
+                        <input type="text" id="patientName" name="patientName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="patientId">Patient ID</label>
+                        <input type="text" id="patientId" name="patientId">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="referralType">Referral Type *</label>
+                        <select id="referralType" name="referralType" required>
+                            <option value="">Select Type</option>
+                            <option value="specialist_consultation">Specialist Consultation</option>
+                            <option value="diagnostic_testing">Diagnostic Testing</option>
+                            <option value="emergency_care">Emergency Care</option>
+                            <option value="surgical_consultation">Surgical Consultation</option>
+                            <option value="rehabilitation">Rehabilitation</option>
+                            <option value="second_opinion">Second Opinion</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="urgency">Urgency Level *</label>
+                        <select id="urgency" name="urgency" required>
+                            <option value="">Select Urgency</option>
+                            <option value="routine">Routine</option>
+                            <option value="urgent">Urgent</option>
+                            <option value="emergency">Emergency</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Clinical Notes</label>
+                        <textarea id="notes" name="notes" rows="4" 
+                                  placeholder="Include relevant medical history, symptoms, and reason for referral..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="documents">Supporting Documents</label>
+                        <input type="file" id="documents" name="documents" multiple 
+                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif">
+                        <div class="file-info">
+                            <small>Accepted formats: PDF, DOC, DOCX, JPG, PNG, GIF (Max 10MB per file)</small>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Submit Referral</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- View Referrals Tab -->
+        <div id="view" class="tab-content">
+            <div class="card">
+                <h2>Patient Referrals</h2>
+                <button onclick="loadReferrals()" class="btn-secondary">Refresh</button>
+                <div id="referralsList" class="referrals-list">
+                    <p>Click refresh to load referrals...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Upload Tab -->
+        <div id="upload" class="tab-content">
+            <div class="card">
+                <h2>File Upload</h2>
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="fileType">Document Type</label>
+                        <select id="fileType" name="fileType">
+                            <option value="medical_report">Medical Report</option>
+                            <option value="documents_for_insurance">Insurance Documents</option>
+                            <option value="documents_for_medical">Medical Documents</option>
+                            <option value="experience_documents">Experience Documents</option>
+                            <option value="qualification_documents">Qualification Documents</option>
+                            <option value="supporting_documents">Supporting Documents</option>
+                            <option value="profile_pic">Profile Picture</option>
+                            <option value="testimonial_image">Testimonial Image</option>
+                            <option value="broadcast_file">Broadcast File</option>
+                            <option value="uploaded_files">General Upload</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="file">Select File</label>
+                        <input type="file" id="file" name="file" required
+                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif">
+                    </div>
+
+                    <button type="submit" class="btn-primary">Upload File</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Sapyyn Patient Referral System - Test Environment</p>
+        </div>
+    </footer>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
