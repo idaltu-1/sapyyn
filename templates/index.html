@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="bi bi-hospital me-3"></i>
+                    Sapyyn Patient Referral System
+                </h1>
+                <p class="lead mb-4">
+                    Streamline patient referrals with secure document management, 
+                    QR code tracking, and HIPAA-compliant data handling.
+                </p>
+                <div class="d-grid d-md-flex gap-2">
+                    {% if not session.user_id %}
+                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">
+                        <i class="bi bi-person-plus"></i> Get Started
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg">
+                        <i class="bi bi-speedometer2"></i> Go to Dashboard
+                    </a>
+                    <a href="{{ url_for('new_referral') }}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-plus-circle"></i> Create Referral
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="bi bi-clipboard2-pulse display-1" style="font-size: 8rem; opacity: 0.8;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="fw-bold">Comprehensive Patient Referral Management</h2>
+                <p class="lead text-muted">Everything you need to manage patient referrals efficiently and securely</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-files text-primary fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold">Document Management</h4>
+                        <p class="text-muted">
+                            Securely upload and organize medical reports, insurance documents, 
+                            qualification certificates, and supporting files.
+                        </p>
+                        <ul class="list-unstyled text-start">
+                            <li><i class="bi bi-check2 text-success"></i> Medical Reports</li>
+                            <li><i class="bi bi-check2 text-success"></i> Insurance Documents</li>
+                            <li><i class="bi bi-check2 text-success"></i> Experience Certificates</li>
+                            <li><i class="bi bi-check2 text-success"></i> Supporting Documents</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-qr-code text-success fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold">QR Code Tracking</h4>
+                        <p class="text-muted">
+                            Generate unique QR codes for each referral to enable quick access 
+                            and tracking throughout the referral process.
+                        </p>
+                        <ul class="list-unstyled text-start">
+                            <li><i class="bi bi-check2 text-success"></i> Instant Generation</li>
+                            <li><i class="bi bi-check2 text-success"></i> Mobile Scanning</li>
+                            <li><i class="bi bi-check2 text-success"></i> Status Tracking</li>
+                            <li><i class="bi bi-check2 text-success"></i> Quick Access</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-shield-check text-warning fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold">HIPAA Compliance</h4>
+                        <p class="text-muted">
+                            Built with security in mind, ensuring all patient data is handled 
+                            according to HIPAA requirements and best practices.
+                        </p>
+                        <ul class="list-unstyled text-start">
+                            <li><i class="bi bi-check2 text-success"></i> Encrypted Storage</li>
+                            <li><i class="bi bi-check2 text-success"></i> Access Controls</li>
+                            <li><i class="bi bi-check2 text-success"></i> Audit Trails</li>
+                            <li><i class="bi bi-check2 text-success"></i> Secure Transmission</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Section -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 mb-4">
+                <div class="card border-0 bg-transparent">
+                    <div class="card-body">
+                        <i class="bi bi-people-fill text-primary fs-1 mb-2"></i>
+                        <h3 class="fw-bold text-primary">1000+</h3>
+                        <p class="text-muted">Active Users</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card border-0 bg-transparent">
+                    <div class="card-body">
+                        <i class="bi bi-clipboard2-pulse-fill text-success fs-1 mb-2"></i>
+                        <h3 class="fw-bold text-success">5000+</h3>
+                        <p class="text-muted">Referrals Processed</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card border-0 bg-transparent">
+                    <div class="card-body">
+                        <i class="bi bi-files text-warning fs-1 mb-2"></i>
+                        <h3 class="fw-bold text-warning">25000+</h3>
+                        <p class="text-muted">Documents Managed</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card border-0 bg-transparent">
+                    <div class="card-body">
+                        <i class="bi bi-hospital text-info fs-1 mb-2"></i>
+                        <h3 class="fw-bold text-info">100+</h3>
+                        <p class="text-muted">Healthcare Partners</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="fw-bold">How It Works</h2>
+                <p class="lead text-muted">Simple steps to manage your patient referrals</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-3 text-center">
+                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                    <span class="fs-2 fw-bold text-primary">1</span>
+                </div>
+                <h5 class="fw-bold">Create Account</h5>
+                <p class="text-muted">Register as a healthcare provider or patient to get started</p>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                    <span class="fs-2 fw-bold text-primary">2</span>
+                </div>
+                <h5 class="fw-bold">Upload Documents</h5>
+                <p class="text-muted">Securely upload medical reports, insurance, and supporting documents</p>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                    <span class="fs-2 fw-bold text-primary">3</span>
+                </div>
+                <h5 class="fw-bold">Create Referral</h5>
+                <p class="text-muted">Generate referrals with QR codes for easy tracking and access</p>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                    <span class="fs-2 fw-bold text-primary">4</span>
+                </div>
+                <h5 class="fw-bold">Track Progress</h5>
+                <p class="text-muted">Monitor referral status and manage communication efficiently</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-3">Ready to Get Started?</h2>
+        <p class="lead mb-4">Join thousands of healthcare professionals using Sapyyn for efficient patient referral management</p>
+        {% if not session.user_id %}
+        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-2">
+            <i class="bi bi-person-plus"></i> Sign Up Now
+        </a>
+        <a href="#" class="btn btn-outline-light btn-lg">
+            <i class="bi bi-info-circle"></i> Learn More
+        </a>
+        {% else %}
+        <a href="{{ url_for('new_referral') }}" class="btn btn-light btn-lg">
+            <i class="bi bi-plus-circle"></i> Create Your First Referral
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

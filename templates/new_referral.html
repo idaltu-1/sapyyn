@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}New Referral - Sapyyn{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-plus-circle"></i>
+                        Create New Patient Referral
+                    </h4>
+                </div>
+                
+                <div class="card-body p-4">
+                    <form method="POST" id="referralForm">
+                        <!-- Patient Information -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">
+                                <i class="bi bi-person-badge text-primary"></i>
+                                Patient Information
+                            </h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="patient_name" class="form-label">Patient Full Name *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-person"></i>
+                                        </span>
+                                        <input type="text" class="form-control" id="patient_name" 
+                                               name="patient_name" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="medical_condition" class="form-label">Medical Condition *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-clipboard2-pulse"></i>
+                                        </span>
+                                        <input type="text" class="form-control" id="medical_condition" 
+                                               name="medical_condition" required 
+                                               placeholder="e.g., Cardiovascular examination">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Referral Information -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">
+                                <i class="bi bi-hospital text-primary"></i>
+                                Referral Details
+                            </h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="referring_doctor" class="form-label">Referring Doctor</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-person-check"></i>
+                                        </span>
+                                        <input type="text" class="form-control" id="referring_doctor" 
+                                               name="referring_doctor" placeholder="Dr. Name">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="target_doctor" class="form-label">Target Specialist</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-person-fill-check"></i>
+                                        </span>
+                                        <input type="text" class="form-control" id="target_doctor" 
+                                               name="target_doctor" placeholder="Specialist/Department">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="urgency_level" class="form-label">Urgency Level *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                    </span>
+                                    <select class="form-select" id="urgency_level" name="urgency_level" required>
+                                        <option value="">Select urgency level</option>
+                                        <option value="low">Low - Routine follow-up</option>
+                                        <option value="normal" selected>Normal - Standard referral</option>
+                                        <option value="high">High - Urgent consultation needed</option>
+                                        <option value="emergency">Emergency - Immediate attention required</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">
+                                <i class="bi bi-chat-square-text text-primary"></i>
+                                Additional Information
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label for="notes" class="form-label">Clinical Notes</label>
+                                <textarea class="form-control" id="notes" name="notes" rows="4" 
+                                          placeholder="Provide any relevant clinical information, symptoms, test results, or special instructions..."></textarea>
+                                <div class="form-text">
+                                    Include relevant medical history, current symptoms, and any special considerations
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i>
+                                Cancel
+                            </a>
+                            
+                            <div>
+                                <button type="button" class="btn btn-outline-primary me-2" onclick="saveDraft()">
+                                    <i class="bi bi-save"></i>
+                                    Save Draft
+                                </button>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-send"></i>
+                                    Create Referral
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Information Panel -->
+            <div class="card mt-4 border-info">
+                <div class="card-body">
+                    <h6 class="card-title text-info">
+                        <i class="bi bi-info-circle"></i>
+                        What happens next?
+                    </h6>
+                    <ul class="mb-0">
+                        <li>A unique referral ID and QR code will be generated</li>
+                        <li>You can attach relevant documents to this referral</li>
+                        <li>The referral can be shared with healthcare providers</li>
+                        <li>Track the status of your referral in your dashboard</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Form validation and enhancement
+document.getElementById('referralForm').addEventListener('submit', function(e) {
+    const patientName = document.getElementById('patient_name').value.trim();
+    const medicalCondition = document.getElementById('medical_condition').value.trim();
+    const urgencyLevel = document.getElementById('urgency_level').value;
+    
+    if (!patientName || !medicalCondition || !urgencyLevel) {
+        e.preventDefault();
+        alert('Please fill in all required fields (marked with *)');
+        return false;
+    }
+    
+    // Show loading state
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Creating...';
+    submitBtn.disabled = true;
+});
+
+// Auto-save draft functionality
+function saveDraft() {
+    const formData = new FormData(document.getElementById('referralForm'));
+    const draftData = Object.fromEntries(formData);
+    
+    localStorage.setItem('referralDraft', JSON.stringify(draftData));
+    
+    // Show success message
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-success alert-dismissible fade show';
+    alertDiv.innerHTML = `
+        <i class="bi bi-check-circle"></i>
+        Draft saved successfully!
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.row'));
+    
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 3000);
+}
+
+// Load draft on page load
+window.addEventListener('load', function() {
+    const draftData = localStorage.getItem('referralDraft');
+    if (draftData) {
+        const draft = JSON.parse(draftData);
+        
+        // Ask user if they want to load the draft
+        if (confirm('A saved draft was found. Do you want to load it?')) {
+            Object.keys(draft).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = draft[key];
+                }
+            });
+        }
+    }
+});
+
+// Clear draft after successful submission
+document.getElementById('referralForm').addEventListener('submit', function() {
+    localStorage.removeItem('referralDraft');
+});
+
+// Character counter for notes
+document.getElementById('notes').addEventListener('input', function() {
+    const maxLength = 1000;
+    const currentLength = this.value.length;
+    
+    let counterElement = document.getElementById('notesCounter');
+    if (!counterElement) {
+        counterElement = document.createElement('div');
+        counterElement.id = 'notesCounter';
+        counterElement.className = 'form-text text-end';
+        this.parentNode.appendChild(counterElement);
+    }
+    
+    counterElement.textContent = `${currentLength}/${maxLength} characters`;
+    counterElement.className = currentLength > maxLength ? 'form-text text-end text-danger' : 'form-text text-end text-muted';
+});
+</script>
+{% endblock %}

@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Sapyyn{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="bi bi-speedometer2 text-primary"></i>
+                        Welcome back, {{ session.full_name or session.username }}!
+                    </h1>
+                    <p class="text-muted">
+                        <i class="bi bi-calendar3"></i>
+                        {{ moment().format('dddd, MMMM Do YYYY') if moment else 'Today' }}
+                    </p>
+                </div>
+                <div>
+                    <a href="{{ url_for('new_referral') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i>
+                        New Referral
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="fw-bold">{{ referrals|length }}</h4>
+                            <p class="mb-0">Total Referrals</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-clipboard2-pulse fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="fw-bold" id="pendingCount">-</h4>
+                            <p class="mb-0">Pending</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-clock-history fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="fw-bold" id="approvedCount">-</h4>
+                            <p class="mb-0">Approved</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-check-circle fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="fw-bold">{{ recent_documents|length }}</h4>
+                            <p class="mb-0">Documents</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-files fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Referrals -->
+        <div class="col-lg-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clipboard2-pulse text-primary"></i>
+                        Recent Referrals
+                    </h5>
+                    <a href="{{ url_for('new_referral') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus"></i>
+                        Add New
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if referrals %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Patient</th>
+                                    <th>Condition</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for referral in referrals[:5] %}
+                                <tr>
+                                    <td>
+                                        <code>{{ referral[2][:8] }}</code>
+                                    </td>
+                                    <td>
+                                        <strong>{{ referral[3] }}</strong>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">{{ referral[6] }}</span>
+                                    </td>
+                                    <td>
+                                        {% set status_class = {
+                                            'pending': 'warning',
+                                            'approved': 'success',
+                                            'rejected': 'danger',
+                                            'completed': 'info'
+                                        } %}
+                                        <span class="badge bg-{{ status_class.get(referral[8], 'secondary') }}">
+                                            {{ referral[8].title() }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ referral[11][:10] }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary btn-sm" 
+                                                    onclick="viewReferral('{{ referral[2] }}')" 
+                                                    title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            {% if referral[10] %}
+                                            <button class="btn btn-outline-info btn-sm" 
+                                                    onclick="showQRCode('{{ referral[10] }}')" 
+                                                    title="View QR Code">
+                                                <i class="bi bi-qr-code"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-clipboard2-x text-muted" style="font-size: 3rem;"></i>
+                        <h5 class="text-muted mt-3">No referrals yet</h5>
+                        <p class="text-muted">Create your first patient referral to get started</p>
+                        <a href="{{ url_for('new_referral') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i>
+                            Create Referral
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Documents & Quick Actions -->
+        <div class="col-lg-4">
+            <!-- Recent Documents -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="bi bi-files text-info"></i>
+                        Recent Documents
+                    </h6>
+                    <a href="{{ url_for('view_documents') }}" class="btn btn-sm btn-outline-info">
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_documents %}
+                    <div class="list-group list-group-flush">
+                        {% for doc in recent_documents %}
+                        <div class="list-group-item px-0 py-2">
+                            <div class="d-flex align-items-start">
+                                <div class="me-2">
+                                    {% set doc_icons = {
+                                        'medical_report': 'file-medical',
+                                        'insurance': 'shield-check',
+                                        'profile_pic': 'person-circle',
+                                        'experience_documents': 'briefcase',
+                                        'qualification_documents': 'award'
+                                    } %}
+                                    <i class="bi bi-{{ doc_icons.get(doc[0], 'file-earmark') }} text-muted"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold small">{{ doc[1][:30] }}...</div>
+                                    <div class="text-muted small">{{ doc[0].replace('_', ' ').title() }}</div>
+                                    <div class="text-muted small">{{ doc[2][:10] }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <i class="bi bi-file-earmark-x text-muted fs-1"></i>
+                        <p class="text-muted small mt-2">No documents uploaded</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-lightning text-warning"></i>
+                        Quick Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('new_referral') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-plus-circle"></i>
+                            New Referral
+                        </a>
+                        <a href="{{ url_for('upload_file') }}" class="btn btn-outline-success">
+                            <i class="bi bi-cloud-upload"></i>
+                            Upload Document
+                        </a>
+                        <a href="{{ url_for('view_documents') }}" class="btn btn-outline-info">
+                            <i class="bi bi-files"></i>
+                            View Documents
+                        </a>
+                        <button class="btn btn-outline-secondary" onclick="downloadReport()">
+                            <i class="bi bi-download"></i>
+                            Download Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Code Modal -->
+<div class="modal fade" id="qrCodeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-qr-code"></i>
+                    Referral QR Code
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="qrCodeImage" src="" alt="QR Code" class="img-fluid" style="max-width: 300px;">
+                <p class="mt-3 text-muted">Scan this code for quick access to referral details</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="downloadQRCode()">
+                    <i class="bi bi-download"></i>
+                    Download
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Load statistics
+fetch('/api/stats')
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('pendingCount').textContent = data.status_counts.pending || 0;
+        document.getElementById('approvedCount').textContent = data.status_counts.approved || 0;
+    })
+    .catch(error => console.error('Error loading stats:', error));
+
+function viewReferral(referralId) {
+    // Implement referral details view
+    alert('View referral details for: ' + referralId);
+}
+
+function showQRCode(qrCodeData) {
+    document.getElementById('qrCodeImage').src = 'data:image/png;base64,' + qrCodeData;
+    new bootstrap.Modal(document.getElementById('qrCodeModal')).show();
+}
+
+function downloadQRCode() {
+    const img = document.getElementById('qrCodeImage');
+    const link = document.createElement('a');
+    link.download = 'referral-qr-code.png';
+    link.href = img.src;
+    link.click();
+}
+
+function downloadReport() {
+    // Implement report download
+    alert('Report download functionality will be implemented');
+}
+</script>
+{% endblock %}
