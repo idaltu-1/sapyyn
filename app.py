@@ -1715,3 +1715,9 @@ def handle_subscription_cancellation(subscription):
     
     conn.commit()
     conn.close()
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    """Render custom 404 page"""
+    return render_template('404.html'), 404
