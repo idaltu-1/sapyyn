@@ -37,23 +37,35 @@
                     <div class="rotating-images">
                         <div class="image-slide active" id="slide1">
                             <div class="dental-image">
-                                <img src="{{ url_for('static', filename='images/dental/dental-team.jpg') }}" 
-                                     alt="Professional Dental Team - Replace with actual team photo" 
+                                <img src="{{ url_for('static', filename='images/dental/dental-team.jpg') }}"
+                                     alt="Experienced Dental Team"
                                      class="img-fluid rounded-3 shadow-lg">
+                            </div>
+                            <div class="slide-caption">
+                                <h5>Caring Professionals</h5>
+                                <p>Friendly staff ready to help</p>
                             </div>
                         </div>
                         <div class="image-slide" id="slide2">
                             <div class="dental-image">
-                                <img src="{{ url_for('static', filename='images/dental/dental-patient.jpg') }}" 
-                                     alt="Happy Dental Patients - Replace with actual patient photos" 
+                                <img src="{{ url_for('static', filename='images/dental/dental-patient.jpg') }}"
+                                     alt="Happy Dental Patients"
                                      class="img-fluid rounded-3 shadow-lg">
+                            </div>
+                            <div class="slide-caption">
+                                <h5>Patient Focused</h5>
+                                <p>Your comfort is our priority</p>
                             </div>
                         </div>
                         <div class="image-slide" id="slide3">
                             <div class="dental-image">
-                                <img src="{{ url_for('static', filename='images/dental/pleasant-smile.jpg') }}" 
-                                     alt="Pleasant Smiles - Replace with actual smile photos" 
+                                <img src="{{ url_for('static', filename='images/dental/pleasant-smile.jpg') }}"
+                                     alt="Beautiful Smiles"
                                      class="img-fluid rounded-3 shadow-lg">
+                            </div>
+                            <div class="slide-caption">
+                                <h5>Results That Shine</h5>
+                                <p>Creating bright, healthy smiles</p>
                             </div>
                         </div>
                     </div>
@@ -542,6 +554,7 @@ document.addEventListener('DOMContentLoaded', function() {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
 .image-slide.active {
@@ -569,6 +582,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .dental-image img:hover {
     transform: scale(1.05);
+}
+
+.slide-caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0.5rem 1rem;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    text-align: center;
+}
+
+.slide-caption h5 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.slide-caption p {
+    font-size: 0.9rem;
+    margin: 0;
 }
 
 .image-dots {
