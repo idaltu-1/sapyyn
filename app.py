@@ -15,6 +15,9 @@ from io import BytesIO
 import base64
 from datetime import datetime
 import json
+import random
+import string
+import requests
 
 app = Flask(__name__)
 app.secret_key = 'sapyyn-patient-referral-system-2024'
@@ -35,7 +38,7 @@ def init_db():
     conn = sqlite3.connect('sapyyn.db')
     cursor = conn.cursor()
     
-    # Users table
+    # Users table - Enhanced for multiple user types
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,17 +47,32 @@ def init_db():
             password_hash TEXT NOT NULL,
             full_name TEXT NOT NULL,
             role TEXT DEFAULT 'patient',
+            user_type TEXT DEFAULT 'patient',
+            practice_name TEXT,
+            license_number TEXT,
+            specialty TEXT,
+            phone TEXT,
+            address TEXT,
+            city TEXT,
+            state TEXT,
+            zip_code TEXT,
+            four_digit_code TEXT UNIQUE,
+            is_active BOOLEAN DEFAULT 1,
+            subscription_plan TEXT DEFAULT 'free',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     
-    # Referrals table
+    # Referrals table - Enhanced with 4-digit code support
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS referrals (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             referral_id TEXT UNIQUE NOT NULL,
+            four_digit_code TEXT,
             patient_name TEXT NOT NULL,
+            patient_email TEXT,
+            patient_phone TEXT,
             referring_doctor TEXT,
             target_doctor TEXT,
             medical_condition TEXT,
@@ -62,6 +80,7 @@ def init_db():
             status TEXT DEFAULT 'pending',
             notes TEXT,
             qr_code TEXT,
+            reward_points INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users (id)
@@ -84,6 +103,74 @@ def init_db():
         )
     ''')
     
+    # Rewards table for tracking reward points and redemptions
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS rewards (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            referral_id INTEGER,
+            points_earned INTEGER DEFAULT 0,
+            points_used INTEGER DEFAULT 0,
+            reward_type TEXT,
+            reward_description TEXT,
+            api_provider TEXT,
+            api_transaction_id TEXT,
+            status TEXT DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id),
+            FOREIGN KEY (referral_id) REFERENCES referrals (id)
+        )
+    ''')
+    
+    # Subscription plans table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS subscription_plans (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            plan_name TEXT UNIQUE NOT NULL,
+            plan_type TEXT NOT NULL,
+            price DECIMAL(10,2) NOT NULL,
+            billing_cycle TEXT DEFAULT 'monthly',
+            features TEXT,
+            max_referrals INTEGER DEFAULT -1,
+            is_active BOOLEAN DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    # API configurations for rewards
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS api_configs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            provider_name TEXT UNIQUE NOT NULL,
+            api_key TEXT,
+            api_secret TEXT,
+            base_url TEXT,
+            is_enabled BOOLEAN DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    # Insert default subscription plans
+    cursor.execute('''
+        INSERT OR IGNORE INTO subscription_plans (plan_name, plan_type, price, billing_cycle, features, max_referrals)
+        VALUES 
+        ('Free', 'basic', 0.00, 'monthly', 'Basic referral system, 5 referrals per month', 5),
+        ('Professional', 'pro', 29.99, 'monthly', 'Unlimited referrals, Analytics, Priority support', -1),
+        ('Enterprise', 'enterprise', 99.99, 'monthly', 'All features, Custom branding, API access, Dedicated support', -1)
+    ''')
+    
+    # Insert default API providers
+    cursor.execute('''
+        INSERT OR IGNORE INTO api_configs (provider_name, base_url, is_enabled)
+        VALUES 
+        ('Tango', 'https://api.tangocard.com', 0),
+        ('Tremendous', 'https://api.tremendous.com', 0),
+        ('Zapier', 'https://hooks.zapier.com', 0),
+        ('n8n', 'http://localhost:5678', 0),
+        ('SMS-it', 'https://api.sms-it.com', 0)
+    ''')
+    
     conn.commit()
     conn.close()
 
@@ -104,10 +191,200 @@ def generate_qr_code(data):
     
     return base64.b64encode(buffer.getvalue()).decode()
 
+def generate_four_digit_code():
+    """Generate unique 4-digit code for referrals"""
+    while True:
+        code = ''.join(random.choices(string.digits, k=4))
+        # Check if code already exists
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT id FROM users WHERE four_digit_code = ?', (code,))
+        if not cursor.fetchone():
+            conn.close()
+            return code
+        conn.close()
+
+def calculate_reward_points(referral_type, user_role):
+    """Calculate reward points based on referral type and user role"""
+    point_mapping = {
+        'dentist': {'referral_sent': 10, 'referral_completed': 25},
+        'specialist': {'referral_received': 5, 'referral_completed': 15},
+        'patient': {'referral_completed': 5}
+    }
+    return point_mapping.get(user_role, {}).get(referral_type, 0)
+
+def send_reward_api_request(provider, reward_data):
+    """Send reward request to third-party API providers"""
+    try:
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT api_key, api_secret, base_url FROM api_configs WHERE provider_name = ? AND is_enabled = 1', (provider,))
+        config = cursor.fetchone()
+        conn.close()
+        
+        if not config:
+            return {'status': 'error', 'message': f'{provider} API not configured'}
+        
+        api_key, api_secret, base_url = config
+        
+        # Basic implementation - would need specific API endpoints for each provider
+        headers = {
+            'Authorization': f'Bearer {api_key}',
+            'Content-Type': 'application/json'
+        }
+        
+        # This is a placeholder - actual implementation would vary by provider
+        response = requests.post(f'{base_url}/rewards', json=reward_data, headers=headers, timeout=30)
+        
+        if response.status_code == 200:
+            return {'status': 'success', 'data': response.json()}
+        else:
+            return {'status': 'error', 'message': f'API request failed: {response.status_code}'}
+            
+    except Exception as e:
+        return {'status': 'error', 'message': str(e)}
+
 @app.route('/')
 def index():
     """Home page"""
     return render_template('index.html')
+
+@app.route('/pricing')
+def pricing():
+    """Pricing page"""
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM subscription_plans WHERE is_active = 1 ORDER BY price ASC')
+    plans = cursor.fetchall()
+    conn.close()
+    return render_template('pricing.html', plans=plans)
+
+@app.route('/about')
+def about():
+    """About page"""
+    return render_template('about.html')
+
+@app.route('/contact')
+def contact():
+    """Contact page"""
+    return render_template('contact.html')
+
+@app.route('/resources')
+def resources():
+    """Resources page"""
+    return render_template('resources.html')
+
+@app.route('/referrals')
+def referrals_info():
+    """Referrals information page"""
+    return render_template('referrals_info.html')
+
+@app.route('/surgicalInstruction')
+def surgical_instruction():
+    """Surgical instruction page"""
+    return render_template('surgical_instruction.html')
+
+# Portal routes
+@app.route('/portal/dentist')
+def dentist_portal():
+    """Dentist portal"""
+    if 'user_id' not in session or session.get('user_type') != 'dentist':
+        return redirect(url_for('login'))
+    return render_template('portals/dentist.html')
+
+@app.route('/portal/specialist')
+def specialist_portal():
+    """Specialist portal"""
+    if 'user_id' not in session or session.get('user_type') != 'specialist':
+        return redirect(url_for('login'))
+    return render_template('portals/specialist.html')
+
+@app.route('/portal/patient')
+def patient_portal():
+    """Patient portal"""
+    if 'user_id' not in session or session.get('user_type') != 'patient':
+        return redirect(url_for('login'))
+    return render_template('portals/patient.html')
+
+@app.route('/admin')
+def admin_portal():
+    """Admin portal"""
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('login'))
+    return render_template('admin/dashboard.html')
+
+@app.route('/admin/dentist')
+def dentist_admin_portal():
+    """Dentist admin portal"""
+    if 'user_id' not in session or session.get('role') not in ['admin', 'dentist_admin']:
+        return redirect(url_for('login'))
+    return render_template('admin/dentist_admin.html')
+
+@app.route('/admin/specialist')
+def specialist_admin_portal():
+    """Specialist admin portal"""
+    if 'user_id' not in session or session.get('role') not in ['admin', 'specialist_admin']:
+        return redirect(url_for('login'))
+    return render_template('admin/specialist_admin.html')
+
+# Quick referral with 4-digit code
+@app.route('/quick-referral', methods=['POST'])
+def quick_referral():
+    """Quick referral using 4-digit code"""
+    if request.method == 'POST':
+        code = request.form.get('code', '').strip()
+        
+        if len(code) != 4 or not code.isdigit():
+            return jsonify({'status': 'error', 'message': 'Invalid 4-digit code'})
+        
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT id, full_name, practice_name FROM users WHERE four_digit_code = ? AND is_active = 1', (code,))
+        doctor = cursor.fetchone()
+        conn.close()
+        
+        if doctor:
+            return jsonify({
+                'status': 'success', 
+                'doctor': {
+                    'id': doctor[0],
+                    'name': doctor[1],
+                    'practice': doctor[2]
+                }
+            })
+        else:
+            return jsonify({'status': 'error', 'message': 'Doctor not found with this code'})
+
+@app.route('/rewards')
+def rewards():
+    """Rewards dashboard"""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Get user's total rewards
+    cursor.execute('''
+        SELECT SUM(points_earned) - COALESCE(SUM(points_used), 0) as total_points
+        FROM rewards 
+        WHERE user_id = ?
+    ''', (session['user_id'],))
+    total_points = cursor.fetchone()[0] or 0
+    
+    # Get recent rewards
+    cursor.execute('''
+        SELECT points_earned, points_used, reward_type, reward_description, created_at
+        FROM rewards 
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+        LIMIT 10
+    ''', (session['user_id'],))
+    recent_rewards = cursor.fetchall()
+    
+    conn.close()
+    
+    return render_template('rewards.html', total_points=total_points, recent_rewards=recent_rewards)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -118,7 +395,10 @@ def login():
         
         conn = sqlite3.connect('sapyyn.db')
         cursor = conn.cursor()
-        cursor.execute('SELECT id, username, password_hash, full_name, role FROM users WHERE username = ?', (username,))
+        cursor.execute('''
+            SELECT id, username, password_hash, full_name, role, user_type, four_digit_code 
+            FROM users WHERE username = ? AND is_active = 1
+        ''', (username,))
         user = cursor.fetchone()
         conn.close()
         
@@ -127,8 +407,19 @@ def login():
             session['username'] = user[1]
             session['full_name'] = user[3]
             session['role'] = user[4]
+            session['user_type'] = user[5]
+            session['four_digit_code'] = user[6]
             flash('Login successful!', 'success')
-            return redirect(url_for('dashboard'))
+            
+            # Redirect to appropriate portal based on user type
+            if user[5] == 'dentist':
+                return redirect(url_for('dentist_portal'))
+            elif user[5] == 'specialist':
+                return redirect(url_for('specialist_portal'))
+            elif user[4] == 'admin':
+                return redirect(url_for('admin_portal'))
+            else:
+                return redirect(url_for('dashboard'))
         else:
             flash('Invalid username or password', 'error')
     
@@ -142,21 +433,30 @@ def register():
         email = request.form['email']
         password = request.form['password']
         full_name = request.form['full_name']
-        role = request.form.get('role', 'patient')
+        user_type = request.form.get('user_type', 'patient')
+        practice_name = request.form.get('practice_name', '')
+        license_number = request.form.get('license_number', '')
+        specialty = request.form.get('specialty', '')
+        phone = request.form.get('phone', '')
         
         password_hash = generate_password_hash(password)
+        four_digit_code = generate_four_digit_code() if user_type in ['dentist', 'specialist'] else None
         
         try:
             conn = sqlite3.connect('sapyyn.db')
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO users (username, email, password_hash, full_name, role)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (username, email, password_hash, full_name, role))
+                INSERT INTO users (username, email, password_hash, full_name, role, user_type, 
+                                 practice_name, license_number, specialty, phone, four_digit_code)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (username, email, password_hash, full_name, user_type, user_type,
+                  practice_name, license_number, specialty, phone, four_digit_code))
             conn.commit()
             conn.close()
             
             flash('Registration successful! Please login.', 'success')
+            if four_digit_code:
+                flash(f'Your 4-digit referral code is: {four_digit_code}', 'info')
             return redirect(url_for('login'))
         except sqlite3.IntegrityError:
             flash('Username or email already exists', 'error')
@@ -337,6 +637,161 @@ def api_stats():
         'status_counts': status_counts,
         'document_counts': document_counts
     })
+
+@app.route('/api/redeem-reward', methods=['POST'])
+def redeem_reward():
+    """API endpoint for reward redemption"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    data = request.get_json()
+    provider = data.get('provider')
+    reward_type = data.get('reward_type')
+    points = data.get('points', 0)
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Check if user has enough points
+    cursor.execute('''
+        SELECT SUM(points_earned) - COALESCE(SUM(points_used), 0) as available_points
+        FROM rewards 
+        WHERE user_id = ?
+    ''', (session['user_id'],))
+    available_points = cursor.fetchone()[0] or 0
+    
+    if available_points < points:
+        conn.close()
+        return jsonify({'status': 'error', 'message': 'Insufficient points'})
+    
+    # Process reward redemption
+    try:
+        # Call external API
+        reward_data = {
+            'user_id': session['user_id'],
+            'reward_type': reward_type,
+            'points': points,
+            'user_email': session.get('email', '')
+        }
+        
+        api_response = send_reward_api_request(provider, reward_data)
+        
+        if api_response['status'] == 'success':
+            # Record the redemption
+            cursor.execute('''
+                INSERT INTO rewards (user_id, points_used, reward_type, reward_description, api_provider, status)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (session['user_id'], points, reward_type, f'{reward_type} via {provider}', provider, 'completed'))
+            conn.commit()
+            
+            result = {'status': 'success', 'message': 'Reward redeemed successfully'}
+        else:
+            result = {'status': 'error', 'message': api_response['message']}
+            
+    except Exception as e:
+        result = {'status': 'error', 'message': str(e)}
+    
+    conn.close()
+    return jsonify(result)
+
+@app.route('/admin/api-config', methods=['GET', 'POST'])
+def admin_api_config():
+    """Admin page for API configuration"""
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        provider = request.form['provider']
+        api_key = request.form['api_key']
+        api_secret = request.form.get('api_secret', '')
+        base_url = request.form['base_url']
+        is_enabled = request.form.get('is_enabled') == 'on'
+        
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        cursor.execute('''
+            UPDATE api_configs 
+            SET api_key = ?, api_secret = ?, base_url = ?, is_enabled = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE provider_name = ?
+        ''', (api_key, api_secret, base_url, is_enabled, provider))
+        conn.commit()
+        conn.close()
+        
+        flash(f'{provider} API configuration updated successfully!', 'success')
+        return redirect(url_for('admin_api_config'))
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM api_configs ORDER BY provider_name')
+    api_configs = cursor.fetchall()
+    conn.close()
+    
+    return render_template('admin/api_config.html', api_configs=api_configs)
+
+@app.route('/admin/users')
+def admin_users():
+    """Admin page for user management"""
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('login'))
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT id, username, email, full_name, user_type, practice_name, four_digit_code, 
+               subscription_plan, is_active, created_at
+        FROM users 
+        ORDER BY created_at DESC
+    ''')
+    users = cursor.fetchall()
+    conn.close()
+    
+    return render_template('admin/users.html', users=users)
+
+@app.route('/admin/analytics')
+def admin_analytics():
+    """Admin analytics dashboard"""
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('login'))
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Get analytics data
+    cursor.execute('SELECT COUNT(*) FROM users WHERE is_active = 1')
+    total_users = cursor.fetchone()[0]
+    
+    cursor.execute('SELECT COUNT(*) FROM referrals')
+    total_referrals = cursor.fetchone()[0]
+    
+    cursor.execute('SELECT COUNT(*) FROM documents')
+    total_documents = cursor.fetchone()[0]
+    
+    cursor.execute('''
+        SELECT user_type, COUNT(*) 
+        FROM users 
+        WHERE is_active = 1 
+        GROUP BY user_type
+    ''')
+    users_by_type = dict(cursor.fetchall())
+    
+    cursor.execute('''
+        SELECT status, COUNT(*) 
+        FROM referrals 
+        GROUP BY status
+    ''')
+    referrals_by_status = dict(cursor.fetchall())
+    
+    conn.close()
+    
+    analytics_data = {
+        'total_users': total_users,
+        'total_referrals': total_referrals,
+        'total_documents': total_documents,
+        'users_by_type': users_by_type,
+        'referrals_by_status': referrals_by_status
+    }
+    
+    return render_template('admin/analytics.html', data=analytics_data)
 
 if __name__ == '__main__':
     init_db()

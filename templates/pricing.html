@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Pricing - Sapyyn{% endblock %}
+
+{% block content %}
+<!-- Pricing Hero Section -->
+<div class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="bi bi-tags me-3"></i>
+                    Choose Your Plan
+                </h1>
+                <p class="lead mb-4">
+                    Select the perfect plan for your practice. All plans include core referral features.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pricing Plans -->
+<div class="py-5">
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            {% for plan in plans %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0 {% if plan[1] == 'pro' %}border-primary{% endif %}">
+                    {% if plan[1] == 'pro' %}
+                    <div class="card-header bg-primary text-white text-center">
+                        <small class="fw-bold">MOST POPULAR</small>
+                    </div>
+                    {% endif %}
+                    <div class="card-body text-center p-4">
+                        <h3 class="fw-bold">{{ plan[1] }}</h3>
+                        <div class="mb-3">
+                            <span class="h2 fw-bold text-primary">${{ "%.2f"|format(plan[3]) }}</span>
+                            <span class="text-muted">/ {{ plan[4] }}</span>
+                        </div>
+                        <p class="text-muted mb-4">{{ plan[5] }}</p>
+                        
+                        <ul class="list-unstyled text-start mb-4">
+                            {% set features = plan[5].split(', ') %}
+                            {% for feature in features %}
+                            <li class="mb-2">
+                                <i class="bi bi-check2 text-success me-2"></i>
+                                {{ feature }}
+                            </li>
+                            {% endfor %}
+                            {% if plan[6] == -1 %}
+                            <li class="mb-2">
+                                <i class="bi bi-check2 text-success me-2"></i>
+                                Unlimited referrals
+                            </li>
+                            {% else %}
+                            <li class="mb-2">
+                                <i class="bi bi-check2 text-success me-2"></i>
+                                Up to {{ plan[6] }} referrals per month
+                            </li>
+                            {% endif %}
+                        </ul>
+                        
+                        {% if plan[3] == 0 %}
+                        <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg w-100">
+                            Get Started Free
+                        </a>
+                        {% else %}
+                        <button class="btn btn-primary btn-lg w-100" onclick="selectPlan('{{ plan[1] }}')">
+                            Choose {{ plan[1] }}
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Features Comparison -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="fw-bold">Feature Comparison</h2>
+                <p class="lead text-muted">Compare features across all plans</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="table-responsive">
+                    <table class="table table-striped bg-white">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th scope="col">Feature</th>
+                                <th scope="col" class="text-center">Free</th>
+                                <th scope="col" class="text-center">Professional</th>
+                                <th scope="col" class="text-center">Enterprise</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Monthly Referrals</td>
+                                <td class="text-center">5</td>
+                                <td class="text-center">Unlimited</td>
+                                <td class="text-center">Unlimited</td>
+                            </tr>
+                            <tr>
+                                <td>QR Code Generation</td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Document Upload</td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>4-Digit Referral Codes</td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Reward Points System</td>
+                                <td class="text-center"><i class="bi bi-x text-danger"></i></td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Analytics Dashboard</td>
+                                <td class="text-center"><i class="bi bi-x text-danger"></i></td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Priority Support</td>
+                                <td class="text-center"><i class="bi bi-x text-danger"></i></td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>API Access</td>
+                                <td class="text-center"><i class="bi bi-x text-danger"></i></td>
+                                <td class="text-center"><i class="bi bi-x text-danger"></i></td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Custom Branding</td>
+                                <td class="text-center"><i class="bi bi-x text-danger"></i></td>
+                                <td class="text-center"><i class="bi bi-x text-danger"></i></td>
+                                <td class="text-center"><i class="bi bi-check text-success"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ Section -->
+<div class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="fw-bold">Frequently Asked Questions</h2>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="accordion" id="pricingFAQ">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq1">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                Can I upgrade or downgrade my plan?
+                            </button>
+                        </h2>
+                        <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                Is there a free trial available?
+                            </button>
+                        </h2>
+                        <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                Our Free plan allows you to try core features with up to 5 referrals per month. Professional and Enterprise plans come with a 14-day free trial.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                What payment methods do you accept?
+                            </button>
+                        </h2>
+                        <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                            <div class="accordion-body">
+                                We accept all major credit cards, PayPal, and ACH transfers for Enterprise customers.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-3">Ready to Get Started?</h2>
+        <p class="lead mb-4">Join thousands of healthcare professionals using Sapyyn</p>
+        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-2">
+            <i class="bi bi-person-plus"></i> Start Free Trial
+        </a>
+        <a href="{{ url_for('contact') }}" class="btn btn-outline-light btn-lg">
+            <i class="bi bi-envelope"></i> Contact Sales
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function selectPlan(planName) {
+    // Redirect to registration with plan parameter
+    window.location.href = "{{ url_for('register') }}?plan=" + planName;
+}
+</script>
+{% endblock %}

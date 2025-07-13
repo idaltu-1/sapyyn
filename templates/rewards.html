@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+
+{% block title %}Rewards - Sapyyn{% endblock %}
+
+{% block content %}
+<!-- Rewards Hero Section -->
+<div class="bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container py-5 text-white">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="bi bi-trophy me-3"></i>
+                    Sapyyn Rewards
+                </h1>
+                <p class="lead mb-4">
+                    Earn points for every referral and redeem them for amazing rewards. The more you refer, the more you earn!
+                </p>
+            </div>
+            <div class="col-lg-4 text-center">
+                <div class="card bg-white text-dark shadow-lg border-0">
+                    <div class="card-body p-4">
+                        <h3 class="fw-bold text-primary">{{ total_points }}</h3>
+                        <p class="text-muted mb-0">Available Points</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Points Balance & Actions -->
+<div class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="bi bi-clock-history me-2"></i>
+                            Recent Activity
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% if recent_rewards %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                        <th>Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for reward in recent_rewards %}
+                                    <tr>
+                                        <td>{{ reward[4].split(' ')[0] }}</td>
+                                        <td>
+                                            {% if reward[0] > 0 %}
+                                                <span class="badge bg-success">Earned</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Redeemed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ reward[3] or 'Referral reward' }}</td>
+                                        <td>
+                                            {% if reward[0] > 0 %}
+                                                <span class="text-success">+{{ reward[0] }}</span>
+                                            {% else %}
+                                                <span class="text-warning">-{{ reward[1] }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-inbox display-4 text-muted"></i>
+                            <h5 class="mt-3 text-muted">No reward activity yet</h5>
+                            <p class="text-muted">Start referring patients to earn your first points!</p>
+                            <a href="{{ url_for('new_referral') }}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Create Referral
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- How to Earn Points -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            How to Earn Points
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-arrow-right text-success"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Send Referral</strong><br>
+                                        <small class="text-muted">Earn 10 points</small>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-check-circle text-success"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Completed Referral</strong><br>
+                                        <small class="text-muted">Earn 25 points</small>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-arrow-left text-success"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Receive Referral</strong><br>
+                                        <small class="text-muted">Earn 5 points</small>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-graph-up me-2"></i>
+                            Your Stats
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6 border-end">
+                                <h4 class="text-primary mb-0">{{ session.get('referral_count', 0) }}</h4>
+                                <small class="text-muted">Referrals Sent</small>
+                            </div>
+                            <div class="col-6">
+                                <h4 class="text-success mb-0">{{ total_points }}</h4>
+                                <small class="text-muted">Total Points</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Redeem Rewards Section -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="fw-bold">Redeem Your Points</h2>
+                <p class="lead text-muted">Choose from a variety of reward options</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-gift text-warning fs-1"></i>
+                        </div>
+                        <h5 class="fw-bold">Gift Cards</h5>
+                        <p class="text-muted mb-3">Amazon, Target, Starbucks and more</p>
+                        <div class="mb-3">
+                            <span class="h6 text-primary">Starting at 500 points</span>
+                        </div>
+                        <button class="btn btn-outline-primary" onclick="redeemReward('tango', 'gift_card')">
+                            Redeem with Tango
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-cash text-success fs-1"></i>
+                        </div>
+                        <h5 class="fw-bold">Cash Rewards</h5>
+                        <p class="text-muted mb-3">Direct cash payments</p>
+                        <div class="mb-3">
+                            <span class="h6 text-primary">Starting at 1000 points</span>
+                        </div>
+                        <button class="btn btn-outline-success" onclick="redeemReward('tremendous', 'cash')">
+                            Redeem with Tremendous
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-mortarboard text-info fs-1"></i>
+                        </div>
+                        <h5 class="fw-bold">Continuing Education</h5>
+                        <p class="text-muted mb-3">CE credits and courses</p>
+                        <div class="mb-3">
+                            <span class="h6 text-primary">Starting at 750 points</span>
+                        </div>
+                        <button class="btn btn-outline-info" onclick="redeemReward('zapier', 'education')">
+                            Learn More
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-danger bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-heart text-danger fs-1"></i>
+                        </div>
+                        <h5 class="fw-bold">Charity Donations</h5>
+                        <p class="text-muted mb-3">Donate to healthcare charities</p>
+                        <div class="mb-3">
+                            <span class="h6 text-primary">Starting at 250 points</span>
+                        </div>
+                        <button class="btn btn-outline-danger" onclick="redeemReward('n8n', 'charity')">
+                            Donate Points
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- API Integration Status -->
+{% if session.get('role') == 'admin' %}
+<div class="py-5">
+    <div class="container">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-gear me-2"></i>
+                    API Integration Status
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-2 text-center">
+                        <i class="bi bi-circle-fill text-success"></i>
+                        <small class="d-block">Tango</small>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <i class="bi bi-circle-fill text-success"></i>
+                        <small class="d-block">Tremendous</small>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <i class="bi bi-circle-fill text-warning"></i>
+                        <small class="d-block">Zapier</small>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <i class="bi bi-circle-fill text-warning"></i>
+                        <small class="d-block">n8n</small>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <i class="bi bi-circle-fill text-danger"></i>
+                        <small class="d-block">SMS-it</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function redeemReward(provider, rewardType) {
+    if ({{ total_points }} < 250) {
+        alert('You need more points to redeem rewards. Keep referring patients!');
+        return;
+    }
+    
+    if (confirm(`Redeem points for ${rewardType} via ${provider}?`)) {
+        fetch('/api/redeem-reward', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                provider: provider,
+                reward_type: rewardType,
+                points: 500  // This would be calculated based on reward type
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Reward redeemed successfully!');
+                location.reload();
+            } else {
+                alert('Error redeeming reward: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Error occurred. Please try again.');
+        });
+    }
+}
+</script>
+{% endblock %}

@@ -8,18 +8,17 @@
             <div class="col-lg-6">
                 <h1 class="display-4 fw-bold mb-4">
                     <i class="bi bi-hospital me-3"></i>
-                    Sapyyn Patient Referral System
+                    Achieve the Smile You've Always Dreamed Of
                 </h1>
                 <p class="lead mb-4">
-                    Streamline patient referrals with secure document management, 
-                    QR code tracking, and HIPAA-compliant data handling.
+                    Our site brings together skilled dental specialists committed to helping you restore and enhance your patients smile. Feel confident in communication chain between dentist, patient and dental specialist.
                 </p>
                 <div class="d-grid d-md-flex gap-2">
                     {% if not session.user_id %}
-                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">
-                        <i class="bi bi-person-plus"></i> Get Started
+                    <a href="https://portal.sapyyn.com/signup" target="_blank" class="btn btn-warning btn-lg">
+                        <i class="bi bi-person-plus"></i> Create an Account
                     </a>
-                    <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                    <a href="https://portal.sapyyn.com/login" target="_blank" class="btn btn-outline-light btn-lg">
                         <i class="bi bi-box-arrow-in-right"></i> Login
                     </a>
                     {% else %}
@@ -39,76 +38,104 @@
     </div>
 </div>
 
+<!-- Quick Referral Section -->
+<div class="py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-5">
+                        <h2 class="fw-bold text-primary mb-3">Quick Referral</h2>
+                        <p class="text-muted mb-4">Enter your 4-digit Dentist Code for quick referral</p>
+                        
+                        <form id="quickReferralForm" onsubmit="handleQuickReferral(event)">
+                            <div class="row g-2 mb-3">
+                                <div class="col">
+                                    <input type="text" class="form-control form-control-lg text-center fw-bold" 
+                                           maxlength="1" id="code1" oninput="moveToNext(this, 'code2')" 
+                                           style="font-size: 2rem; height: 70px;">
+                                </div>
+                                <div class="col">
+                                    <input type="text" class="form-control form-control-lg text-center fw-bold" 
+                                           maxlength="1" id="code2" oninput="moveToNext(this, 'code3')" 
+                                           style="font-size: 2rem; height: 70px;">
+                                </div>
+                                <div class="col">
+                                    <input type="text" class="form-control form-control-lg text-center fw-bold" 
+                                           maxlength="1" id="code3" oninput="moveToNext(this, 'code4')" 
+                                           style="font-size: 2rem; height: 70px;">
+                                </div>
+                                <div class="col">
+                                    <input type="text" class="form-control form-control-lg text-center fw-bold" 
+                                           maxlength="1" id="code4" oninput="moveToNext(this, null)" 
+                                           style="font-size: 2rem; height: 70px;">
+                                </div>
+                            </div>
+                            <p class="text-muted mb-3">Enter your Dentist Code</p>
+                            <button type="submit" class="btn btn-danger btn-lg w-100">
+                                <i class="bi bi-arrow-right-circle"></i> Refer
+                            </button>
+                        </form>
+                        
+                        <div id="referralResult" class="mt-3" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 text-center">
+                <img src="/static/images/referral-illustration.png" alt="Referral" class="img-fluid" style="max-height: 400px;">
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Features Section -->
 <div class="py-5">
     <div class="container">
-        <div class="row text-center mb-5">
-            <div class="col">
-                <h2 class="fw-bold">Comprehensive Patient Referral Management</h2>
-                <p class="lead text-muted">Everything you need to manage patient referrals efficiently and securely</p>
-            </div>
-        </div>
-        
         <div class="row g-4">
-            <div class="col-md-4">
+            <div class="col-lg-3 col-md-6 text-center">
                 <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body text-center p-4">
+                    <div class="card-body p-4">
                         <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                            <i class="bi bi-files text-primary fs-1"></i>
+                            <i class="bi bi-qr-code text-primary fs-1"></i>
                         </div>
-                        <h4 class="fw-bold">Document Management</h4>
-                        <p class="text-muted">
-                            Securely upload and organize medical reports, insurance documents, 
-                            qualification certificates, and supporting files.
-                        </p>
-                        <ul class="list-unstyled text-start">
-                            <li><i class="bi bi-check2 text-success"></i> Medical Reports</li>
-                            <li><i class="bi bi-check2 text-success"></i> Insurance Documents</li>
-                            <li><i class="bi bi-check2 text-success"></i> Experience Certificates</li>
-                            <li><i class="bi bi-check2 text-success"></i> Supporting Documents</li>
-                        </ul>
+                        <h4 class="fw-bold">Instant Patient Referral via QR Code</h4>
+                        <p class="text-muted">Simply scan the QR code to refer your patients to our practice. It's quick, convenient, and secure, ensuring your patients receive the care they need without any hassle.</p>
                     </div>
                 </div>
             </div>
             
-            <div class="col-md-4">
+            <div class="col-lg-3 col-md-6 text-center">
                 <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body text-center p-4">
+                    <div class="card-body p-4">
                         <div class="bg-success bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                            <i class="bi bi-qr-code text-success fs-1"></i>
+                            <i class="bi bi-chat-text text-success fs-1"></i>
                         </div>
-                        <h4 class="fw-bold">QR Code Tracking</h4>
-                        <p class="text-muted">
-                            Generate unique QR codes for each referral to enable quick access 
-                            and tracking throughout the referral process.
-                        </p>
-                        <ul class="list-unstyled text-start">
-                            <li><i class="bi bi-check2 text-success"></i> Instant Generation</li>
-                            <li><i class="bi bi-check2 text-success"></i> Mobile Scanning</li>
-                            <li><i class="bi bi-check2 text-success"></i> Status Tracking</li>
-                            <li><i class="bi bi-check2 text-success"></i> Quick Access</li>
-                        </ul>
+                        <h4 class="fw-bold">Refer Patients with a Simple Text Message</h4>
+                        <p class="text-muted">Just text us your patient's details using our dedicated referral number, and we'll take care of the rest. It's a fast and efficient way to ensure your patients get the specialized care they need.</p>
                     </div>
                 </div>
             </div>
             
-            <div class="col-md-4">
+            <div class="col-lg-3 col-md-6 text-center">
                 <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body text-center p-4">
+                    <div class="card-body p-4">
                         <div class="bg-warning bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                            <i class="bi bi-shield-check text-warning fs-1"></i>
+                            <i class="bi bi-people text-warning fs-1"></i>
                         </div>
-                        <h4 class="fw-bold">HIPAA Compliance</h4>
-                        <p class="text-muted">
-                            Built with security in mind, ensuring all patient data is handled 
-                            according to HIPAA requirements and best practices.
-                        </p>
-                        <ul class="list-unstyled text-start">
-                            <li><i class="bi bi-check2 text-success"></i> Encrypted Storage</li>
-                            <li><i class="bi bi-check2 text-success"></i> Access Controls</li>
-                            <li><i class="bi bi-check2 text-success"></i> Audit Trails</li>
-                            <li><i class="bi bi-check2 text-success"></i> Secure Transmission</li>
-                        </ul>
+                        <h4 class="fw-bold">Connect with Fellow Providers</h4>
+                        <p class="text-muted">Join our network to discuss cases, share insights, and collaborate with other dental professionals. Our platform makes it easy to connect and chat with peers, enhancing patient outcomes through teamwork.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 text-center">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-file-earmark-medical text-info fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold">Send Patient Documents Securely</h4>
+                        <p class="text-muted">Upload and share patient records directly through our secure platform. Our system ensures that all documents are transferred safely and in compliance with HIPAA regulations, giving you peace of mind.</p>
                     </div>
                 </div>
             </div>
@@ -124,35 +151,35 @@
                 <div class="card border-0 bg-transparent">
                     <div class="card-body">
                         <i class="bi bi-people-fill text-primary fs-1 mb-2"></i>
-                        <h3 class="fw-bold text-primary">1000+</h3>
-                        <p class="text-muted">Active Users</p>
+                        <h3 class="fw-bold text-primary">500+</h3>
+                        <p class="text-muted">Doctors</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="card border-0 bg-transparent">
                     <div class="card-body">
-                        <i class="bi bi-clipboard2-pulse-fill text-success fs-1 mb-2"></i>
-                        <h3 class="fw-bold text-success">5000+</h3>
-                        <p class="text-muted">Referrals Processed</p>
+                        <i class="bi bi-award-fill text-success fs-1 mb-2"></i>
+                        <h3 class="fw-bold text-success">9</h3>
+                        <p class="text-muted">Awards</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="card border-0 bg-transparent">
                     <div class="card-body">
-                        <i class="bi bi-files text-warning fs-1 mb-2"></i>
-                        <h3 class="fw-bold text-warning">25000+</h3>
-                        <p class="text-muted">Documents Managed</p>
+                        <i class="bi bi-building text-warning fs-1 mb-2"></i>
+                        <h3 class="fw-bold text-warning">720</h3>
+                        <p class="text-muted">Clinic</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="card border-0 bg-transparent">
                     <div class="card-body">
-                        <i class="bi bi-hospital text-info fs-1 mb-2"></i>
-                        <h3 class="fw-bold text-info">100+</h3>
-                        <p class="text-muted">Healthcare Partners</p>
+                        <i class="bi bi-heart-pulse text-info fs-1 mb-2"></i>
+                        <h3 class="fw-bold text-info">14500</h3>
+                        <p class="text-muted">Patient</p>
                     </div>
                 </div>
             </div>
@@ -160,44 +187,98 @@
     </div>
 </div>
 
-<!-- How It Works Section -->
+<!-- Gallery Section -->
 <div class="py-5">
     <div class="container">
         <div class="row text-center mb-5">
             <div class="col">
-                <h2 class="fw-bold">How It Works</h2>
-                <p class="lead text-muted">Simple steps to manage your patient referrals</p>
+                <h2 class="fw-bold">Gallery</h2>
             </div>
         </div>
-        
         <div class="row g-4">
-            <div class="col-md-3 text-center">
-                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                    <span class="fs-2 fw-bold text-primary">1</span>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <img src="/static/images/gallery1.jpg" class="card-img-top" alt="Gallery Image 1">
+                    <div class="card-body">
+                        <button class="btn btn-primary btn-sm">
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-                <h5 class="fw-bold">Create Account</h5>
-                <p class="text-muted">Register as a healthcare provider or patient to get started</p>
             </div>
-            <div class="col-md-3 text-center">
-                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                    <span class="fs-2 fw-bold text-primary">2</span>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <img src="/static/images/gallery2.jpg" class="card-img-top" alt="Gallery Image 2">
+                    <div class="card-body">
+                        <button class="btn btn-primary btn-sm">
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-                <h5 class="fw-bold">Upload Documents</h5>
-                <p class="text-muted">Securely upload medical reports, insurance, and supporting documents</p>
             </div>
-            <div class="col-md-3 text-center">
-                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                    <span class="fs-2 fw-bold text-primary">3</span>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <img src="/static/images/gallery3.jpg" class="card-img-top" alt="Gallery Image 3">
+                    <div class="card-body">
+                        <button class="btn btn-primary btn-sm">
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-                <h5 class="fw-bold">Create Referral</h5>
-                <p class="text-muted">Generate referrals with QR codes for easy tracking and access</p>
             </div>
-            <div class="col-md-3 text-center">
-                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                    <span class="fs-2 fw-bold text-primary">4</span>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <img src="/static/images/gallery4.jpg" class="card-img-top" alt="Gallery Image 4">
+                    <div class="card-body">
+                        <button class="btn btn-primary btn-sm">
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-                <h5 class="fw-bold">Track Progress</h5>
-                <p class="text-muted">Monitor referral status and manage communication efficiently</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Newsletter Subscription -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-5 text-center">
+                        <h3 class="fw-bold mb-4">Stay Updated</h3>
+                        <form id="subscriptionForm" onsubmit="handleSubscription(event)">
+                            <div class="row g-2 mb-3">
+                                <div class="col-12 mb-3">
+                                    <p class="mb-3">I am a</p>
+                                    <div class="btn-group" role="group">
+                                        <input type="radio" class="btn-check" name="userType" id="dentist" value="dentist" required>
+                                        <label class="btn btn-outline-primary" for="dentist">Dentist</label>
+                                        
+                                        <input type="radio" class="btn-check" name="userType" id="specialist" value="specialist" required>
+                                        <label class="btn btn-outline-primary" for="specialist">Specialist</label>
+                                        
+                                        <input type="radio" class="btn-check" name="userType" id="patient" value="patient" required>
+                                        <label class="btn btn-outline-primary" for="patient">Patient</label>
+                                        
+                                        <input type="radio" class="btn-check" name="userType" id="other" value="other" required>
+                                        <label class="btn btn-outline-primary" for="other">Other</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5">
+                                    <input type="text" class="form-control" placeholder="Name" name="name" required>
+                                </div>
+                                <div class="col-lg-4">
+                                    <input type="email" class="form-control" placeholder="Email ID" name="email" required>
+                                </div>
+                                <div class="col-lg-3">
+                                    <button type="submit" class="btn btn-primary w-100">Subscribe Now</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -212,8 +293,8 @@
         <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-2">
             <i class="bi bi-person-plus"></i> Sign Up Now
         </a>
-        <a href="#" class="btn btn-outline-light btn-lg">
-            <i class="bi bi-info-circle"></i> Learn More
+        <a href="{{ url_for('pricing') }}" class="btn btn-outline-light btn-lg">
+            <i class="bi bi-info-circle"></i> View Pricing
         </a>
         {% else %}
         <a href="{{ url_for('new_referral') }}" class="btn btn-light btn-lg">
@@ -222,4 +303,65 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function moveToNext(current, nextId) {
+    if (current.value.length === 1 && nextId) {
+        document.getElementById(nextId).focus();
+    }
+}
+
+function handleQuickReferral(event) {
+    event.preventDefault();
+    
+    const code = document.getElementById('code1').value + 
+                 document.getElementById('code2').value + 
+                 document.getElementById('code3').value + 
+                 document.getElementById('code4').value;
+    
+    if (code.length !== 4) {
+        showResult('Please enter all 4 digits', 'danger');
+        return;
+    }
+    
+    fetch('{{ url_for("quick_referral") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'code=' + code
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showResult(`Doctor found: ${data.doctor.name} at ${data.doctor.practice}`, 'success');
+        } else {
+            showResult(data.message, 'danger');
+        }
+    })
+    .catch(error => {
+        showResult('Error occurred. Please try again.', 'danger');
+    });
+}
+
+function showResult(message, type) {
+    const resultDiv = document.getElementById('referralResult');
+    resultDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+    resultDiv.style.display = 'block';
+}
+
+function handleSubscription(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    
+    // Here you would typically send to a subscription endpoint
+    alert('Thank you for subscribing! We will keep you updated.');
+    
+    // Reset form
+    event.target.reset();
+}
+</script>
 {% endblock %}
