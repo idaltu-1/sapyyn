@@ -40,11 +40,11 @@
 </div>
 
 <!-- Quick Referral Section -->
-<div class="bg-light py-5">
+<div class="bg-light py-5 quick-referral-section">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 quick-referral-card">
                     <div class="card-body p-5 text-center">
                         <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-4">
                             <i class="bi bi-lightning-charge-fill text-primary fs-1"></i>
@@ -247,6 +247,114 @@
     </div>
 </div>
 
+<!-- Pricing Preview Section -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="fw-bold">Simple, Transparent Pricing</h2>
+                <p class="lead text-muted">Choose the perfect plan for your practice with our 14-day free trial</p>
+            </div>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            <!-- Starter Plan -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-white text-center border-0 py-4">
+                        <h4 class="fw-bold">Starter</h4>
+                        <div class="pricing-amount">
+                            <span class="currency">$</span>
+                            <span class="amount">49.99</span>
+                            <span class="period">/month</span>
+                        </div>
+                        <p class="text-muted small">Perfect for individual practitioners</p>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Up to 50 referrals/month</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>6-digit provider code</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>QR code generation</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>5 GB storage</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Email support</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-transparent text-center border-0 pb-4">
+                        <a href="{{ url_for('subscribe', plan_name='starter') }}" class="btn btn-outline-primary w-100">Get Started</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professional Plan (Most Popular) -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-lg border-primary position-relative">
+                    <div class="badge bg-primary position-absolute top-0 start-50 translate-middle">Most Popular</div>
+                    <div class="card-header bg-primary text-white text-center border-0 py-4">
+                        <h4 class="fw-bold">Professional</h4>
+                        <div class="pricing-amount">
+                            <span class="currency">$</span>
+                            <span class="amount">99.99</span>
+                            <span class="period">/month</span>
+                        </div>
+                        <p class="opacity-75 small">For growing practices</p>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Up to 200 referrals/month</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Multiple provider codes</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Advanced analytics</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>25 GB storage</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Priority support</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-transparent text-center border-0 pb-4">
+                        <a href="{{ url_for('subscribe', plan_name='professional') }}" class="btn btn-primary w-100">Start Free Trial</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enterprise Plan -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-dark text-white text-center border-0 py-4">
+                        <h4 class="fw-bold">Enterprise</h4>
+                        <div class="pricing-amount">
+                            <span class="currency">$</span>
+                            <span class="amount">499</span>
+                            <span class="period">/month</span>
+                        </div>
+                        <p class="opacity-75 small">For large practices & hospitals</p>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Unlimited referrals</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Custom integrations</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Dedicated support</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>100 GB storage</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>24/7 phone support</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-transparent text-center border-0 pb-4">
+                        <a href="{{ url_for('subscribe', plan_name='enterprise') }}" class="btn btn-dark w-100">Contact Sales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col text-center">
+                <p class="text-muted mb-3">
+                    <i class="bi bi-gift me-2"></i>
+                    <strong>14-Day Free Trial</strong> - No credit card required. Cancel anytime.
+                </p>
+                <a href="{{ url_for('pricing') }}" class="btn btn-outline-primary">
+                    View Complete Pricing Details
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- CTA Section -->
 <div class="bg-primary text-white py-5">
     <div class="container text-center">
@@ -326,4 +434,44 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<style>
+/* Pricing Section Styles */
+.pricing-amount {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: inherit;
+}
+
+.pricing-amount .currency {
+    font-size: 1.2rem;
+    vertical-align: top;
+}
+
+.pricing-amount .period {
+    font-size: 1rem;
+    color: #6c757d;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.badge.bg-primary {
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+}
+
+/* Quick Referral Section Styles */
+.quick-referral-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 100%);
+}
+
+.quick-referral-card {
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+</style>
 {% endblock %}
