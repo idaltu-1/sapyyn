@@ -12,6 +12,16 @@ A comprehensive web-based patient referral management system built with Flask, f
 - **Dashboard Analytics** - Real-time statistics and referral status tracking
 - **Responsive Design** - Mobile-friendly interface using Bootstrap 5
 
+### 🏆 Referral Rewards System
+- **Comprehensive Reward Programs** - Customizable reward programs with tiered structures
+- **HIPAA & Stark Law Compliant** - Full regulatory compliance for healthcare environments
+- **Gamification Features** - Achievements, leaderboards, and progress tracking
+- **Automated Reward Processing** - Intelligent trigger system for reward allocation
+- **Compliance Audit Trail** - Complete logging for regulatory requirements
+- **Flexible Fulfillment Options** - Manual, automatic, and external system integration
+- **Advanced Analytics** - Performance metrics and reward program insights
+- **Role-Based Administration** - Granular control for program management
+
 ### Document Categories Supported
 - Medical Reports
 - Insurance Documents
@@ -59,18 +69,23 @@ A comprehensive web-based patient referral management system built with Flask, f
    pip install -r requirements.txt
    ```
 
-3. **Initialize the database**
+3. **Initialize the database and demo users**
    ```bash
    python3 create_demo_users.py
    ```
 
-4. **Run the application**
+4. **Initialize the rewards system**
+   ```bash
+   python3 init_rewards_sample_data.py
+   ```
+
+5. **Run the application**
    ```bash
    python3 app.py
    ```
 
-5. **Access the application**
-   - Open your browser and navigate to `http://localhost:5000`
+6. **Access the application**
+   - Open your browser and navigate to `http://localhost:5001`
    - Use demo credentials or register a new account
 
 ## 👥 Demo Accounts
@@ -344,3 +359,40 @@ For support and questions:
 ---
 
 *Built with ❤️ for healthcare professionals to streamline patient referral management.*
+
+## 🏆 Rewards System
+
+The Sapyyn platform includes a comprehensive referral rewards system designed to incentivize quality patient referrals while maintaining strict compliance with healthcare regulations.
+
+### Key Features
+
+- **HIPAA & Stark Law Compliant**: Full regulatory compliance for healthcare environments
+- **Customizable Programs**: Create and manage multiple reward programs with flexible configurations
+- **Tiered Rewards**: Progressive reward structure (Bronze, Silver, Gold, Platinum)
+- **Gamification**: Achievements, leaderboards, and progress tracking
+- **Automated Processing**: Intelligent trigger system for reward allocation
+- **Audit Trail**: Complete logging for compliance and regulatory requirements
+- **Role-Based Access**: Different interfaces for patients, doctors, and administrators
+
+### Using the Rewards System
+
+#### For Healthcare Professionals
+1. **Access Rewards Dashboard**: Navigate to "Rewards" in the main menu
+2. **View Progress**: Track your points, tier status, and achievements
+3. **Check Leaderboard**: See your ranking among peers (anonymized for privacy)
+4. **Earn Rewards**: Complete quality referrals to earn points and advance tiers
+
+#### For Administrators
+1. **Manage Programs**: Create and configure reward programs
+2. **Set Tiers**: Define reward tiers and requirements
+3. **Monitor Compliance**: Access audit trails and compliance reports
+4. **Configure Triggers**: Set up automated reward conditions
+
+### Compliance Features
+
+- **Privacy Protection**: All leaderboards anonymized to protect user privacy
+- **Audit Logging**: Comprehensive logging of all system actions
+- **Legal Framework**: Customizable terms and conditions
+- **Regulatory Adherence**: Built-in HIPAA and Stark Law compliance
+
+For detailed information, see [REWARDS_SYSTEM_DOCUMENTATION.md](REWARDS_SYSTEM_DOCUMENTATION.md).

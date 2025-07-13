@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Compliance Audit Trail - Sapyyn{% endblock %}
+
+{% block extra_head %}
+<style>
+    .audit-header {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .audit-entry {
+        border-left: 4px solid #007bff;
+        padding: 15px;
+        margin-bottom: 10px;
+        background: #f8f9fa;
+        border-radius: 0 8px 8px 0;
+    }
+    .action-badge {
+        font-size: 0.8rem;
+        padding: 4px 8px;
+        border-radius: 12px;
+    }
+    .timestamp {
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="audit-header">
+        <h1 class="h2 mb-3">
+            <i class="bi bi-shield-check"></i>
+            Compliance Audit Trail
+        </h1>
+        <p class="mb-0">Comprehensive logging for HIPAA and Stark Law compliance</p>
+    </div>
+
+    <!-- Compliance Overview -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">{{ audit_entries|length }}</h5>
+                    <p class="card-text">Total Audit Entries</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-success">{{ audit_entries|selectattr('2', 'equalto', 'CREATE')|list|length }}</h5>
+                    <p class="card-text">Creation Actions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">{{ audit_entries|selectattr('2', 'equalto', 'UPDATE')|list|length }}</h5>
+                    <p class="card-text">Modification Actions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audit Trail -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="bi bi-list-ul"></i>
+                Recent Audit Entries (Last 100)
+            </h5>
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-outline-primary" onclick="filterAudit('all')">All</button>
+                <button type="button" class="btn btn-outline-success" onclick="filterAudit('CREATE')">Creates</button>
+                <button type="button" class="btn btn-outline-warning" onclick="filterAudit('UPDATE')">Updates</button>
+                <button type="button" class="btn btn-outline-danger" onclick="filterAudit('DELETE')">Deletes</button>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if audit_entries %}
+            <div class="audit-timeline">
+                {% for entry in audit_entries %}
+                <div class="audit-entry" data-action="{{ entry[2] }}">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3">
+                                    {% if entry[2] == 'CREATE' %}
+                                    <span class="action-badge bg-success text-white">CREATE</span>
+                                    {% elif entry[2] == 'UPDATE' %}
+                                    <span class="action-badge bg-warning text-dark">UPDATE</span>
+                                    {% elif entry[2] == 'DELETE' %}
+                                    <span class="action-badge bg-danger text-white">DELETE</span>
+                                    {% else %}
+                                    <span class="action-badge bg-primary text-white">{{ entry[2] }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">
+                                        {{ entry[10] }} - {{ entry[3] }} #{{ entry[4] }}
+                                    </h6>
+                                    <p class="mb-2 text-muted">{{ entry[5] }}</p>
+                                    <small class="text-muted">
+                                        <i class="bi bi-person"></i> {{ entry[10] }}
+                                        <span class="mx-2">|</span>
+                                        <i class="bi bi-geo-alt"></i> {{ entry[6] or 'Unknown IP' }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="timestamp">{{ entry[8] }}</div>
+                            {% if entry[7] %}
+                            <small class="text-muted d-block mt-1">
+                                {{ entry[7][:50] }}{% if entry[7]|length > 50 %}...{% endif %}
+                            </small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-shield-check text-muted mb-3" style="font-size: 4rem;"></i>
+                <h4 class="text-muted">No Audit Entries</h4>
+                <p class="text-muted">Audit trail will appear here as actions are performed</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Compliance Information -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        Compliance Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>HIPAA Compliance</h6>
+                            <ul class="mb-3">
+                                <li>All actions are logged with timestamps</li>
+                                <li>User identification is maintained</li>
+                                <li>Access patterns are monitored</li>
+                                <li>Data modifications are tracked</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Stark Law Compliance</h6>
+                            <ul class="mb-3">
+                                <li>Reward program changes are audited</li>
+                                <li>Administrative actions are logged</li>
+                                <li>Financial incentives are tracked</li>
+                                <li>Approval workflows are documented</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning mb-0">
+                        <strong>Data Retention:</strong> Audit logs are retained for 6 years as required by healthcare regulations. 
+                        All entries are immutable and cryptographically signed to ensure integrity.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterAudit(action) {
+    const entries = document.querySelectorAll('.audit-entry');
+    const buttons = document.querySelectorAll('.btn-group .btn');
+    
+    // Reset button states
+    buttons.forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Set active button
+    event.target.classList.add('active');
+    
+    // Filter entries
+    entries.forEach(entry => {
+        if (action === 'all' || entry.dataset.action === action) {
+            entry.style.display = 'block';
+        } else {
+            entry.style.display = 'none';
+        }
+    });
+}
+
+// Set initial state
+document.querySelector('.btn-group .btn').classList.add('active');
+</script>
+{% endblock %}

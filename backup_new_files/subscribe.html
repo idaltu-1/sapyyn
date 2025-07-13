@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block title %}Subscribe to {{ plan[2] }} Plan{% endblock %}
+
+{% block extra_head %}
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+    .payment-form {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .plan-summary {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #007bff;
+    }
+    
+    .billing-toggle {
+        background: #e3f2fd;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-element {
+        padding: 10px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        background: white;
+        margin-bottom: 1rem;
+    }
+    
+    .card-errors {
+        color: #e74c3c;
+        margin-top: 10px;
+    }
+    
+    .btn-pay {
+        width: 100%;
+        padding: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    .loading-spinner {
+        display: none;
+        margin-left: 10px;
+    }
+    
+    .feature-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .feature-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .feature-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .feature-list li::before {
+        content: "✓";
+        color: #28a745;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="payment-form">
+        <div class="text-center mb-4">
+            <h2 class="text-primary">Subscribe to {{ plan[2] }}</h2>
+            <p class="text-muted">Complete your subscription to get started</p>
+        </div>
+
+        <div class="plan-summary">
+            <h4>{{ plan[2] }} Plan</h4>
+            <p class="mb-3">{{ plan[5] or 'Professional healthcare management solution' }}</p>
+            
+            <ul class="feature-list">
+                {% if plan[2] == 'Starter' %}
+                    <li>Basic patient management</li>
+                    <li>6-digit provider code</li>
+                    <li>Essential reporting</li>
+                    <li>Email support</li>
+                {% elif plan[2] == 'Professional' %}
+                    <li>Complete patient management</li>
+                    <li>6-digit provider code</li>
+                    <li>Advanced reporting & analytics</li>
+                    <li>Specialist referral system</li>
+                    <li>Priority support</li>
+                    <li>API access</li>
+                {% elif plan[2] == 'Enterprise' %}
+                    <li>Everything in Professional</li>
+                    <li>Multiple provider codes</li>
+                    <li>Custom integrations</li>
+                    <li>Dedicated account manager</li>
+                    <li>Advanced security features</li>
+                    <li>Custom reporting</li>
+                    <li>24/7 phone support</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <div class="billing-toggle">
+            <h5>Billing Cycle</h5>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="billing" id="monthly" value="monthly" checked>
+                <label class="form-check-label" for="monthly">
+                    Monthly - ${{ "%.2f"|format(plan[3]) }}
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="billing" id="yearly" value="yearly">
+                <label class="form-check-label" for="yearly">
+                    Yearly - ${{ "%.2f"|format(plan[4]) }} <span class="badge bg-success">Save 17%</span>
+                </label>
+            </div>
+        </div>
+
+        <form id="payment-form">
+            <div class="mb-3">
+                <label for="cardholder-name" class="form-label">Cardholder Name</label>
+                <input type="text" class="form-control" id="cardholder-name" value="{{ session.get('full_name', '') }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="card-element" class="form-label">Card Information</label>
+                <div id="card-element" class="card-element">
+                    <!-- Stripe Elements will mount here -->
+                </div>
+                <div id="card-errors" class="card-errors" role="alert"></div>
+            </div>
+            
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="terms" required>
+                <label class="form-check-label" for="terms">
+                    I agree to the <a href="#" class="text-primary">Terms of Service</a> and 
+                    <a href="#" class="text-primary">Privacy Policy</a>
+                </label>
+            </div>
+            
+            <button type="submit" id="submit-button" class="btn btn-primary btn-pay">
+                <span id="button-text">Subscribe Now</span>
+                <div class="spinner-border spinner-border-sm loading-spinner" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </button>
+            
+            <p class="text-center text-muted mt-3">
+                <small>
+                    <i class="fas fa-lock"></i> Secure payment powered by Stripe<br>
+                    You can cancel anytime from your account settings
+                </small>
+            </p>
+        </form>
+    </div>
+</div>
+
+<script>
+// Initialize Stripe
+const stripe = Stripe('{{ stripe_key }}');
+const elements = stripe.elements();
+
+// Create card element
+const cardElement = elements.create('card', {
+    style: {
+        base: {
+            fontSize: '16px',
+            color: '#424770',
+            '::placeholder': {
+                color: '#aab7c4',
+            },
+        },
+    },
+});
+
+cardElement.mount('#card-element');
+
+// Handle real-time validation errors from the card Element
+cardElement.on('change', ({error}) => {
+    const displayError = document.getElementById('card-errors');
+    if (error) {
+        displayError.textContent = error.message;
+    } else {
+        displayError.textContent = '';
+    }
+});
+
+// Handle form submission
+const form = document.getElementById('payment-form');
+const submitButton = document.getElementById('submit-button');
+const buttonText = document.getElementById('button-text');
+const loadingSpinner = document.querySelector('.loading-spinner');
+
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    
+    // Disable button and show loading
+    submitButton.disabled = true;
+    buttonText.style.display = 'none';
+    loadingSpinner.style.display = 'inline-block';
+    
+    const billingCycle = document.querySelector('input[name="billing"]:checked').value;
+    
+    try {
+        // Create payment intent
+        const response = await fetch('/create-payment-intent', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                plan_id: {{ plan[0] }},
+                billing_cycle: billingCycle
+            }),
+        });
+        
+        const {client_secret, customer_id} = await response.json();
+        
+        if (!client_secret) {
+            throw new Error('Failed to create payment intent');
+        }
+        
+        // Confirm payment with Stripe
+        const {error, paymentIntent} = await stripe.confirmCardPayment(client_secret, {
+            payment_method: {
+                card: cardElement,
+                billing_details: {
+                    name: document.getElementById('cardholder-name').value,
+                }
+            }
+        });
+        
+        if (error) {
+            throw error;
+        }
+        
+        // Payment succeeded
+        if (paymentIntent.status === 'succeeded') {
+            // Redirect to success page
+            window.location.href = '/dashboard?subscription=success';
+        }
+        
+    } catch (error) {
+        // Show error message
+        const errorElement = document.getElementById('card-errors');
+        errorElement.textContent = error.message || 'An error occurred during payment';
+        
+        // Re-enable button
+        submitButton.disabled = false;
+        buttonText.style.display = 'inline';
+        loadingSpinner.style.display = 'none';
+    }
+});
+
+// Update price display when billing cycle changes
+document.querySelectorAll('input[name="billing"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        const monthly = {{ plan[3] }};
+        const yearly = {{ plan[4] }};
+        const selectedPrice = e.target.value === 'monthly' ? monthly : yearly;
+        buttonText.textContent = `Subscribe for $${selectedPrice.toFixed(2)}`;
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block title %}Rewards Dashboard - Sapyyn{% endblock %}
+
+{% block extra_head %}
+<style>
+    .rewards-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+    .points-display {
+        font-size: 3rem;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    .achievement-badge {
+        background: #ffd700;
+        color: #333;
+        border-radius: 20px;
+        padding: 8px 15px;
+        margin: 5px;
+        display: inline-block;
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+    .reward-tier {
+        background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 10px 0;
+    }
+    .notification-badge {
+        background: #ff4757;
+        color: white;
+        border-radius: 50%;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+    .progress-ring {
+        width: 120px;
+        height: 120px;
+    }
+    .gamification-section {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h2 mb-0">
+                <i class="bi bi-trophy text-warning"></i>
+                Rewards Dashboard
+            </h1>
+            <p class="text-muted">Track your referral rewards and achievements</p>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    {% if notifications %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <h6><i class="bi bi-bell"></i> Recent Notifications</h6>
+                {% for notification in notifications %}
+                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                    <div>
+                        <strong>{{ notification[3] }}</strong><br>
+                        <small class="text-muted">{{ notification[4] }}</small>
+                    </div>
+                    <small class="text-muted">{{ notification[6] }}</small>
+                </div>
+                {% endfor %}
+                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="markNotificationsRead()">
+                    Mark All Read
+                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Stats Row -->
+    <div class="row mb-4">
+        <!-- Total Points Card -->
+        <div class="col-md-4">
+            <div class="rewards-card text-center">
+                <h5 class="mb-3">
+                    <i class="bi bi-gem"></i>
+                    Total Points
+                </h5>
+                <div class="points-display">{{ total_points|int }}</div>
+                <p class="mb-0">Lifetime Earned</p>
+            </div>
+        </div>
+
+        <!-- Achievement Progress -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-award"></i>
+                        Achievement Progress
+                    </h6>
+                </div>
+                <div class="card-body text-center">
+                    <div class="progress-ring mx-auto mb-3">
+                        <svg width="120" height="120">
+                            <circle cx="60" cy="60" r="50" stroke="#e9ecef" stroke-width="8" fill="none"/>
+                            <circle cx="60" cy="60" r="50" stroke="#28a745" stroke-width="8" fill="none"
+                                    stroke-dasharray="314" stroke-dashoffset="157"/>
+                        </svg>
+                        <div class="position-absolute top-50 start-50 translate-middle">
+                            <span class="h4">{{ achievements|selectattr('5')|list|length }}/{{ achievements|length }}</span>
+                        </div>
+                    </div>
+                    <p class="text-muted">Achievements Unlocked</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-bar-chart"></i>
+                        Quick Stats
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Recent Rewards:</span>
+                        <span class="fw-bold">{{ recent_rewards|length }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Active Programs:</span>
+                        <span class="fw-bold">{{ active_programs|length }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Pending Rewards:</span>
+                        <span class="fw-bold">{{ recent_rewards|selectattr('9', 'equalto', 'pending')|list|length }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Programs -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-star"></i>
+                        Active Reward Programs
+                    </h5>
+                    {% if session.role in ['admin', 'doctor'] %}
+                    <a href="{{ url_for('rewards_admin') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-gear"></i> Manage Programs
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if active_programs %}
+                    <div class="row">
+                        {% for program in active_programs %}
+                        <div class="col-md-6 mb-3">
+                            <div class="reward-tier">
+                                <h6 class="fw-bold">{{ program[1] }}</h6>
+                                <p class="mb-2">{{ program[2] }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-light text-dark">{{ program[3]|title }}</span>
+                                    <small class="opacity-75">
+                                        {% if program[5] %}
+                                        Active until {{ program[5] }}
+                                        {% else %}
+                                        Ongoing Program
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-info-circle text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3">No active reward programs at this time.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gamification Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <!-- Recent Rewards -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history"></i>
+                        Recent Rewards
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_rewards %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Program</th>
+                                    <th>Points</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reward in recent_rewards %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ reward[12] }}</strong>
+                                        {% if reward[13] %}
+                                        <br><small class="text-muted">{{ reward[13] }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-success">+{{ reward[5]|int }}</span>
+                                    </td>
+                                    <td>
+                                        {% if reward[6] == 'earned' %}
+                                        <span class="badge bg-success">{{ reward[6]|title }}</span>
+                                        {% elif reward[6] == 'pending' %}
+                                        <span class="badge bg-warning">{{ reward[6]|title }}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ reward[6]|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ reward[7] }}</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-gift text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3">Start making referrals to earn your first rewards!</p>
+                        <a href="{{ url_for('new_referral') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Create First Referral
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Achievements -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-trophy"></i>
+                        Achievements
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if achievements %}
+                    <div class="achievements-container" style="max-height: 400px; overflow-y: auto;">
+                        {% for achievement in achievements %}
+                        <div class="achievement-item mb-3 p-3 border rounded {% if achievement[5] %}bg-light{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <div class="achievement-icon me-3">
+                                    {% if achievement[5] %}
+                                    <i class="bi bi-check-circle-fill text-success" style="font-size: 1.5rem;"></i>
+                                    {% else %}
+                                    <i class="bi bi-circle text-muted" style="font-size: 1.5rem;"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ achievement[1] }}</h6>
+                                    <p class="mb-2 text-muted small">{{ achievement[2] }}</p>
+                                    {% if achievement[5] %}
+                                    <span class="badge bg-success">Unlocked</span>
+                                    {% else %}
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar" role="progressbar" 
+                                             style="width: {{ (achievement[7] / achievement[4] * 100) if achievement[4] else 0 }}%">
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">{{ achievement[7] or 0 }}/{{ achievement[4] }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-award text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3">No achievements available yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightning"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <a href="{{ url_for('new_referral') }}" class="btn btn-primary w-100">
+                                <i class="bi bi-plus-circle"></i><br>
+                                New Referral
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ url_for('rewards_leaderboard') }}" class="btn btn-info w-100">
+                                <i class="bi bi-bar-chart"></i><br>
+                                Leaderboard
+                            </a>
+                        </div>
+                        {% if session.role in ['admin', 'doctor'] %}
+                        <div class="col-md-3">
+                            <a href="{{ url_for('new_reward_program') }}" class="btn btn-success w-100">
+                                <i class="bi bi-gear"></i><br>
+                                New Program
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ url_for('compliance_audit') }}" class="btn btn-warning w-100">
+                                <i class="bi bi-shield-check"></i><br>
+                                Compliance
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function markNotificationsRead() {
+    fetch('/api/rewards/notifications/mark-read', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+</script>
+{% endblock %}
