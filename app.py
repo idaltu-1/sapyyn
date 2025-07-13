@@ -18,7 +18,7 @@ import json
 import stripe
 
 app = Flask(__name__)
-app.secret_key = 'sapyyn-patient-referral-system-2024'
+app.secret_key = 'sapyyn-patient-referral-system-2025'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Stripe configuration

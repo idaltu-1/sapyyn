@@ -2,6 +2,8 @@
 
 A comprehensive web-based patient referral management system built with Flask, featuring secure document handling, QR code generation, and HIPAA-compliant data management.
 
+**Copyright © 2025 Sapyyn. All rights reserved.**
+
 ## 🚀 Features
 
 ### Core Functionality
@@ -55,6 +57,8 @@ A comprehensive web-based patient referral management system built with Flask, f
 ### Prerequisites
 - Python 3.8 or higher
 - pip package manager
+- Node.js 16 or higher (for frontend build)
+- npm package manager
 
 ### Setup Instructions
 
@@ -64,22 +68,33 @@ A comprehensive web-based patient referral management system built with Flask, f
    cd sapyyn
    ```
 
-2. **Install dependencies**
+2. **Quick Build (Recommended)**
    ```bash
-   pip install -r requirements.txt
+   chmod +x build.sh
+   ./build.sh
    ```
 
-3. **Initialize the database and demo users**
+3. **Manual Installation**
+   ```bash
+   # Install Python dependencies
+   pip install -r requirements.txt
+   
+   # Install Node.js dependencies and build frontend assets
+   npm install
+   npm run build
+   ```
+
+4. **Initialize the database and demo users**
    ```bash
    python3 create_demo_users.py
    ```
 
-4. **Initialize the rewards system**
+5. **Initialize the rewards system**
    ```bash
    python3 init_rewards_sample_data.py
    ```
 
-5. **Run the application**
+6. **Run the application**
    ```bash
    python3 app.py
    ```

@@ -1,10 +1,12 @@
 // Sapyyn Patient Referral System - Main JavaScript
+// Copyright (c) 2025 Sapyyn. All rights reserved.
 
 // Global variables and configuration
 const SapyynApp = {
     apiUrl: '/api',
     version: '1.0.0',
-    debug: true
+    debug: true,
+    year: 2025
 };
 
 // Utility functions
