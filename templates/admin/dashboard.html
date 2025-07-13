@@ -1,0 +1,415 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Sapyyn{% endblock %}
+
+{% block content %}
+<!-- Admin Dashboard Header -->
+<div class="bg-gradient-dark text-white py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold mb-2">
+                    <i class="bi bi-gear-fill me-3"></i>
+                    Admin Dashboard
+                </h1>
+                <p class="lead mb-0">Welcome back, {{ session.full_name }}!</p>
+                <p class="mb-0">System administration and analytics</p>
+            </div>
+            <div class="col-lg-4 text-end">
+                <div class="card bg-white text-dark">
+                    <div class="card-body p-3">
+                        <h5 class="mb-1">System Status</h5>
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <i class="bi bi-circle-fill text-success"></i>
+                                <small class="d-block">API</small>
+                            </div>
+                            <div class="col-4">
+                                <i class="bi bi-circle-fill text-success"></i>
+                                <small class="d-block">DB</small>
+                            </div>
+                            <div class="col-4">
+                                <i class="bi bi-circle-fill text-warning"></i>
+                                <small class="d-block">Cache</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="py-4 bg-light">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-people-fill text-primary fs-1 mb-3"></i>
+                        <h3 class="fw-bold text-primary">1,247</h3>
+                        <p class="text-muted mb-0">Total Users</p>
+                        <small class="text-success">↑ 12% this month</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-arrow-repeat text-success fs-1 mb-3"></i>
+                        <h3 class="fw-bold text-success">3,891</h3>
+                        <p class="text-muted mb-0">Total Referrals</p>
+                        <small class="text-success">↑ 8% this month</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-files text-warning fs-1 mb-3"></i>
+                        <h3 class="fw-bold text-warning">12,543</h3>
+                        <p class="text-muted mb-0">Documents</p>
+                        <small class="text-info">↑ 15% this month</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-currency-dollar text-info fs-1 mb-3"></i>
+                        <h3 class="fw-bold text-info">$18,392</h3>
+                        <p class="text-muted mb-0">Monthly Revenue</p>
+                        <small class="text-success">↑ 23% this month</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Navigation -->
+<div class="py-4">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <a href="{{ url_for('admin_users') }}" class="card text-decoration-none h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-3">
+                        <i class="bi bi-people text-primary fs-2 mb-2"></i>
+                        <h6 class="fw-bold text-dark">User Management</h6>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <a href="{{ url_for('admin_analytics') }}" class="card text-decoration-none h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-3">
+                        <i class="bi bi-graph-up text-success fs-2 mb-2"></i>
+                        <h6 class="fw-bold text-dark">Analytics</h6>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <a href="{{ url_for('admin_api_config') }}" class="card text-decoration-none h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-3">
+                        <i class="bi bi-gear text-warning fs-2 mb-2"></i>
+                        <h6 class="fw-bold text-dark">API Config</h6>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="card text-decoration-none h-100 border-0 shadow-sm" onclick="openSubscriptions()">
+                    <div class="card-body text-center p-3">
+                        <i class="bi bi-credit-card text-info fs-2 mb-2"></i>
+                        <h6 class="fw-bold text-dark">Subscriptions</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="card text-decoration-none h-100 border-0 shadow-sm" onclick="openReports()">
+                    <div class="card-body text-center p-3">
+                        <i class="bi bi-file-earmark-bar-graph text-danger fs-2 mb-2"></i>
+                        <h6 class="fw-bold text-dark">Reports</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="card text-decoration-none h-100 border-0 shadow-sm" onclick="openSettings()">
+                    <div class="card-body text-center p-3">
+                        <i class="bi bi-sliders text-secondary fs-2 mb-2"></i>
+                        <h6 class="fw-bold text-dark">Settings</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Content -->
+<div class="py-4">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Recent Activity -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-activity me-2"></i>
+                            Recent System Activity
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="d-flex mb-3">
+                                <div class="bg-success rounded-circle p-2 me-3 flex-shrink-0">
+                                    <i class="bi bi-person-plus text-white"></i>
+                                </div>
+                                <div>
+                                    <strong>New user registration</strong><br>
+                                    <small class="text-muted">Dr. Sarah Johnson registered as a specialist - 2 minutes ago</small>
+                                </div>
+                            </div>
+                            <div class="d-flex mb-3">
+                                <div class="bg-info rounded-circle p-2 me-3 flex-shrink-0">
+                                    <i class="bi bi-arrow-repeat text-white"></i>
+                                </div>
+                                <div>
+                                    <strong>Referral completed</strong><br>
+                                    <small class="text-muted">Patient John Smith completed treatment with Dr. Wilson - 15 minutes ago</small>
+                                </div>
+                            </div>
+                            <div class="d-flex mb-3">
+                                <div class="bg-warning rounded-circle p-2 me-3 flex-shrink-0">
+                                    <i class="bi bi-exclamation-triangle text-white"></i>
+                                </div>
+                                <div>
+                                    <strong>API rate limit warning</strong><br>
+                                    <small class="text-muted">Tango Card API approaching rate limit - 30 minutes ago</small>
+                                </div>
+                            </div>
+                            <div class="d-flex mb-3">
+                                <div class="bg-primary rounded-circle p-2 me-3 flex-shrink-0">
+                                    <i class="bi bi-upload text-white"></i>
+                                </div>
+                                <div>
+                                    <strong>Document uploaded</strong><br>
+                                    <small class="text-muted">Patient Emma Thompson uploaded medical records - 1 hour ago</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button class="btn btn-outline-primary">View All Activity</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Charts -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-bar-chart me-2"></i>
+                            Monthly Analytics
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <canvas id="userGrowthChart" width="300" height="200"></canvas>
+                            </div>
+                            <div class="col-md-6">
+                                <canvas id="referralChart" width="300" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- System Health -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0">
+                            <i class="bi bi-heart-pulse me-2"></i>
+                            System Health
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center mb-3">
+                            <div class="col-4">
+                                <div class="text-success">
+                                    <i class="bi bi-cpu fs-3"></i>
+                                    <div class="small">CPU</div>
+                                    <div class="fw-bold">45%</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-warning">
+                                    <i class="bi bi-memory fs-3"></i>
+                                    <div class="small">Memory</div>
+                                    <div class="fw-bold">78%</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-info">
+                                    <i class="bi bi-hdd fs-3"></i>
+                                    <div class="small">Storage</div>
+                                    <div class="fw-bold">32%</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <small class="text-muted">Database queries/min:</small>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: 65%">325</div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <small class="text-muted">API response time:</small>
+                            <div class="progress">
+                                <div class="progress-bar bg-info" style="width: 85%">142ms</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Top Users -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0">
+                            <i class="bi bi-star me-2"></i>
+                            Top Referrers This Month
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>Dr. Michael Smith</strong><br>
+                                <small class="text-muted">Family Dental</small>
+                            </div>
+                            <span class="badge bg-primary">47 referrals</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>Dr. Sarah Wilson</strong><br>
+                                <small class="text-muted">Smile Orthodontics</small>
+                            </div>
+                            <span class="badge bg-success">32 referrals</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>Dr. James Brown</strong><br>
+                                <small class="text-muted">Dental Care Plus</small>
+                            </div>
+                            <span class="badge bg-warning">28 referrals</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Alerts -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-danger text-white">
+                        <h6 class="mb-0">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            System Alerts
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning py-2 mb-2">
+                            <small>
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                High API usage for Tango Card integration
+                            </small>
+                        </div>
+                        <div class="alert alert-info py-2 mb-2">
+                            <small>
+                                <i class="bi bi-info-circle me-1"></i>
+                                5 users pending email verification
+                            </small>
+                        </div>
+                        <div class="alert alert-success py-2 mb-0">
+                            <small>
+                                <i class="bi bi-check-circle me-1"></i>
+                                Backup completed successfully
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// User Growth Chart
+const userCtx = document.getElementById('userGrowthChart').getContext('2d');
+new Chart(userCtx, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+            label: 'New Users',
+            data: [65, 89, 134, 221, 289, 347],
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            title: {
+                display: true,
+                text: 'User Growth'
+            }
+        }
+    }
+});
+
+// Referral Chart
+const referralCtx = document.getElementById('referralChart').getContext('2d');
+new Chart(referralCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Completed', 'In Progress', 'Pending'],
+        datasets: [{
+            data: [65, 25, 10],
+            backgroundColor: [
+                'rgb(40, 167, 69)',
+                'rgb(255, 193, 7)',
+                'rgb(220, 53, 69)'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Referral Status'
+            }
+        }
+    }
+});
+
+function openSubscriptions() {
+    alert('Opening subscription management...');
+}
+
+function openReports() {
+    alert('Opening reports section...');
+}
+
+function openSettings() {
+    alert('Opening system settings...');
+}
+
+// Auto-refresh dashboard every 2 minutes
+setInterval(function() {
+    console.log('Refreshing dashboard data...');
+    // This would typically fetch updated stats from the server
+}, 120000);
+</script>
+{% endblock %}

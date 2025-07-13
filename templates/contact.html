@@ -1,0 +1,391 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - Sapyyn{% endblock %}
+
+{% block content %}
+<!-- Contact Hero Section -->
+<div class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="bi bi-envelope me-3"></i>
+                    Contact Us
+                </h1>
+                <p class="lead mb-4">
+                    Get in touch with our team - we're here to help!
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Information -->
+<div class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="bi bi-chat-dots me-2"></i>
+                            Send us a Message
+                        </h4>
+                    </div>
+                    <div class="card-body p-5">
+                        <form id="contactForm" onsubmit="handleContactForm(event)">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="firstName" class="form-label">First Name *</label>
+                                    <input type="text" class="form-control" id="firstName" name="firstName" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="lastName" class="form-label">Last Name *</label>
+                                    <input type="text" class="form-control" id="lastName" name="lastName" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email Address *</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="userType" class="form-label">I am a *</label>
+                                    <select class="form-select" id="userType" name="userType" required>
+                                        <option value="">Select your role</option>
+                                        <option value="dentist">Dentist</option>
+                                        <option value="specialist">Specialist</option>
+                                        <option value="patient">Patient</option>
+                                        <option value="admin">Administrator</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="subject" class="form-label">Subject *</label>
+                                    <select class="form-select" id="subject" name="subject" required>
+                                        <option value="">Select a topic</option>
+                                        <option value="general">General Inquiry</option>
+                                        <option value="technical">Technical Support</option>
+                                        <option value="billing">Billing Question</option>
+                                        <option value="partnership">Partnership Opportunity</option>
+                                        <option value="feedback">Feedback</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label for="practiceInfo" class="form-label">Practice Information (if applicable)</label>
+                                    <input type="text" class="form-control" id="practiceInfo" name="practiceInfo" 
+                                           placeholder="Practice name, location, specialty">
+                                </div>
+                                <div class="col-12">
+                                    <label for="message" class="form-label">Message *</label>
+                                    <textarea class="form-control" id="message" name="message" rows="5" 
+                                              placeholder="Please describe how we can help you..." required></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="newsletter" name="newsletter">
+                                        <label class="form-check-label" for="newsletter">
+                                            Subscribe to our newsletter for updates and tips
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-send me-2"></i>
+                                        Send Message
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Contact Information -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Contact Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                                <i class="bi bi-envelope text-primary"></i>
+                            </div>
+                            <div>
+                                <strong>Email</strong><br>
+                                <a href="mailto:contact@sapyyn.com" class="text-decoration-none">contact@sapyyn.com</a>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                                <i class="bi bi-telephone text-success"></i>
+                            </div>
+                            <div>
+                                <strong>Phone</strong><br>
+                                <a href="tel:+1-800-SAPYYN1" class="text-decoration-none">1-800-SAPYYN1</a><br>
+                                <small class="text-muted">(1-800-727-9961)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3">
+                                <i class="bi bi-clock text-warning"></i>
+                            </div>
+                            <div>
+                                <strong>Support Hours</strong><br>
+                                Monday - Friday: 8 AM - 8 PM EST<br>
+                                Saturday: 9 AM - 5 PM EST<br>
+                                <small class="text-muted">Emergency support 24/7</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-3 me-3">
+                                <i class="bi bi-geo-alt text-info"></i>
+                            </div>
+                            <div>
+                                <strong>Headquarters</strong><br>
+                                123 Healthcare Drive<br>
+                                Medical District, NY 10001
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-link-45deg me-2"></i>
+                            Quick Links
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="#" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-question-circle me-1"></i> FAQs
+                            </a>
+                            <a href="#" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-book me-1"></i> User Guide
+                            </a>
+                            <a href="#" class="btn btn-outline-warning btn-sm">
+                                <i class="bi bi-tools me-1"></i> Technical Support
+                            </a>
+                            <a href="{{ url_for('pricing') }}" class="btn btn-outline-info btn-sm">
+                                <i class="bi bi-tags me-1"></i> Pricing Plans
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Emergency Contact -->
+                <div class="card shadow-sm border-0 border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Emergency Support
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-3">
+                            For urgent technical issues affecting patient care:
+                        </p>
+                        <div class="d-grid gap-2">
+                            <a href="tel:+1-800-911-TECH" class="btn btn-danger">
+                                <i class="bi bi-telephone-fill me-1"></i> 
+                                Call Emergency Line
+                            </a>
+                            <a href="mailto:emergency@sapyyn.com" class="btn btn-outline-danger">
+                                <i class="bi bi-envelope-fill me-1"></i>
+                                Email Emergency Team
+                            </a>
+                        </div>
+                        <small class="text-muted">
+                            Available 24/7 for critical system issues
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Team Section -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="fw-bold">Meet Our Support Team</h2>
+                <p class="lead text-muted">Healthcare professionals helping healthcare professionals</p>
+            </div>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-3 col-md-6 text-center">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <img src="/static/images/support-team-1.jpg" alt="Support Team" class="rounded-circle mb-3" 
+                             style="width: 80px; height: 80px; object-fit: cover;">
+                        <h6 class="fw-bold">Lisa Rodriguez</h6>
+                        <p class="text-muted mb-2">Customer Success Manager</p>
+                        <p class="small">Former dental practice administrator with 10+ years experience</p>
+                        <a href="mailto:lisa@sapyyn.com" class="btn btn-outline-primary btn-sm">Contact Lisa</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 text-center">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <img src="/static/images/support-team-2.jpg" alt="Support Team" class="rounded-circle mb-3" 
+                             style="width: 80px; height: 80px; object-fit: cover;">
+                        <h6 class="fw-bold">Mark Chen</h6>
+                        <p class="text-muted mb-2">Technical Support Lead</p>
+                        <p class="small">Healthcare IT specialist with expertise in HIPAA compliance</p>
+                        <a href="mailto:mark@sapyyn.com" class="btn btn-outline-primary btn-sm">Contact Mark</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 text-center">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <img src="/static/images/support-team-3.jpg" alt="Support Team" class="rounded-circle mb-3" 
+                             style="width: 80px; height: 80px; object-fit: cover;">
+                        <h6 class="fw-bold">Dr. Amanda Foster</h6>
+                        <p class="text-muted mb-2">Clinical Advisor</p>
+                        <p class="small">Practicing dentist and workflow optimization expert</p>
+                        <a href="mailto:amanda@sapyyn.com" class="btn btn-outline-primary btn-sm">Contact Amanda</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ Section -->
+<div class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="fw-bold">Frequently Asked Questions</h2>
+                <p class="lead text-muted">Quick answers to common questions</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="accordion" id="contactFAQ">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq1">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                How quickly do you respond to support requests?
+                            </button>
+                        </h2>
+                        <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#contactFAQ">
+                            <div class="accordion-body">
+                                We aim to respond to all support requests within 2 hours during business hours. 
+                                Emergency issues are addressed immediately 24/7.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                Do you offer phone support?
+                            </button>
+                        </h2>
+                        <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#contactFAQ">
+                            <div class="accordion-body">
+                                Yes! Phone support is available during business hours for all paid plans. 
+                                Emergency phone support is available 24/7 for critical issues.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                Can you help with implementation and training?
+                            </button>
+                        </h2>
+                        <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#contactFAQ">
+                            <div class="accordion-body">
+                                Absolutely! We provide comprehensive onboarding, training sessions, and implementation support 
+                                to ensure your team gets the most out of Sapyyn.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq4">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+                                What if I have a feature request?
+                            </button>
+                        </h2>
+                        <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#contactFAQ">
+                            <div class="accordion-body">
+                                We love hearing from our users! Feature requests are carefully reviewed and prioritized 
+                                based on user feedback and clinical needs.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function handleContactForm(event) {
+    event.preventDefault();
+    
+    // Get form data
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData.entries());
+    
+    // Show loading state
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Sending...';
+    submitBtn.disabled = true;
+    
+    // Simulate form submission (in real app, this would send to server)
+    setTimeout(() => {
+        // Reset button
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        
+        // Show success message
+        alert('Thank you for your message! We will get back to you within 2 hours.');
+        
+        // Reset form
+        event.target.reset();
+    }, 2000);
+}
+
+// Auto-expand message textarea as user types
+document.getElementById('message').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
+});
+
+// Show relevant quick links based on user type selection
+document.getElementById('userType').addEventListener('change', function() {
+    const userType = this.value;
+    // This could show different helpful resources based on user type
+    console.log('User type selected:', userType);
+});
+</script>
+{% endblock %}

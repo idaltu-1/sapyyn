@@ -1,0 +1,425 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Portal - Sapyyn{% endblock %}
+
+{% block content %}
+<!-- Patient Portal Header -->
+<div class="bg-gradient-info text-white py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold mb-2">
+                    <i class="bi bi-person-heart me-3"></i>
+                    Patient Portal
+                </h1>
+                <p class="lead mb-0">Welcome, {{ session.full_name }}!</p>
+                <p class="mb-0">Manage your healthcare referrals and appointments</p>
+            </div>
+            <div class="col-lg-4 text-end">
+                <div class="card bg-white text-dark">
+                    <div class="card-body p-3">
+                        <h5 class="mb-1">Your Health Journey</h5>
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <h4 class="text-info mb-0">3</h4>
+                                <small>Active Referrals</small>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="text-success mb-0">2</h4>
+                                <small>Completed</small>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="text-primary mb-0">1</h4>
+                                <small>Upcoming</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="py-4 bg-light">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-lg-3 col-md-6">
+                <div class="card text-decoration-none h-100 border-0 shadow-sm" onclick="viewAppointments()">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-calendar-check text-primary fs-1 mb-3"></i>
+                        <h5 class="fw-bold text-dark">My Appointments</h5>
+                        <p class="text-muted mb-0">View and manage appointments</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card text-decoration-none h-100 border-0 shadow-sm" onclick="viewReferrals()">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-arrow-right-circle text-success fs-1 mb-3"></i>
+                        <h5 class="fw-bold text-dark">My Referrals</h5>
+                        <p class="text-muted mb-0">Track referral status</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <a href="{{ url_for('view_documents') }}" class="card text-decoration-none h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-file-earmark-medical text-warning fs-1 mb-3"></i>
+                        <h5 class="fw-bold text-dark">My Documents</h5>
+                        <p class="text-muted mb-0">Access medical records</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card text-decoration-none h-100 border-0 shadow-sm" onclick="contactProvider()">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-chat-dots text-info fs-1 mb-3"></i>
+                        <h5 class="fw-bold text-dark">Messages</h5>
+                        <p class="text-muted mb-0">Communicate with providers</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Dashboard -->
+<div class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Upcoming Appointments -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar-event me-2"></i>
+                            Upcoming Appointments
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="card border-start border-primary border-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="text-primary fw-bold">Dr. Wilson - Orthodontist</h6>
+                                                <p class="mb-1">
+                                                    <i class="bi bi-calendar me-1"></i>
+                                                    January 15, 2024 at 2:00 PM
+                                                </p>
+                                                <p class="mb-1">
+                                                    <i class="bi bi-geo-alt me-1"></i>
+                                                    Smile Orthodontics, Suite 200
+                                                </p>
+                                                <p class="small text-muted mb-0">Initial consultation</p>
+                                            </div>
+                                            <span class="badge bg-warning">Tomorrow</span>
+                                        </div>
+                                        <div class="mt-3">
+                                            <button class="btn btn-outline-primary btn-sm me-2">
+                                                <i class="bi bi-telephone"></i> Call
+                                            </button>
+                                            <button class="btn btn-outline-info btn-sm">
+                                                <i class="bi bi-map"></i> Directions
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-start border-success border-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="text-success fw-bold">Dr. Davis - Oral Surgeon</h6>
+                                                <p class="mb-1">
+                                                    <i class="bi bi-calendar me-1"></i>
+                                                    January 22, 2024 at 10:30 AM
+                                                </p>
+                                                <p class="mb-1">
+                                                    <i class="bi bi-geo-alt me-1"></i>
+                                                    Dental Surgery Center
+                                                </p>
+                                                <p class="small text-muted mb-0">Wisdom tooth extraction</p>
+                                            </div>
+                                            <span class="badge bg-info">Next Week</span>
+                                        </div>
+                                        <div class="mt-3">
+                                            <button class="btn btn-outline-success btn-sm me-2">
+                                                <i class="bi bi-telephone"></i> Call
+                                            </button>
+                                            <button class="btn btn-outline-info btn-sm">
+                                                <i class="bi bi-map"></i> Directions
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Referral Status -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-arrow-repeat me-2"></i>
+                            Referral Status
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Referring Doctor</th>
+                                        <th>Specialist</th>
+                                        <th>Condition</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Dr. Smith<br><small class="text-muted">Family Dental</small></td>
+                                        <td>Dr. Wilson<br><small class="text-muted">Orthodontist</small></td>
+                                        <td>Braces consultation</td>
+                                        <td><span class="badge bg-warning">Scheduled</span></td>
+                                        <td>Jan 10, 2024</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Dr. Brown<br><small class="text-muted">Smile Clinic</small></td>
+                                        <td>Dr. Davis<br><small class="text-muted">Oral Surgeon</small></td>
+                                        <td>Wisdom tooth removal</td>
+                                        <td><span class="badge bg-primary">Approved</span></td>
+                                        <td>Jan 8, 2024</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Dr. Jones<br><small class="text-muted">Dental Care</small></td>
+                                        <td>Dr. Lee<br><small class="text-muted">Endodontist</small></td>
+                                        <td>Root canal therapy</td>
+                                        <td><span class="badge bg-success">Completed</span></td>
+                                        <td>Dec 15, 2023</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Health Summary -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0">
+                            <i class="bi bi-heart-pulse me-2"></i>
+                            Health Summary
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <strong>Recent Visits:</strong>
+                            <div class="small text-muted mt-1">
+                                <div>✓ Regular cleaning - Dec 1, 2023</div>
+                                <div>✓ Consultation - Nov 15, 2023</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Current Treatments:</strong>
+                            <div class="small text-muted mt-1">
+                                <div>📋 Orthodontic evaluation</div>
+                                <div>📋 Wisdom tooth extraction</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Next Check-up:</strong>
+                            <div class="small text-primary mt-1">
+                                <strong>June 1, 2024</strong> - Regular cleaning
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Insurance Information -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-warning text-white">
+                        <h6 class="mb-0">
+                            <i class="bi bi-shield-check me-2"></i>
+                            Insurance Info
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <strong>Provider:</strong> Delta Dental
+                        </div>
+                        <div class="mb-2">
+                            <strong>Plan:</strong> Premium Plus
+                        </div>
+                        <div class="mb-2">
+                            <strong>ID:</strong> DD123456789
+                        </div>
+                        <div class="mb-3">
+                            <strong>Coverage:</strong> 80% preventive, 50% major
+                        </div>
+                        <button class="btn btn-outline-warning btn-sm w-100">
+                            View Full Details
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h6 class="mb-0">
+                            <i class="bi bi-lightning me-2"></i>
+                            Quick Actions
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary btn-sm" onclick="requestReferral()">
+                                <i class="bi bi-plus-circle me-1"></i> Request Referral
+                            </button>
+                            <button class="btn btn-outline-success btn-sm" onclick="scheduleAppointment()">
+                                <i class="bi bi-calendar-plus me-1"></i> Schedule Appointment
+                            </button>
+                            <button class="btn btn-outline-info btn-sm" onclick="sendMessage()">
+                                <i class="bi bi-chat-dots me-1"></i> Message Provider
+                            </button>
+                            <button class="btn btn-outline-warning btn-sm" onclick="updateProfile()">
+                                <i class="bi bi-person-gear me-1"></i> Update Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reminders -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-danger text-white">
+                        <h6 class="mb-0">
+                            <i class="bi bi-bell me-2"></i>
+                            Reminders
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning py-2">
+                            <small>
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                Appointment with Dr. Wilson tomorrow at 2:00 PM
+                            </small>
+                        </div>
+                        <div class="alert alert-info py-2">
+                            <small>
+                                <i class="bi bi-info-circle me-1"></i>
+                                Upload pre-surgery forms for Dr. Davis
+                            </small>
+                        </div>
+                        <div class="alert alert-success py-2">
+                            <small>
+                                <i class="bi bi-check-circle me-1"></i>
+                                Insurance pre-authorization approved
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Message Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Send Message</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">To:</label>
+                        <select class="form-select">
+                            <option>Dr. Smith - Family Dental</option>
+                            <option>Dr. Wilson - Orthodontist</option>
+                            <option>Dr. Davis - Oral Surgeon</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Subject:</label>
+                        <input type="text" class="form-control" placeholder="Enter subject">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Message:</label>
+                        <textarea class="form-control" rows="4" placeholder="Type your message here..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Send Message</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function viewAppointments() {
+    alert('Opening appointments view...');
+}
+
+function viewReferrals() {
+    alert('Opening referrals tracking...');
+}
+
+function contactProvider() {
+    alert('Opening messages...');
+}
+
+function requestReferral() {
+    alert('Opening referral request form...');
+}
+
+function scheduleAppointment() {
+    alert('Opening appointment scheduler...');
+}
+
+function sendMessage() {
+    const modal = new bootstrap.Modal(document.getElementById('messageModal'));
+    modal.show();
+}
+
+function updateProfile() {
+    alert('Opening profile settings...');
+}
+
+// Auto-refresh notifications every 30 seconds
+setInterval(function() {
+    console.log('Checking for new notifications...');
+    // This would typically check for appointment reminders, messages, etc.
+}, 30000);
+
+// Appointment reminder notification
+function showAppointmentReminder() {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Appointment Reminder', {
+            body: 'You have an appointment with Dr. Wilson tomorrow at 2:00 PM',
+            icon: '/static/images/notification-icon.png'
+        });
+    }
+}
+
+// Request notification permission on page load
+document.addEventListener('DOMContentLoaded', function() {
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+});
+</script>
+{% endblock %}
