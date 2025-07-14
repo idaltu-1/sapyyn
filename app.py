@@ -1717,6 +1717,143 @@ def handle_subscription_cancellation(subscription):
     conn.close()
 
 
+# ============================================================================
+# STATIC PAGE ROUTES
+# ============================================================================
+
+@app.route('/static-pages/<path:filename>')
+def serve_static_page(filename):
+    """Serve static HTML pages with authentication checks"""
+    # URL decode the filename and remove .html extension if present
+    from urllib.parse import unquote
+    filename = unquote(filename)
+    if filename.endswith('.html'):
+        filename = filename[:-5]
+    
+    # Define page categories and access controls
+    public_pages = [
+        'about_page', 'pricing_page', 'resources_page', 'contact', 'contact-us',
+        'blog', 'blog-article', 'case studies', 'educational content',
+        'training and support', 'how to guide', 'short video', 'newsletter',
+        'surgical-instruction', 'surgical_instruction_page', 'pre op consultation',
+        'co_marketing', 'getstarted_page', 'resources'
+    ]
+    
+    admin_pages = [
+        'admin', 'admin-1', 'admin-2', 'admin-3', 'admin-4', 'admin-users', 
+        'admin-referrals', 'sapyyn-admin-panel', 'corrected_admin_html',
+        'importDentists', 'importPatients', 'importSpecialist', 'users', 'roles'
+    ]
+    
+    portal_pages = [
+        'Dashboard', 'Patient Referral', 'Patient Referrral Admin portal',
+        'Patient Referrral Admin', 'Referral History', 'Track Referral',
+        'Medical Updates', 'portal-1', 'portal-referrals', 'portal-signup',
+        'portal_integrations', 'portal_messaging', 'portal_settings',
+        'patient', 'dentist', 'specialist', 'sapyyn-portal',
+        'sapyyn_unified_portal', 'sapyyn_unified_portal (1)', 'sapyyn_unified_portal (2)',
+        'updated_portal_rewards', 'appointments', 'forms', 'referrals',
+        'referrals_page', 'referrals_page (1)', 'rewards', 'redeem list'
+    ]
+    
+    # Check if file exists
+    static_file_path = os.path.join('static', f'{filename}.html')
+    if not os.path.exists(static_file_path):
+        return render_template('404.html'), 404
+    
+    # Apply access controls
+    if filename in admin_pages:
+        if 'user_id' not in session or session.get('role') not in ['admin', 'dentist_admin', 'specialist_admin']:
+            flash('Access denied. Administrator privileges required.', 'error')
+            return redirect(url_for('login'))
+    
+    elif filename in portal_pages:
+        if 'user_id' not in session:
+            flash('Please log in to access portal pages.', 'error')
+            return redirect(url_for('login'))
+    
+    # Serve the static file
+    return send_from_directory('static', f'{filename}.html')
+
+@app.route('/about')
+def about():
+    """About page route"""
+    return redirect(url_for('serve_static_page', filename='about_page'))
+
+@app.route('/resources')
+def resources():
+    """Resources page route"""
+    return redirect(url_for('serve_static_page', filename='resources_page'))
+
+@app.route('/contact')
+def contact():
+    """Contact page route"""
+    return redirect(url_for('serve_static_page', filename='contact'))
+
+@app.route('/blog')
+def blog():
+    """Blog page route"""
+    return redirect(url_for('serve_static_page', filename='blog'))
+
+@app.route('/training')
+def training():
+    """Training and support page route"""
+    return redirect(url_for('serve_static_page', filename='training and support'))
+
+@app.route('/surgical-instructions')
+def surgical_instructions():
+    """Surgical instructions page route"""
+    return redirect(url_for('serve_static_page', filename='surgical-instruction'))
+
+@app.route('/admin-panel')
+def admin_panel():
+    """Admin panel page route"""
+    if 'user_id' not in session or session.get('role') not in ['admin', 'dentist_admin', 'specialist_admin']:
+        flash('Access denied. Administrator privileges required.', 'error')
+        return redirect(url_for('login'))
+    return redirect(url_for('serve_static_page', filename='admin'))
+
+@app.route('/referral-history')
+def referral_history():
+    """Referral history page route"""
+    if 'user_id' not in session:
+        flash('Please log in to view referral history.', 'error')
+        return redirect(url_for('login'))
+    return redirect(url_for('serve_static_page', filename='Referral History'))
+
+@app.route('/track-referral')
+def track_referral():
+    """Track referral page route"""
+    if 'user_id' not in session:
+        flash('Please log in to track referrals.', 'error')
+        return redirect(url_for('login'))
+    return redirect(url_for('serve_static_page', filename='Track Referral'))
+
+@app.route('/appointments')
+def appointments():
+    """Appointments page route"""
+    if 'user_id' not in session:
+        flash('Please log in to view appointments.', 'error')
+        return redirect(url_for('login'))
+    return redirect(url_for('serve_static_page', filename='appointments'))
+
+@app.route('/portal-dashboard')
+def portal_dashboard():
+    """Portal dashboard route based on user role"""
+    if 'user_id' not in session:
+        flash('Please log in to access the portal.', 'error')
+        return redirect(url_for('login'))
+    
+    role = session.get('role', 'patient')
+    if role in ['admin', 'dentist_admin', 'specialist_admin']:
+        return redirect(url_for('serve_static_page', filename='admin'))
+    elif role in ['dentist']:
+        return redirect(url_for('serve_static_page', filename='dentist'))
+    elif role in ['specialist']:
+        return redirect(url_for('serve_static_page', filename='specialist'))
+    else:
+        return redirect(url_for('serve_static_page', filename='patient'))
+
 @app.errorhandler(404)
 def page_not_found(e):
     """Render custom 404 page"""
