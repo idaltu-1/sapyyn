@@ -93,37 +93,29 @@
                         </ul>
                     </li>
                     {% else %}
-                    <!-- Public navigation for non-authenticated users -->
+                    <!-- Public navigation for non-authenticated users - matches static index.html navigation -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('about') }}">
-                            <i class="bi bi-info-circle"></i> About
+                        <a class="nav-link" href="{{ url_for('index') }}" title="Home">
+                            <i class="bi bi-house"></i>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('pricing') }}">
-                            <i class="bi bi-tags"></i> Pricing
-                        </a>
+                        <a class="nav-link" href="{{ url_for('referrals') }}">Referrals</a>
                     </li>
-                    
-                    <!-- Public Education & Resources Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="publicEducationDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-book"></i> Resources
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('resources') }}"><i class="bi bi-collection"></i> Resource Library</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('surgical_instructions') }}"><i class="bi bi-file-medical"></i> Surgical Instructions</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('serve_static_page', filename='educational content') }}"><i class="bi bi-mortarboard"></i> Educational Content</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('serve_static_page', filename='how to guide') }}"><i class="bi bi-question-circle"></i> How-to Guide</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('blog') }}"><i class="bi bi-journal-text"></i> Blog</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('serve_static_page', filename='case studies') }}"><i class="bi bi-clipboard-data"></i> Case Studies</a></li>
-                        </ul>
-                    </li>
-                    
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('contact') }}">
-                            <i class="bi bi-envelope"></i> Contact
-                        </a>
+                        <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('pricing') }}">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('resources') }}">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('surgical_instruction') }}">Surgical Instruction</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -154,14 +146,10 @@
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('login') }}">
-                            <i class="bi bi-box-arrow-in-right"></i> Login
-                        </a>
+                        <a class="nav-link" href="{{ url_for('login') }}">Sign In</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('register') }}">
-                            <i class="bi bi-person-plus"></i> Register
-                        </a>
+                        <a class="nav-link" href="{{ url_for('register') }}">Get Started</a>
                     </li>
                     {% endif %}
                 </ul>
