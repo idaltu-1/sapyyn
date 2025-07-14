@@ -1717,7 +1717,49 @@ def handle_subscription_cancellation(subscription):
     conn.close()
 
 
+@app.route('/privacy')
+def privacy_policy():
+    """Privacy Policy page"""
+    return render_template('privacy.html')
+
+@app.route('/terms')
+def terms_of_service():
+    """Terms of Service page"""
+    return render_template('terms.html')
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    """Forgot Password page and handler"""
+    if request.method == 'POST':
+        email = request.form['email']
+        
+        # Check if user exists
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT id, username FROM users WHERE email = ?', (email,))
+        user = cursor.fetchone()
+        conn.close()
+        
+        if user:
+            # In a real implementation, you would:
+            # 1. Generate a secure reset token
+            # 2. Store it in the database with expiration
+            # 3. Send email with reset link
+            # For now, we'll just show a success message
+            flash('If an account with that email exists, you will receive a password reset link shortly.', 'info')
+        else:
+            # Don't reveal if email exists or not for security
+            flash('If an account with that email exists, you will receive a password reset link shortly.', 'info')
+        
+        return redirect(url_for('forgot_password'))
+    
+    return render_template('forgot_password.html')
+
 @app.errorhandler(404)
 def page_not_found(e):
     """Render custom 404 page"""
     return render_template('404.html'), 404
+
+if __name__ == '__main__':
+    init_db()
+    app.run(debug=True, host='0.0.0.0', port=5000)

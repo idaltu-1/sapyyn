@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy - Sapyyn{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
+                    <h1 class="mb-4"><i class="bi bi-shield-check text-primary"></i> Privacy Policy</h1>
+                    <p class="text-muted mb-4">Last updated: January 14, 2025</p>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>HIPAA Compliance:</strong> Sapyyn is committed to protecting your protected health information (PHI) in accordance with HIPAA regulations.
+                    </div>
+
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">Information We Collect</h2>
+                        <p>We collect information you provide directly to us, such as when you:</p>
+                        <ul>
+                            <li>Create an account or update your profile</li>
+                            <li>Upload medical documents or referral information</li>
+                            <li>Communicate with healthcare providers through our platform</li>
+                            <li>Contact our support team</li>
+                        </ul>
+                    </section>
+
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">How We Use Your Information</h2>
+                        <p>We use the information we collect to:</p>
+                        <ul>
+                            <li>Provide, maintain, and improve our services</li>
+                            <li>Facilitate secure communication between healthcare providers</li>
+                            <li>Process patient referrals and document management</li>
+                            <li>Comply with legal obligations and healthcare regulations</li>
+                            <li>Protect the security and integrity of our platform</li>
+                        </ul>
+                    </section>
+
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">Information Sharing and Disclosure</h2>
+                        <p>We may share your information only in the following circumstances:</p>
+                        <ul>
+                            <li><strong>Healthcare Providers:</strong> With authorized healthcare providers involved in your care</li>
+                            <li><strong>Legal Requirements:</strong> When required by law or to protect rights and safety</li>
+                            <li><strong>Business Partners:</strong> With trusted service providers who help us operate our platform</li>
+                            <li><strong>Consent:</strong> With your explicit consent for specific purposes</li>
+                        </ul>
+                    </section>
+
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">Data Security</h2>
+                        <p>We implement comprehensive security measures to protect your information:</p>
+                        <ul>
+                            <li>End-to-end encryption for all data transmission</li>
+                            <li>Secure, encrypted storage of all documents and records</li>
+                            <li>Regular security audits and compliance assessments</li>
+                            <li>Access controls and authentication requirements</li>
+                            <li>Staff training on HIPAA compliance and data protection</li>
+                        </ul>
+                    </section>
+
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">Your Rights and Choices</h2>
+                        <p>Under HIPAA and applicable privacy laws, you have the right to:</p>
+                        <ul>
+                            <li>Access your personal health information</li>
+                            <li>Request corrections to your information</li>
+                            <li>Request restrictions on use or disclosure</li>
+                            <li>Request an accounting of disclosures</li>
+                            <li>File a complaint if you believe your privacy rights have been violated</li>
+                        </ul>
+                    </section>
+
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">Data Retention</h2>
+                        <p>We retain your information as long as necessary to:</p>
+                        <ul>
+                            <li>Provide our services to you</li>
+                            <li>Comply with legal and regulatory requirements</li>
+                            <li>Resolve disputes and enforce agreements</li>
+                        </ul>
+                        <p>Medical records and referral information are retained according to healthcare industry standards and legal requirements.</p>
+                    </section>
+
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">Changes to This Policy</h2>
+                        <p>We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new Privacy Policy on this page and updating the "Last updated" date.</p>
+                    </section>
+
+                    <section class="mb-5">
+                        <h2 class="h4 mb-3">Contact Us</h2>
+                        <p>If you have any questions about this Privacy Policy or our privacy practices, please contact us:</p>
+                        <div class="card bg-light mt-3">
+                            <div class="card-body">
+                                <p class="mb-1"><strong>Privacy Officer</strong></p>
+                                <p class="mb-1"><i class="bi bi-envelope"></i> privacy@sapyyn.com</p>
+                                <p class="mb-1"><i class="bi bi-telephone"></i> 1-800-SAPYYN-1</p>
+                                <p class="mb-0"><i class="bi bi-geo-alt"></i> 123 Healthcare Ave, Medical District, City, State 12345</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="text-center mt-5">
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">
+                            <i class="bi bi-house"></i> Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
