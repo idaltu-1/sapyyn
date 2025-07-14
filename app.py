@@ -1717,7 +1717,102 @@ def handle_subscription_cancellation(subscription):
     conn.close()
 
 
+# Additional routes for navigation links
+@app.route('/original')
+def original_page():
+    """Serve the original static index.html page for comparison"""
+    return send_from_directory('.', 'index.html')
+
+@app.route('/about')
+def about():
+    """About page"""
+    return render_template('about.html')
+
+@app.route('/referrals')
+def referrals():
+    """Referrals page - redirect to dashboard for logged in users"""
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
+    return redirect(url_for('login'))
+
+@app.route('/resources')
+def resources():
+    """Resources page"""
+    # Check if static file exists and serve it
+    return send_from_directory('static', 'resources.html')
+
+@app.route('/surgicalInstruction')
+def surgical_instruction():
+    """Surgical instruction page"""
+    # Check if static file exists and serve it
+    return send_from_directory('static', 'surgical_instruction_page.html')
+
+@app.route('/contact')
+def contact():
+    """Contact page"""
+    return render_template('contact.html')
+
+@app.route('/casestudies')
+def case_studies():
+    """Case studies page"""
+    return render_template('case_studies.html')
+
+@app.route('/tutorials')
+def tutorials():
+    """Tutorials page"""
+    return render_template('tutorials.html')
+
+@app.route('/howtoguides')
+def how_to_guides():
+    """How-to guides page"""
+    return render_template('how_to_guides.html')
+
+@app.route('/loyaltyrewards')
+def loyalty_rewards():
+    """Loyalty rewards page - redirect to rewards dashboard"""
+    return redirect(url_for('rewards'))
+
+@app.route('/hippa')
+def hipaa():
+    """HIPAA compliance page"""
+    return render_template('hipaa.html')
+
+@app.route('/privacy')
+def privacy():
+    """Privacy policy page"""
+    return render_template('privacy.html')
+
+@app.route('/faq')
+def faq():
+    """FAQ page"""
+    return render_template('faq.html')
+
+@app.route('/connectproviders')
+def connect_providers():
+    """Connect providers page - redirect to appropriate portal"""
+    if 'user_id' in session:
+        user_role = session.get('role', 'patient')
+        if user_role == 'dentist':
+            return redirect(url_for('portal_dentist'))
+        elif user_role == 'specialist':
+            return redirect(url_for('portal_specialist'))
+        else:
+            return redirect(url_for('portal_patient'))
+    return redirect(url_for('login'))
+
+@app.route('/sendpatientdocuments')
+def send_patient_documents():
+    """Send patient documents page - redirect to upload"""
+    if 'user_id' in session:
+        return redirect(url_for('upload_file'))
+    return redirect(url_for('login'))
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     """Render custom 404 page"""
     return render_template('404.html'), 404
+
+if __name__ == '__main__':
+    init_db()
+    app.run(debug=True, host='0.0.0.0', port=5000)
