@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapyyn - Revolutionizing Dental Referrals with Rewards</title>
+    <meta name="description" content="Connect dental providers and patients nationwide with our secure, HIPAA-compliant referral platform. Earn rewards while making referrals. Join 500+ dental professionals today.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="./favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --secondary-blue: #3B82F6;
+            --light-blue: #DBEAFE;
+            --accent-yellow: #FCD34D;
+            --warning-yellow: #F59E0B;
+            --white: #FFFFFF;
+            --light-grey: #F8FAFC;
+            --medium-grey: #64748B;
+            --dark-grey: #334155;
+            --black: #0F172A;
+            --success: #10B981;
+            --danger: #EF4444;
+            --glass: rgba(255, 255, 255, 0.25);
+            --shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+            --shadow-hover: 0 16px 64px rgba(37, 99, 235, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--black);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        }
+        
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(37, 99, 235, 0.1), rgba(59, 130, 246, 0.05));
+            animation: float 20s infinite ease-in-out;
+        }
+        
+        .floating-element:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .floating-element:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 50%;
+            right: 10%;
+            animation-delay: 7s;
+        }
+        
+        .floating-element:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            bottom: 30%;
+            left: 70%;
+            animation-delay: 14s;
+        }
+        
+        .floating-element:nth-child(4) {
+            width: 120px;
+            height: 120px;
+            top: 80%;
+            left: 20%;
+            animation-delay: 21s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.3;
+            }
+            25% {
+                transform: translateY(-50px) rotate(90deg);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateY(-100px) rotate(180deg);
+                opacity: 0.3;
+            }
+            75% {
+                transform: translateY(-50px) rotate(270deg);
+                opacity: 0.6;
+            }
+        }
+        
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--light-blue);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--primary-blue);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo img {
+            height: 45px;
+            margin-right: 12px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+            gap: 2.5rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-grey);
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-links a:hover {
+            color: var(--secondary-blue);
+            background: var(--light-blue);
+            transform: translateY(-2px);
+        }
+        
+        .nav-links a:hover::after {
+            width: 80%;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        /* Contact Float Button */
+        .contact-float-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-yellow), var(--warning-yellow));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--black);
+            font-size: 1.5rem;
+            text-decoration: none;
+            box-shadow: var(--shadow-hover);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .contact-float-btn:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 20px 40px rgba(252, 211, 77, 0.4);
+        }
+        
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+        }
+        
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 5%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-text h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--white);
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .hero-text h1 span {
+            background: linear-gradient(135deg, var(--accent-yellow), var(--warning-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+        
+        .hero-text h1 span::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-yellow), var(--warning-yellow));
+            border-radius: 2px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 20px var(--accent-yellow); }
+            to { box-shadow: 0 0 30px var(--warning-yellow); }
+        }
+        
+        .hero-text p {
+            font-size: 1.4rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2.5rem;
+            line-height: 1.7;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+        }
+        
+        .stat {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .stat:hover {
+            transform: translateY(-5px) scale(1.05);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: var(--white);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        
+        .hero-image {
+            position: relative;
+            perspective: 1000px;
+        }
+        
+        .hero-image img, .referral-image img, .gallery-item img {
+            transition: all 0.3s ease;
+        }
+        
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            transform: rotateY(-5deg) rotateX(5deg);
+        }
+        
+        .hero-image:hover img {
+            transform: rotateY(0deg) rotateX(0deg) scale(1.02);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+        }
+        
+        .floating-card {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-hover);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: floatCard 4s ease-in-out infinite;
+        }
+        
+        @keyframes floatCard {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+        
+        .floating-card-1 {
+            top: 15%;
+            right: -80px;
+            animation-delay: 0s;
+        }
+        
+        .floating-card-2 {
+            bottom: 15%;
+            left: -80px;
+            animation-delay: 2s;
+        }
+        
+        /* Quick Referral Section */
+        .quick-referral {
+            padding: 6rem 5%;
+            background: var(--white);
+            position: relative;
+        }
+        
+        .referral-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        
+        .referral-left {
+            background: linear-gradient(135deg, var(--light-blue), rgba(255, 255, 255, 0.9));
+            padding: 3rem;
+            border-radius: 24px;
+            border: 1px solid var(--primary-blue);
+            box-shadow: var(--shadow);
+        }
+        
+        .referral-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .referral-subtitle {
+            font-size: 1.2rem;
+            color: var(--medium-grey);
+            margin-bottom: 2.5rem;
+        }
+        
+        .code-inputs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            justify-content: center;
+        }
+        
+        .code-input {
+            width: 60px;
+            height: 60px;
+            border: 3px solid var(--light-blue);
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+        
+        .code-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .code-label {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--medium-grey);
+            font-weight: 600;
+        }
+        
+        .refer-btn {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .refer-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(37, 99, 235, 0.4);
+        }
+        
+        .referral-image {
+            position: relative;
+        }
+        
+        .referral-image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .referral-image:hover img {
+            transform: scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        /* Features Grid Section */
+        .features-grid-section {
+            padding: 6rem 5%;
+            background: var(--light-grey);
+        }
+        
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background: var(--white);
+            padding: 2.5rem 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--light-blue);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.1), transparent);
+            transition: left 0.6s;
+        }
+        
+        .feature-card:hover::before {
+            left: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--secondary-blue);
+        }
+        
+        .feature-icon {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 2.25rem;
+            color: white;
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 16px 40px rgba(37, 99, 235, 0.4);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .feature-card p {
+            color: var(--medium-grey);
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+        
+        /* Stats Section */
+        .stats-section {
+            padding: 6rem 5%;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+        }
+        
+        .stats-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .stat-card .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--accent-yellow);
+        }
+        
+        .stat-card .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .stat-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        /* Rewards Section */
+        .rewards-section {
+            padding: 6rem 5%;
+            background: linear-gradient(135deg, var(--accent-yellow) 0%, var(--warning-yellow) 100%);
+            color: var(--black);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .rewards-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .rewards-content h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .rewards-content p {
+            font-size: 1.3rem;
+            margin-bottom: 3rem;
+            line-height: 1.7;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .rewards-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .reward-feature {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .reward-feature:hover {
+            transform: translateY(-8px);
+            background: var(--white);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .reward-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.75rem;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .reward-feature h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .reward-feature p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+        
+        /* Gallery Section */
+        .gallery-section {
+            padding: 6rem 5%;
+            background: var(--white);
+        }
+        
+        .gallery-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .gallery-title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 3rem;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .gallery-item {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.8), rgba(59, 130, 246, 0.8));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+        
+        .gallery-overlay i {
+            font-size: 3rem;
+            color: white;
+        }
+        
+        /* Subscribe Section */
+        .subscribe-section {
+            padding: 6rem 5%;
+            background: var(--light-grey);
+        }
+        
+        .subscribe-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .subscribe-form {
+            background: var(--white);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--light-blue);
+        }
+        
+        .user-type-selection {
+            margin-bottom: 2rem;
+        }
+        
+        .user-type-selection p {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .radio-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary-blue);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .form-row input {
+            padding: 1rem;
+            border: 2px solid var(--light-blue);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-row input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.2);
+        }
+        
+        .subscribe-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .subscribe-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--black);
+            color: white;
+            padding: 5rem 5% 2rem;
+            position: relative;
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 3rem;
+        }
+        
+        .footer-brand h3 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+        }
+        
+        .footer-brand p {
+            color: rgba(255,255,255,0.7);
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        .footer-links h4 {
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .social-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .social-icon:hover {
+            background: var(--secondary-blue);
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 1rem;
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-toggle:hover {
+            background: var(--light-blue);
+            transform: scale(1.1);
+        }
+        
+        /* Success Animation */
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--success), #0D9488);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .success-message.show {
+            transform: translateX(0);
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 2rem;
+                box-shadow: var(--shadow);
+                border-radius: 0 0 16px 16px;
+            }
+            
+            .nav-links.show {
+                display: flex;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .hero-content, .referral-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 3rem;
+            }
+            
+            .hero-text h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero-buttons {
+                justify-content: center;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .hero-stats {
+                justify-content: center;
+                gap: 1.5rem;
+                flex-wrap: wrap;
+            }
+            
+            .floating-card {
+                display: none;
+            }
+            
+            .contact-float-btn {
+                display: none;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 2rem;
+            }
+            
+            .social-icons {
+                justify-content: center;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-text h1 {
+                font-size: 2.2rem;
+            }
+            
+            .stat {
+                padding: 1rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            .code-inputs {
+                gap: 0.5rem;
+            }
+            
+            .code-input {
+                width: 45px;
+                height: 45px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <nav>
+            <a href="https://sapyyn.com/" class="logo">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMyNTYzRUIiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI4IiB5PSI4Ij4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+" alt="Sapyyn">
+                Sapyyn
+            </a>
+            <ul class="nav-links">
+                <li><a href="https://sapyyn.com/referrals">Referrals</a></li>
+                <li><a href="https://sapyyn.com/about">About</a></li>
+                <li><a href="https://sapyyn.com/pricing">Pricing</a></li>
+                <li><a href="https://sapyyn.com/resources">Resources</a></li>
+                <li><a href="https://sapyyn.com/surgicalInstruction">Surgical Instruction</a></li>
+                <li><a href="https://sapyyn.com/contact">Contact</a></li>
+            </ul>
+            <div class="cta-buttons">
+                <a href="https://portal.sapyyn.com/login" target="_blank" class="btn btn-secondary">Sign In</a>
+                <a href="https://portal.sapyyn.com/signup" target="_blank" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i> Get Started
+                </a>
+            </div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <!-- Contact Button -->
+        <a href="https://sapyyn.com/contact" class="contact-float-btn" title="Contact Us">
+            <i class="fas fa-phone"></i>
+        </a>
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Achieve the <span>Smile</span> You've Always Dreamed Of</h1>
+                <p>Our platform brings together skilled dental specialists committed to helping you restore and enhance your patients' smiles. Feel confident in the communication chain between dentist, patient and dental specialist while earning rewards for every referral.</p>
+                <div class="hero-buttons">
+                    <a href="https://portal.sapyyn.com/login" target="_blank" class="btn btn-primary" onclick="trackSignup()">
+                        <i class="fas fa-eye"></i> View Doctors
+                    </a>
+                    <a href="#rewards" class="btn btn-secondary">
+                        <i class="fas fa-star"></i> Learn About Rewards
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-number" data-target="500">500</div>
+                        <div class="stat-label">Doctors</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" data-target="14500">14500</div>
+                        <div class="stat-label">Patients</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" data-target="720">720</div>
+                        <div class="stat-label">Clinics</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?auto=format&fit=crop&w=800&h=600&q=80" alt="Medical Dashboard Interface" loading="lazy">
+                <div class="floating-card floating-card-1">
+                    <i class="fas fa-star" style="color: var(--accent-yellow); font-size: 1.5rem; margin-right: 0.5rem;"></i>
+                    <span style="font-weight: 700; color: var(--primary-blue);">+25 Reward Points!</span>
+                </div>
+                <div class="floating-card floating-card-2">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-shield-alt" style="color: var(--secondary-blue); font-size: 1.25rem;"></i>
+                        <span style="font-weight: 700;">HIPAA Compliant</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Referral Section -->
+    <section class="quick-referral" id="referrals">
+        <div class="referral-content">
+            <div class="referral-left">
+                <h2 class="referral-title">Quick Referral</h2>
+                <p class="referral-subtitle">Enter your 6-digit Dentist Code for quick referral</p>
+                <div class="code-inputs">
+                    <input type="text" maxlength="1" class="code-input" oninput="moveToNext(this, 0)">
+                    <input type="text" maxlength="1" class="code-input" oninput="moveToNext(this, 1)">
+                    <input type="text" maxlength="1" class="code-input" oninput="moveToNext(this, 2)">
+                    <input type="text" maxlength="1" class="code-input" oninput="moveToNext(this, 3)">
+                    <input type="text" maxlength="1" class="code-input" oninput="moveToNext(this, 4)">
+                    <input type="text" maxlength="1" class="code-input" oninput="moveToNext(this, 5)">
+                </div>
+                <p class="code-label">Enter your Dentist Code</p>
+                <button class="refer-btn" onclick="processReferral()">
+                    <i class="fas fa-paper-plane"></i> Refer
+                </button>
+            </div>
+            <div class="referral-image">
+                <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=600&h=400&q=80" alt="Dental Implant Treatment Process" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid Section -->
+    <section class="features-grid-section" id="features">
+        <div class="features-grid">
+            <div class="feature-card" onclick="highlightFeature(this); window.open('https://sapyyn.com/referrals', '_blank');">
+                <div class="feature-icon">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+                <h3>Instant Patient Referral via QR Code</h3>
+                <p>Simply scan the QR code to refer your patients to our practice. It's quick, convenient, and secure, ensuring your patients receive the care they need without any hassle.</p>
+            </div>
+            <div class="feature-card" onclick="highlightFeature(this); window.open('https://sapyyn.com/referrals', '_blank');">
+                <div class="feature-icon">
+                    <i class="fas fa-sms"></i>
+                </div>
+                <h3>Refer Patients with a Simple Text Message</h3>
+                <p>Just text us your patient's details using our dedicated referral number, and we'll take care of the rest. It's a fast and efficient way to ensure your patients get the specialized care they need.</p>
+            </div>
+            <div class="feature-card" onclick="highlightFeature(this); window.open('https://sapyyn.com/connectproviders', '_blank');">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Connect with Fellow Providers</h3>
+                <p>Join our network to discuss cases, share insights, and collaborate with other dental professionals. Our platform makes it easy to connect and chat with peers, enhancing patient outcomes through teamwork.</p>
+            </div>
+            <div class="feature-card" onclick="highlightFeature(this); window.open('https://sapyyn.com/sendpatientdocuments', '_blank');">
+                <div class="feature-icon">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <h3>Send Patient Documents Securely</h3>
+                <p>Upload and share patient records directly through our secure platform. Our system ensures that all documents are transferred safely and in compliance with HIPAA regulations, giving you peace of mind.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Doctors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="stat-number">9</div>
+                <div class="stat-label">Awards</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clinic-medical"></i>
+                </div>
+                <div class="stat-number">720</div>
+                <div class="stat-label">Clinics</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="stat-number">14500</div>
+                <div class="stat-label">Patients</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rewards Section -->
+    <section class="rewards-section" id="rewards">
+        <div class="rewards-content">
+            <h2>
+                <i class="fas fa-star"></i>
+                Earn Rewards While Making Referrals
+            </h2>
+            <p>Turn every referral into an opportunity. Our integrated rewards system recognizes your contribution to the dental community with points, cashback, and exclusive benefits.</p>
+            
+            <div class="rewards-features">
+                <div class="reward-feature">
+                    <div class="reward-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <h3>Earn Points</h3>
+                    <p>Get 25 points for every successful referral. Bonus points for specialist feedback and patient follow-ups.</p>
+                </div>
+                <div class="reward-feature">
+                    <div class="reward-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3>Tier System</h3>
+                    <p>Unlock Bronze, Silver, Gold, and Platinum tiers with increasing rewards and exclusive benefits.</p>
+                </div>
+                <div class="reward-feature">
+                    <div class="reward-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h3>Cash Rewards</h3>
+                    <p>Redeem points for cash, practice credits, or premium features. Monthly bonus opportunities available.</p>
+                </div>
+            </div>
+            
+            <a href="https://portal.sapyyn.com/signup" target="_blank" class="btn btn-primary" style="background: var(--primary-blue);">
+                <i class="fas fa-star"></i> Start Earning Rewards
+            </a>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery-section">
+        <div class="gallery-content">
+            <h2 class="gallery-title">Gallery</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item" onclick="openGalleryModal(this)">
+                    <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=400&h=250&q=80" alt="Modern Dental Office">
+                    <div class="gallery-overlay">
+                        <i class="fas fa-search-plus"></i>
+                    </div>
+                </div>
+                <div class="gallery-item" onclick="openGalleryModal(this)">
+                    <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=400&h=250&q=80" alt="Dental Implant Procedure">
+                    <div class="gallery-overlay">
+                        <i class="fas fa-search-plus"></i>
+                    </div>
+                </div>
+                <div class="gallery-item" onclick="openGalleryModal(this)">
+                    <img src="https://images.unsplash.com/photo-1551601651-2a8555f1a136?auto=format&fit=crop&w=400&h=250&q=80" alt="Digital Dental Technology">
+                    <div class="gallery-overlay">
+                        <i class="fas fa-search-plus"></i>
+                    </div>
+                </div>
+                <div class="gallery-item" onclick="openGalleryModal(this)">
+                    <img src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&w=400&h=250&q=80" alt="Dental Patient Care">
+                    <div class="gallery-overlay">
+                        <i class="fas fa-search-plus"></i>
+                    </div>
+                </div>
+                <div class="gallery-item" onclick="openGalleryModal(this)">
+                    <img src="https://images.unsplash.com/photo-1559757175-0eb20b2fe735?auto=format&fit=crop&w=400&h=250&q=80" alt="Medical Network Collaboration">
+                    <div class="gallery-overlay">
+                        <i class="fas fa-search-plus"></i>
+                    </div>
+                </div>
+                <div class="gallery-item" onclick="openGalleryModal(this)">
+                    <img src="https://images.unsplash.com/photo-1576669801775-ff43c5ab079d?auto=format&fit=crop&w=400&h=250&q=80" alt="Healthcare Digital Platform">
+                    <div class="gallery-overlay">
+                        <i class="fas fa-search-plus"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Subscribe Section -->
+    <section class="subscribe-section" id="contact">
+        <div class="subscribe-content">
+            <div class="subscribe-form">
+                <form action="https://sapyyn.com/subscribe" method="POST" onsubmit="return handleSubscribeForm(event)">
+                    <div class="user-type-selection">
+                        <p>I am a</p>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="userType" value="dentist" id="dentist" required>
+                                <label for="dentist">Dentist</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="userType" value="specialist" id="specialist" required>
+                                <label for="specialist">Specialist</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="userType" value="patient" id="patient" required>
+                                <label for="patient">Patient</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="userType" value="other" id="other" required>
+                                <label for="other">Other</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <input type="text" placeholder="Name" name="name" required>
+                        <input type="email" placeholder="Email ID" name="email" required>
+                        <button type="submit" class="subscribe-btn">Subscribe Now</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>Sapyyn</h3>
+                <p>Bridging the gap between dental providers and patients nationwide with our innovative, secure, and HIPAA-compliant referral platform. Transforming dental care one referral at a time while rewarding excellence.</p>
+                <div class="social-icons">
+                    <a href="https://facebook.com/sapyyn" target="_blank" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com/sapyyn" target="_blank" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="https://linkedin.com/company/sapyyn" target="_blank" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://instagram.com/sapyyn" target="_blank" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="https://sapyyn.com/casestudies">Case Studies</a></li>
+                    <li><a href="https://sapyyn.com/tutorials">Tutorials</a></li>
+                    <li><a href="https://sapyyn.com/howtoguides">How-To Guides</a></li>
+                    <li><a href="https://sapyyn.com/loyaltyrewards">Loyalty Rewards</a></li>
+                    <li><a href="https://sapyyn.com/hippa">HIPAA Compliance</a></li>
+                    <li><a href="https://sapyyn.com/privacy">Privacy Terms</a></li>
+                    <li><a href="https://sapyyn.com/faq">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Contact Us</h4>
+                <ul>
+                    <li><a href="mailto:contact@sapyyn.com">contact@sapyyn.com</a></li>
+                    <li><a href="https://sapyyn.com/about">About</a></li>
+                    <li><a href="https://sapyyn.com/referrals">Referrals</a></li>
+                    <li><a href="https://sapyyn.com/surgicalInstruction">Surgical Instruction</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="https://sapyyn.com/privacy">Privacy Policy</a></li>
+                    <li><a href="https://sapyyn.com/terms">Terms of Service</a></li>
+                    <li><a href="https://sapyyn.com/sitemap">Sitemap</a></li>
+                    <li><a href="https://sapyyn.com/security">Security</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Sapyyn. All rights reserved. Powered by Sapyyn | Empowering dental professionals nationwide with rewards for excellence.</p>
+        </div>
+    </footer>
+
+    <!-- Success Message -->
+    <div class="success-message" id="successMessage">
+        <i class="fas fa-check-circle"></i> Action completed successfully!
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('show');
+        }
+
+        // Code input functionality
+        function moveToNext(current, index) {
+            if (current.value.length === 1 && index < 5) {
+                const inputs = document.querySelectorAll('.code-input');
+                inputs[index + 1].focus();
+            }
+            
+            // Auto-submit when all fields are filled
+            const allInputs = Array.from(document.querySelectorAll('.code-input'));
+            if (allInputs.every(input => input.value.length === 1)) {
+                showSuccessMessage('🔢 Code entered! Processing referral...');
+            }
+        }
+
+        // Process referral
+        function processReferral() {
+            const inputs = document.querySelectorAll('.code-input');
+            const code = Array.from(inputs).map(input => input.value).join('');
+            
+            if (code.length === 6) {
+                showSuccessMessage('🚀 Referral processed successfully!');
+                // Clear inputs after success
+                setTimeout(() => {
+                    inputs.forEach(input => input.value = '');
+                }, 2000);
+            } else {
+                showSuccessMessage('⚠️ Please enter all 6 digits');
+            }
+        }
+
+        // Gallery modal functionality
+        function openGalleryModal(item) {
+            const img = item.querySelector('img');
+            const alt = img.alt;
+            const src = img.src.replace('w=400&h=250', 'w=1200&h=800'); // Get higher resolution
+            
+            showSuccessMessage('🖼️ Opening ' + alt + ' in full size...');
+            
+            // Open image in new tab for full viewing
+            setTimeout(() => {
+                window.open(src, '_blank');
+            }, 500);
+        }
+
+        // Feature highlighting
+        function highlightFeature(card) {
+            document.querySelectorAll('.feature-card').forEach(c => {
+                c.style.borderColor = 'var(--light-blue)';
+                c.style.transform = '';
+            });
+            
+            card.style.borderColor = 'var(--accent-yellow)';
+            card.style.transform = 'translateY(-15px) scale(1.02)';
+            card.style.boxShadow = '0 20px 60px rgba(252, 211, 77, 0.3)';
+            
+            showSuccessMessage('💡 Feature highlighted! Opening details...');
+        }
+
+        // Handle subscription form
+        function handleSubscribeForm(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const name = formData.get('name');
+            const email = formData.get('email');
+            const userType = formData.get('userType');
+
+            if (name && email && userType) {
+                showSuccessMessage('📧 Subscription successful! Welcome aboard!');
+                
+                // In a real implementation, you would send this data to your server
+                console.log('Subscription data:', { name, email, userType });
+                
+                // Clear form
+                setTimeout(() => {
+                    event.target.reset();
+                }, 2000);
+                
+                return false;
+            } else {
+                showSuccessMessage('⚠️ Please fill in all fields');
+                return false;
+            }
+        }
+
+        // Legacy function for backward compatibility
+        function handleSubscribe() {
+            const form = document.querySelector('.subscribe-form form');
+            if (form) {
+                handleSubscribeForm(new Event('submit'));
+            }
+        }
+
+        // Success message display
+        function showSuccessMessage(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.innerHTML = message;
+            successDiv.classList.add('show');
+            
+            setTimeout(() => {
+                successDiv.classList.remove('show');
+            }, 3000);
+        }
+
+        // Track signup clicks
+        function trackSignup() {
+            showSuccessMessage('🚀 Redirecting to portal...');
+            setTimeout(() => {
+                window.open('https://portal.sapyyn.com/login', '_blank');
+            }, 1000);
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+                header.style.backdropFilter = 'blur(25px)';
+                header.style.borderBottom = '1px solid var(--light-blue)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(20px)';
+                header.style.borderBottom = '1px solid var(--light-blue)';
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Auto-close mobile menu on window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 968) {
+                document.querySelector('.nav-links').classList.remove('show');
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Add keyboard support for code inputs
+            const codeInputs = document.querySelectorAll('.code-input');
+            codeInputs.forEach((input, index) => {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && input.value === '' && index > 0) {
+                        codeInputs[index - 1].focus();
+                    }
+                    if (e.key === 'Enter') {
+                        processReferral();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
