@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resources - Sapyyn</title>
+    <meta name="description" content="Access helpful resources, guides, and tools to maximize your Sapyyn experience. Download templates, watch tutorials, and learn best practices.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --secondary-blue: #3B82F6;
+            --light-blue: #DBEAFE;
+            --accent-yellow: #FCD34D;
+            --warning-yellow: #F59E0B;
+            --white: #FFFFFF;
+            --light-grey: #F8FAFC;
+            --medium-grey: #64748B;
+            --dark-grey: #334155;
+            --black: #0F172A;
+            --success: #10B981;
+            --danger: #EF4444;
+            --shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+            --shadow-hover: 0 16px 64px rgba(37, 99, 235, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--black);
+            line-height: 1.6;
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        }
+        
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--light-blue);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--primary-blue);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo img {
+            height: 45px;
+            margin-right: 12px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+            gap: 2.5rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-grey);
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-links a.active {
+            color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+        
+        .nav-links a:hover {
+            color: var(--secondary-blue);
+            background: var(--light-blue);
+            transform: translateY(-2px);
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        /* Page Header */
+        .page-header {
+            margin-top: 80px;
+            padding: 6rem 5% 4rem;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .page-header p {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 6rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Resource Categories */
+        .categories-section {
+            margin-bottom: 6rem;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .section-header p {
+            font-size: 1.2rem;
+            color: var(--medium-grey);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .category-card {
+            background: var(--white);
+            padding: 2.5rem 2rem;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid var(--light-blue);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--secondary-blue);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .category-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+        }
+        
+        .category-card h3 {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .category-card p {
+            color: var(--medium-grey);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .resource-count {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        /* Featured Resources */
+        .featured-resources {
+            margin-bottom: 6rem;
+        }
+        
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .resource-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid var(--light-blue);
+            transition: all 0.3s ease;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--secondary-blue);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .resource-image {
+            height: 200px;
+            background: linear-gradient(135deg, var(--light-blue), var(--white));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--primary-blue);
+        }
+        
+        .resource-content {
+            padding: 2rem;
+        }
+        
+        .resource-type {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .resource-card h3 {
+            font-size: 1.3rem;
+            color: var(--black);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .resource-card p {
+            color: var(--medium-grey);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .resource-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--medium-grey);
+        }
+        
+        .download-btn {
+            background: var(--primary-blue);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .download-btn:hover {
+            background: var(--secondary-blue);
+            transform: translateY(-2px);
+        }
+        
+        /* Tutorials Section */
+        .tutorials-section {
+            background: linear-gradient(135deg, var(--accent-yellow) 0%, var(--warning-yellow) 100%);
+            color: var(--black);
+            padding: 4rem 2rem;
+            border-radius: 20px;
+            margin-bottom: 6rem;
+        }
+        
+        .tutorials-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+            text-align: center;
+        }
+        
+        .tutorials-section p {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .tutorials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .tutorial-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .tutorial-card:hover {
+            background: var(--white);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .tutorial-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.75rem;
+            color: white;
+        }
+        
+        .tutorial-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .tutorial-card p {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .tutorial-duration {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+        
+        .watch-btn {
+            background: var(--primary-blue);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        
+        .watch-btn:hover {
+            background: var(--secondary-blue);
+            transform: translateY(-2px);
+        }
+        
+        /* Support Section */
+        .support-section {
+            margin-bottom: 6rem;
+        }
+        
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .support-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid var(--light-blue);
+            transition: all 0.3s ease;
+        }
+        
+        .support-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary-blue);
+            box-shadow: var(--shadow);
+        }
+        
+        .support-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--light-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+        }
+        
+        .support-card h3 {
+            font-size: 1.2rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .support-card p {
+            color: var(--medium-grey);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .support-btn {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .support-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            padding: 4rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+        
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .cta-buttons {
+            justify-content: center;
+            gap: 1.5rem;
+        }
+        
+        .btn-white {
+            background: var(--white);
+            color: var(--primary-blue);
+        }
+        
+        .btn-white:hover {
+            background: var(--light-grey);
+            transform: translateY(-3px) scale(1.05);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--black);
+            color: white;
+            padding: 4rem 5% 2rem;
+            margin-top: 6rem;
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 3rem;
+        }
+        
+        .footer-brand h3 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+        }
+        
+        .footer-brand p {
+            color: rgba(255,255,255,0.7);
+            line-height: 1.8;
+        }
+        
+        .footer-links h4 {
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-toggle:hover {
+            background: var(--light-blue);
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 2rem;
+                box-shadow: var(--shadow);
+                border-radius: 0 0 16px 16px;
+            }
+            
+            .nav-links.show {
+                display: flex;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tutorials-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .support-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <a href="./index.html" class="logo">
+                <img src="./assets/logo.svg" alt="Sapyyn">
+                Sapyyn
+            </a>
+            <ul class="nav-links">
+                <li><a href="./referrals.html">Referrals</a></li>
+                <li><a href="./about.html">About</a></li>
+                <li><a href="./pricing.html">Pricing</a></li>
+                <li><a href="./resources.html" class="active">Resources</a></li>
+                <li><a href="./surgical-instruction.html">Surgical Instruction</a></li>
+                <li><a href="./contact.html">Contact</a></li>
+            </ul>
+            <div class="cta-buttons">
+                <a href="./sapyyn-portal.html" class="btn btn-secondary">Sign In</a>
+                <a href="./portal-signup.html" class="btn btn-primary">Get Started</a>
+            </div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <h1>Resources & Support</h1>
+        <p>Everything you need to maximize your Sapyyn experience. Access guides, tutorials, templates, and expert support to streamline your referral process.</p>
+    </section>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Resource Categories -->
+        <section class="categories-section">
+            <div class="section-header">
+                <h2>Browse by Category</h2>
+                <p>Find the resources you need organized by topic and type.</p>
+            </div>
+            <div class="categories-grid">
+                <div class="category-card" onclick="filterResources('getting-started')">
+                    <div class="category-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3>Getting Started</h3>
+                    <p>Quick start guides, setup tutorials, and onboarding materials to get you up and running.</p>
+                    <span class="resource-count">12 Resources</span>
+                </div>
+                <div class="category-card" onclick="filterResources('best-practices')">
+                    <div class="category-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3>Best Practices</h3>
+                    <p>Expert tips, workflows, and strategies to optimize your referral process and earn more rewards.</p>
+                    <span class="resource-count">8 Resources</span>
+                </div>
+                <div class="category-card" onclick="filterResources('templates')">
+                    <div class="category-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3>Templates & Forms</h3>
+                    <p>Downloadable templates, forms, and documents to standardize your referral communications.</p>
+                    <span class="resource-count">15 Resources</span>
+                </div>
+                <div class="category-card" onclick="filterResources('technical')">
+                    <div class="category-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <h3>Technical Guides</h3>
+                    <p>API documentation, integration guides, and technical specifications for advanced users.</p>
+                    <span class="resource-count">6 Resources</span>
+                </div>
+                <div class="category-card" onclick="filterResources('compliance')">
+                    <div class="category-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Compliance & Security</h3>
+                    <p>HIPAA guidelines, security protocols, and regulatory compliance information.</p>
+                    <span class="resource-count">9 Resources</span>
+                </div>
+                <div class="category-card" onclick="filterResources('rewards')">
+                    <div class="category-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3>Rewards Program</h3>
+                    <p>Learn about earning points, tier benefits, and maximizing your rewards potential.</p>
+                    <span class="resource-count">7 Resources</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Resources -->
+        <section class="featured-resources">
+            <div class="section-header">
+                <h2>Featured Resources</h2>
+                <p>Our most popular and helpful resources to get the most out of Sapyyn.</p>
+            </div>
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-image">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <div class="resource-content">
+                        <span class="resource-type">Video Guide</span>
+                        <h3>Complete Platform Walkthrough</h3>
+                        <p>A comprehensive 15-minute video covering all platform features, from creating your first referral to redeeming rewards.</p>
+                        <div class="resource-meta">
+                            <span><i class="fas fa-clock"></i> 15 min</span>
+                            <span><i class="fas fa-eye"></i> 2.1K views</span>
+                        </div>
+                        <a href="#" class="download-btn">
+                            <i class="fas fa-play"></i> Watch Video
+                        </a>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-image">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="resource-content">
+                        <span class="resource-type">PDF Guide</span>
+                        <h3>Referral Best Practices Handbook</h3>
+                        <p>A 24-page comprehensive guide covering proven strategies for successful referrals and maximizing patient outcomes.</p>
+                        <div class="resource-meta">
+                            <span><i class="fas fa-file"></i> 24 pages</span>
+                            <span><i class="fas fa-download"></i> 847 downloads</span>
+                        </div>
+                        <a href="#" class="download-btn">
+                            <i class="fas fa-download"></i> Download PDF
+                        </a>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-image">
+                        <i class="fas fa-file-word"></i>
+                    </div>
+                    <div class="resource-content">
+                        <span class="resource-type">Template</span>
+                        <h3>Patient Referral Letter Templates</h3>
+                        <p>Professional referral letter templates for different specialties, customizable for your practice's branding and needs.</p>
+                        <div class="resource-meta">
+                            <span><i class="fas fa-file"></i> 8 templates</span>
+                            <span><i class="fas fa-download"></i> 1.2K downloads</span>
+                        </div>
+                        <a href="#" class="download-btn">
+                            <i class="fas fa-download"></i> Download Templates
+                        </a>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-image">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="resource-content">
+                        <span class="resource-type">White Paper</span>
+                        <h3>ROI of Digital Referral Systems</h3>
+                        <p>Research-backed analysis showing how digital referral platforms improve practice efficiency and patient satisfaction.</p>
+                        <div class="resource-meta">
+                            <span><i class="fas fa-file"></i> 16 pages</span>
+                            <span><i class="fas fa-download"></i> 634 downloads</span>
+                        </div>
+                        <a href="#" class="download-btn">
+                            <i class="fas fa-download"></i> Download Report
+                        </a>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-image">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="resource-content">
+                        <span class="resource-type">Mobile Guide</span>
+                        <h3>Mobile App User Manual</h3>
+                        <p>Step-by-step instructions for using the Sapyyn mobile app, including offline features and push notifications.</p>
+                        <div class="resource-meta">
+                            <span><i class="fas fa-file"></i> 12 pages</span>
+                            <span><i class="fas fa-download"></i> 923 downloads</span>
+                        </div>
+                        <a href="#" class="download-btn">
+                            <i class="fas fa-download"></i> Download Guide
+                        </a>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-image">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="resource-content">
+                        <span class="resource-type">Training</span>
+                        <h3>Rewards Optimization Course</h3>
+                        <p>Interactive training module covering advanced strategies for maximizing your rewards earnings and tier progression.</p>
+                        <div class="resource-meta">
+                            <span><i class="fas fa-clock"></i> 45 min</span>
+                            <span><i class="fas fa-users"></i> 512 completed</span>
+                        </div>
+                        <a href="#" class="download-btn">
+                            <i class="fas fa-play"></i> Start Course
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tutorials Section -->
+        <section class="tutorials-section">
+            <h2>Video Tutorials</h2>
+            <p>Learn at your own pace with our comprehensive video tutorial library.</p>
+            <div class="tutorials-grid">
+                <div class="tutorial-card">
+                    <div class="tutorial-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>Creating Your First Referral</h3>
+                    <p>Learn how to create, customize, and send your first patient referral through the platform.</p>
+                    <span class="tutorial-duration">8 minutes</span>
+                    <a href="#" class="watch-btn">
+                        <i class="fas fa-play"></i> Watch Now
+                    </a>
+                </div>
+                <div class="tutorial-card">
+                    <div class="tutorial-icon">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <h3>QR Code Referral System</h3>
+                    <p>Master the QR code feature for instant referrals and learn about mobile scanning best practices.</p>
+                    <span class="tutorial-duration">6 minutes</span>
+                    <a href="#" class="watch-btn">
+                        <i class="fas fa-play"></i> Watch Now
+                    </a>
+                </div>
+                <div class="tutorial-card">
+                    <div class="tutorial-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3>Maximizing Your Rewards</h3>
+                    <p>Discover tips and strategies for earning more points and advancing through reward tiers quickly.</p>
+                    <span class="tutorial-duration">12 minutes</span>
+                    <a href="#" class="watch-btn">
+                        <i class="fas fa-play"></i> Watch Now
+                    </a>
+                </div>
+                <div class="tutorial-card">
+                    <div class="tutorial-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Analytics & Reporting</h3>
+                    <p>Learn how to interpret your referral analytics and use data to improve patient outcomes.</p>
+                    <span class="tutorial-duration">10 minutes</span>
+                    <a href="#" class="watch-btn">
+                        <i class="fas fa-play"></i> Watch Now
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Support Options -->
+        <section class="support-section">
+            <div class="section-header">
+                <h2>Get Support</h2>
+                <p>Multiple ways to get help when you need it.</p>
+            </div>
+            <div class="support-grid">
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-life-ring"></i>
+                    </div>
+                    <h3>Help Center</h3>
+                    <p>Browse our comprehensive knowledge base with answers to common questions.</p>
+                    <a href="#" class="support-btn">Visit Help Center</a>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Live Chat</h3>
+                    <p>Get instant help from our support team during business hours (8 AM - 6 PM EST).</p>
+                    <a href="#" class="support-btn">Start Chat</a>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3>Email Support</h3>
+                    <p>Send us a detailed message and we'll respond within 24 hours.</p>
+                    <a href="mailto:support@sapyyn.com" class="support-btn">Send Email</a>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h3>Phone Support</h3>
+                    <p>Call our support line for urgent issues or complex technical questions.</p>
+                    <a href="tel:+1-800-SAPYYN" class="support-btn">Call Now</a>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Community Forum</h3>
+                    <p>Connect with other users, share tips, and get advice from the Sapyyn community.</p>
+                    <a href="#" class="support-btn">Join Forum</a>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <h3>Schedule Training</h3>
+                    <p>Book a one-on-one training session with our customer success team.</p>
+                    <a href="#" class="support-btn">Book Session</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <h2>Still Have Questions?</h2>
+            <p>Our team is here to help you succeed with Sapyyn. Reach out and we'll get you the answers you need.</p>
+            <div class="cta-buttons">
+                <a href="./contact.html" class="btn btn-white">
+                    <i class="fas fa-envelope"></i> Contact Support
+                </a>
+                <a href="./portal-signup.html" class="btn btn-secondary" style="border-color: white; color: white;">
+                    <i class="fas fa-rocket"></i> Get Started
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>Sapyyn</h3>
+                <p>Revolutionizing dental referrals with our secure, HIPAA-compliant platform. Connect patients with specialists while earning rewards for your contributions to exceptional care.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="./index.html">Features</a></li>
+                    <li><a href="./pricing.html">Pricing</a></li>
+                    <li><a href="./resources.html">Resources</a></li>
+                    <li><a href="./referrals.html">Referrals</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="./about.html">About</a></li>
+                    <li><a href="./surgical-instruction.html">Surgical Instruction</a></li>
+                    <li><a href="./contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="./privacy.html">Privacy Policy</a></li>
+                    <li><a href="./terms.html">Terms of Service</a></li>
+                    <li><a href="./hipaa.html">HIPAA Compliance</a></li>
+                    <li><a href="./security.html">Security</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Sapyyn. All rights reserved. Transforming dental referrals nationwide.</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('show');
+        }
+
+        function filterResources(category) {
+            // This would normally filter the resources
+            console.log('Filtering resources by:', category);
+            // For demo purposes, just show an alert
+            alert(`Showing ${category} resources. This would filter the resources in a real implementation.`);
+        }
+
+        // Auto-close mobile menu on window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 968) {
+                document.querySelector('.nav-links').classList.remove('show');
+            }
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+                header.style.backdropFilter = 'blur(25px)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(20px)';
+            }
+        });
+
+        // Animate cards on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.category-card, .resource-card, .tutorial-card, .support-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'all 0.6s ease';
+                
+                setTimeout(() => {
+                    observer.observe(card);
+                }, index * 50);
+            });
+        });
+    </script>
+</body>
+</html>

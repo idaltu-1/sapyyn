@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapyyn Portal - Integrations Dashboard</title>
+    <meta name="description" content="Manage your third-party integrations and connect with dental software platforms">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --secondary-blue: #3B82F6;
+            --light-blue: #DBEAFE;
+            --accent-yellow: #FCD34D;
+            --warning-yellow: #F59E0B;
+            --white: #FFFFFF;
+            --light-grey: #F8FAFC;
+            --medium-grey: #64748B;
+            --dark-grey: #334155;
+            --black: #0F172A;
+            --success: #10B981;
+            --danger: #EF4444;
+            --glass: rgba(255, 255, 255, 0.25);
+            --shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+            --shadow-hover: 0 16px 64px rgba(37, 99, 235, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+            color: var(--black);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Portal Header */
+        .portal-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--light-blue);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .portal-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .portal-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--primary-blue);
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+        
+        .portal-logo img {
+            height: 40px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .portal-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .portal-menu a {
+            text-decoration: none;
+            color: var(--dark-grey);
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .portal-menu a:hover {
+            color: var(--secondary-blue);
+            background: var(--light-blue);
+            transform: translateY(-2px);
+        }
+        
+        .portal-menu a.active {
+            color: var(--white);
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            box-shadow: var(--shadow);
+        }
+        
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .notification-btn {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--medium-grey);
+            cursor: pointer;
+            position: relative;
+            padding: 0.75rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .notification-btn:hover {
+            color: var(--primary-blue);
+            background: var(--light-blue);
+            transform: scale(1.1);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--light-blue);
+        }
+        
+        .user-profile:hover {
+            background: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        /* Dashboard Container */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Page Header */
+        .page-header {
+            margin-bottom: 3rem;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            font-size: 1.25rem;
+            color: var(--medium-grey);
+        }
+        
+        /* Stats Overview */
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .stat-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--light-blue);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .stat-card:hover::before {
+            left: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--medium-grey);
+            font-weight: 500;
+        }
+        
+        /* Integration Categories */
+        .integration-categories {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .category-filter {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--light-blue);
+            background: var(--white);
+            color: var(--primary-blue);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .category-filter:hover,
+        .category-filter.active {
+            background: var(--primary-blue);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        /* Integrations Grid */
+        .integrations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .integration-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--light-blue);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .integration-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .integration-header {
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .integration-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: var(--light-grey);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .integration-info h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 0.25rem;
+        }
+        
+        .integration-info p {
+            color: var(--medium-grey);
+            font-size: 0.9rem;
+        }
+        
+        .integration-status {
+            margin-left: auto;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-connected {
+            background: linear-gradient(135deg, var(--success), #0D9488);
+            color: white;
+        }
+        
+        .status-available {
+            background: linear-gradient(135deg, var(--accent-yellow), var(--warning-yellow));
+            color: var(--black);
+        }
+        
+        .status-pending {
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+            color: white;
+        }
+        
+        .integration-body {
+            padding: 0 2rem 2rem;
+        }
+        
+        .integration-description {
+            color: var(--dark-grey);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .integration-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+        
+        .integration-features li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--dark-grey);
+        }
+        
+        .integration-features li i {
+            color: var(--success);
+            font-size: 0.9rem;
+        }
+        
+        .integration-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+        }
+        
+        /* API Keys Section */
+        .api-section {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--light-blue);
+            margin-bottom: 3rem;
+        }
+        
+        .api-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .api-key-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            background: var(--light-grey);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .api-key-item:hover {
+            background: rgba(37, 99, 235, 0.05);
+            transform: translateX(4px);
+        }
+        
+        .api-key-info h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .api-key-info p {
+            color: var(--medium-grey);
+            font-size: 0.9rem;
+        }
+        
+        .api-key-value {
+            font-family: 'Courier New', monospace;
+            background: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--light-blue);
+            margin: 0 1rem;
+            color: var(--dark-grey);
+            font-size: 0.85rem;
+        }
+        
+        .api-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-icon {
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--medium-grey);
+            background: var(--white);
+        }
+        
+        .btn-icon:hover {
+            color: var(--primary-blue);
+            background: var(--light-blue);
+            transform: scale(1.1);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 968px) {
+            .portal-menu {
+                display: none;
+            }
+            
+            .stats-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            .integrations-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .integration-categories {
+                justify-content: center;
+            }
+            
+            .integration-actions {
+                flex-direction: column;
+            }
+            
+            .api-key-item {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .dashboard-container {
+                padding: 1rem;
+            }
+            
+            .integration-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .category-filter {
+                font-size: 0.9rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Portal Header -->
+    <header class="portal-header">
+        <nav class="portal-nav">
+            <a href="./sapyyn-portal.html" class="portal-logo">
+                <img src="./assets/logo.svg" alt="Sapyyn">
+                <span>Portal</span>
+            </a>
+            
+            <ul class="portal-menu">
+                <li><a href="./sapyyn-portal.html">Dashboard</a></li>
+                <li><a href="./portal-referrals.html">My Referrals</a></li>
+                <li><a href="./portal-appointments.html">Appointments</a></li>
+                <li><a href="./portal-documents.html">Documents</a></li>
+                <li><a href="./portal-integrations.html" class="active">Integrations</a></li>
+                <li><a href="./portal-settings.html">Settings</a></li>
+            </ul>
+            
+            <div class="user-controls">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <div class="user-profile">
+                    <div class="user-avatar">JD</div>
+                    <div class="user-info">
+                        <div style="font-weight: 600; font-size: 0.9rem;">John Doe</div>
+                        <div style="font-size: 0.8rem; color: var(--medium-grey);">Patient #12345</div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--medium-grey);"></i>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Dashboard Content -->
+    <main class="dashboard-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Integrations</h1>
+            <p class="page-subtitle">Connect with your favorite dental software and third-party applications</p>
+        </div>
+
+        <!-- Stats Overview -->
+        <section class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-plug"></i>
+                </div>
+                <div class="stat-value">12</div>
+                <div class="stat-label">Active Integrations</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <div class="stat-value">1,247</div>
+                <div class="stat-label">Data Syncs Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-value">2</div>
+                <div class="stat-label">Pending Connections</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="stat-value">100%</div>
+                <div class="stat-label">Security Score</div>
+            </div>
+        </section>
+
+        <!-- Integration Categories -->
+        <div class="integration-categories">
+            <button class="category-filter active" data-category="all">All Integrations</button>
+            <button class="category-filter" data-category="pms">Practice Management</button>
+            <button class="category-filter" data-category="imaging">Imaging Systems</button>
+            <button class="category-filter" data-category="communication">Communication</button>
+            <button class="category-filter" data-category="billing">Billing & Payment</button>
+            <button class="category-filter" data-category="analytics">Analytics</button>
+        </div>
+
+        <!-- Integrations Grid -->
+        <section class="integrations-grid">
+            <!-- Dentrix Integration -->
+            <div class="integration-card" data-category="pms">
+                <div class="integration-header">
+                    <div class="integration-logo" style="background: #4A90E2; color: white;">
+                        <i class="fas fa-tooth"></i>
+                    </div>
+                    <div class="integration-info">
+                        <h3>Dentrix</h3>
+                        <p>Practice Management System</p>
+                    </div>
+                    <span class="integration-status status-connected">Connected</span>
+                </div>
+                <div class="integration-body">
+                    <p class="integration-description">Seamlessly sync patient data, appointments, and treatment plans with your Dentrix practice management system.</p>
+                    <ul class="integration-features">
+                        <li><i class="fas fa-check"></i> Patient data synchronization</li>
+                        <li><i class="fas fa-check"></i> Appointment scheduling</li>
+                        <li><i class="fas fa-check"></i> Treatment plan sharing</li>
+                        <li><i class="fas fa-check"></i> Real-time updates</li>
+                    </ul>
+                    <div class="integration-actions">
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-cog"></i> Configure
+                        </button>
+                        <button class="btn btn-danger">
+                            <i class="fas fa-unlink"></i> Disconnect
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Eaglesoft Integration -->
+            <div class="integration-card" data-category="pms">
+                <div class="integration-header">
+                    <div class="integration-logo" style="background: #E74C3C; color: white;">
+                        <i class="fas fa-desktop"></i>
+                    </div>
+                    <div class="integration-info">
+                        <h3>Eaglesoft</h3>
+                        <p>Practice Management System</p>
+                    </div>
+                    <span class="integration-status status-available">Available</span>
+                </div>
+                <div class="integration-body">
+                    <p class="integration-description">Connect your Eaglesoft system to streamline referral workflows and patient data management.</p>
+                    <ul class="integration-features">
+                        <li><i class="fas fa-check"></i> Patient records integration</li>
+                        <li><i class="fas fa-check"></i> Automated referral creation</li>
+                        <li><i class="fas fa-check"></i> Insurance verification</li>
+                        <li><i class="fas fa-check"></i> Digital chart access</li>
+                    </ul>
+                    <div class="integration-actions">
+                        <button class="btn btn-primary" onclick="connectIntegration('Eaglesoft')">
+                            <i class="fas fa-plus"></i> Connect
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-info-circle"></i> Learn More
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DEXIS Integration -->
+            <div class="integration-card" data-category="imaging">
+                <div class="integration-header">
+                    <div class="integration-logo" style="background: #27AE60; color: white;">
+                        <i class="fas fa-x-ray"></i>
+                    </div>
+                    <div class="integration-info">
+                        <h3>DEXIS</h3>
+                        <p>Digital Imaging System</p>
+                    </div>
+                    <span class="integration-status status-connected">Connected</span>
+                </div>
+                <div class="integration-body">
+                    <p class="integration-description">Share digital X-rays and imaging data directly with specialists through secure DEXIS integration.</p>
+                    <ul class="integration-features">
+                        <li><i class="fas fa-check"></i> Digital X-ray sharing</li>
+                        <li><i class="fas fa-check"></i> Image annotation tools</li>
+                        <li><i class="fas fa-check"></i> DICOM compatibility</li>
+                        <li><i class="fas fa-check"></i> Cloud storage access</li>
+                    </ul>
+                    <div class="integration-actions">
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-cog"></i> Configure
+                        </button>
+                        <button class="btn btn-danger">
+                            <i class="fas fa-unlink"></i> Disconnect
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slack Integration -->
+            <div class="integration-card" data-category="communication">
+                <div class="integration-header">
+                    <div class="integration-logo" style="background: #4A154B; color: white;">
+                        <i class="fab fa-slack"></i>
+                    </div>
+                    <div class="integration-info">
+                        <h3>Slack</h3>
+                        <p>Team Communication</p>
+                    </div>
+                    <span class="integration-status status-pending">Pending</span>
+                </div>
+                <div class="integration-body">
+                    <p class="integration-description">Get instant notifications and updates about referrals directly in your Slack workspace.</p>
+                    <ul class="integration-features">
+                        <li><i class="fas fa-check"></i> Real-time notifications</li>
+                        <li><i class="fas fa-check"></i> Referral status updates</li>
+                        <li><i class="fas fa-check"></i> Team collaboration</li>
+                        <li><i class="fas fa-check"></i> Custom alert settings</li>
+                    </ul>
+                    <div class="integration-actions">
+                        <button class="btn btn-primary" onclick="connectIntegration('Slack')">
+                            <i class="fas fa-plus"></i> Connect
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-info-circle"></i> Learn More
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QuickBooks Integration -->
+            <div class="integration-card" data-category="billing">
+                <div class="integration-header">
+                    <div class="integration-logo" style="background: #0077C5; color: white;">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <div class="integration-info">
+                        <h3>QuickBooks</h3>
+                        <p>Accounting & Billing</p>
+                    </div>
+                    <span class="integration-status status-available">Available</span>
+                </div>
+                <div class="integration-body">
+                    <p class="integration-description">Sync billing information and track referral-related revenue with QuickBooks integration.</p>
+                    <ul class="integration-features">
+                        <li><i class="fas fa-check"></i> Automated invoicing</li>
+                        <li><i class="fas fa-check"></i> Payment tracking</li>
+                        <li><i class="fas fa-check"></i> Financial reporting</li>
+                        <li><i class="fas fa-check"></i> Tax preparation support</li>
+                    </ul>
+                    <div class="integration-actions">
+                        <button class="btn btn-primary" onclick="connectIntegration('QuickBooks')">
+                            <i class="fas fa-plus"></i> Connect
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-info-circle"></i> Learn More
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Google Analytics Integration -->
+            <div class="integration-card" data-category="analytics">
+                <div class="integration-header">
+                    <div class="integration-logo" style="background: #FF6C37; color: white;">
+                        <i class="fab fa-google"></i>
+                    </div>
+                    <div class="integration-info">
+                        <h3>Google Analytics</h3>
+                        <p>Web Analytics</p>
+                    </div>
+                    <span class="integration-status status-connected">Connected</span>
+                </div>
+                <div class="integration-body">
+                    <p class="integration-description">Track referral patterns and patient acquisition metrics with Google Analytics integration.</p>
+                    <ul class="integration-features">
+                        <li><i class="fas fa-check"></i> Referral source tracking</li>
+                        <li><i class="fas fa-check"></i> Conversion analytics</li>
+                        <li><i class="fas fa-check"></i> Patient journey mapping</li>
+                        <li><i class="fas fa-check"></i> Custom dashboards</li>
+                    </ul>
+                    <div class="integration-actions">
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-cog"></i> Configure
+                        </button>
+                        <button class="btn btn-danger">
+                            <i class="fas fa-unlink"></i> Disconnect
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Keys Section -->
+        <section class="api-section">
+            <h2>
+                <i class="fas fa-key"></i>
+                API Keys & Webhooks
+            </h2>
+            
+            <div class="api-key-item">
+                <div class="api-key-info">
+                    <h4>Production API Key</h4>
+                    <p>For live integrations and production systems</p>
+                </div>
+                <div class="api-key-value">sk_live_****************************</div>
+                <div class="api-actions">
+                    <button class="btn-icon" onclick="copyToClipboard('api-key-1')">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <button class="btn-icon" onclick="regenerateKey('production')">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="btn-icon" onclick="revokeKey('production')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="api-key-item">
+                <div class="api-key-info">
+                    <h4>Test API Key</h4>
+                    <p>For development and testing purposes</p>
+                </div>
+                <div class="api-key-value">sk_test_****************************</div>
+                <div class="api-actions">
+                    <button class="btn-icon" onclick="copyToClipboard('api-key-2')">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <button class="btn-icon" onclick="regenerateKey('test')">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="api-key-item">
+                <div class="api-key-info">
+                    <h4>Webhook Endpoint</h4>
+                    <p>Receive real-time updates about referral status changes</p>
+                </div>
+                <div class="api-key-value">https://your-app.com/webhooks/sapyyn</div>
+                <div class="api-actions">
+                    <button class="btn-icon" onclick="copyToClipboard('webhook')">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <button class="btn-icon" onclick="testWebhook()">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button class="btn-icon" onclick="configureWebhook()">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Category filtering
+        document.querySelectorAll('.category-filter').forEach(filter => {
+            filter.addEventListener('click', function() {
+                // Remove active class from all filters
+                document.querySelectorAll('.category-filter').forEach(f => f.classList.remove('active'));
+                // Add active class to clicked filter
+                this.classList.add('active');
+                
+                const category = this.getAttribute('data-category');
+                const cards = document.querySelectorAll('.integration-card');
+                
+                cards.forEach(card => {
+                    if (category === 'all' || card.getAttribute('data-category') === category) {
+                        card.style.display = 'block';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, 100);
+                    } else {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(20px)';
+                        setTimeout(() => {
+                            card.style.display = 'none';
+                        }, 300);
+                    }
+                });
+            });
+        });
+
+        // Connect integration
+        function connectIntegration(name) {
+            alert(`Connecting to ${name}... Please wait while we establish the connection.`);
+            // In a real app, this would open an OAuth flow or configuration modal
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(type) {
+            alert('API key copied to clipboard!');
+        }
+
+        // Regenerate API key
+        function regenerateKey(type) {
+            if (confirm(`Are you sure you want to regenerate the ${type} API key? This will invalidate the current key.`)) {
+                alert(`${type} API key regenerated successfully!`);
+            }
+        }
+
+        // Revoke API key
+        function revokeKey(type) {
+            if (confirm(`Are you sure you want to revoke the ${type} API key? This action cannot be undone.`)) {
+                alert(`${type} API key revoked successfully!`);
+            }
+        }
+
+        // Test webhook
+        function testWebhook() {
+            alert('Sending test webhook... Check your endpoint for the test payload.');
+        }
+
+        // Configure webhook
+        function configureWebhook() {
+            alert('Opening webhook configuration...');
+        }
+
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate stat cards
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Animate integration cards
+            const integrationCards = document.querySelectorAll('.integration-card');
+            integrationCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 200 + (index * 100));
+            });
+        });
+    </script>
+</body>
+</html>

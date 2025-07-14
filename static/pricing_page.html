@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Plans - Sapyyn</title>
+    <meta name="description" content="Choose the perfect Sapyyn plan for your dental practice. Start with a 14-day free trial and upgrade to unlock advanced features and rewards.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --secondary-blue: #3B82F6;
+            --light-blue: #DBEAFE;
+            --accent-yellow: #FCD34D;
+            --warning-yellow: #F59E0B;
+            --white: #FFFFFF;
+            --light-grey: #F8FAFC;
+            --medium-grey: #64748B;
+            --dark-grey: #334155;
+            --black: #0F172A;
+            --success: #10B981;
+            --danger: #EF4444;
+            --shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+            --shadow-hover: 0 16px 64px rgba(37, 99, 235, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--black);
+            line-height: 1.6;
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        }
+        
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--light-blue);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--primary-blue);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo img {
+            height: 45px;
+            margin-right: 12px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+            gap: 2.5rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-grey);
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-links a.active {
+            color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+        
+        .nav-links a:hover {
+            color: var(--secondary-blue);
+            background: var(--light-blue);
+            transform: translateY(-2px);
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        /* Page Header */
+        .page-header {
+            margin-top: 80px;
+            padding: 6rem 5% 4rem;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .page-header p {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        
+        /* Pricing Toggle */
+        .pricing-toggle {
+            text-align: center;
+            margin: 4rem auto;
+            max-width: 400px;
+        }
+        
+        .toggle-container {
+            background: var(--light-grey);
+            border-radius: 50px;
+            padding: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .toggle-option {
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            background: transparent;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--medium-grey);
+        }
+        
+        .toggle-option.active {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        .discount-badge {
+            background: linear-gradient(135deg, var(--accent-yellow), var(--warning-yellow));
+            color: var(--black);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 2rem 5% 6rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Pricing Grid */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 6rem;
+        }
+        
+        .pricing-card {
+            background: var(--white);
+            border: 3px solid var(--light-blue);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pricing-card.featured {
+            border-color: var(--primary-blue);
+            transform: scale(1.05);
+            box-shadow: var(--shadow-hover);
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(59, 130, 246, 0.05));
+        }
+        
+        .pricing-card.featured::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: 25px;
+            right: -35px;
+            background: linear-gradient(135deg, var(--accent-yellow), var(--warning-yellow));
+            color: var(--black);
+            padding: 0.75rem 4rem;
+            transform: rotate(45deg);
+            font-size: 0.9rem;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--secondary-blue);
+        }
+        
+        .pricing-card.featured:hover {
+            transform: translateY(-15px) scale(1.07);
+        }
+        
+        .plan-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+        }
+        
+        .plan-name {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .plan-description {
+            color: var(--medium-grey);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+        
+        .plan-price {
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--black);
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+        
+        .plan-price .currency {
+            font-size: 2rem;
+            vertical-align: super;
+        }
+        
+        .plan-price .decimal {
+            font-size: 2.5rem;
+        }
+        
+        .plan-period {
+            color: var(--medium-grey);
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .plan-features {
+            list-style: none;
+            margin-bottom: 3rem;
+            text-align: left;
+        }
+        
+        .plan-features li {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--light-grey);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.05rem;
+        }
+        
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .plan-features i {
+            color: var(--success);
+            font-size: 1.2rem;
+            width: 20px;
+            flex-shrink: 0;
+        }
+        
+        .plan-features .feature-highlight {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+        
+        .plan-btn {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .plan-btn.primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+        }
+        
+        .plan-btn.primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
+        }
+        
+        .plan-btn.secondary {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+        
+        .plan-btn.secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .plan-btn.accent {
+            background: linear-gradient(135deg, var(--accent-yellow), var(--warning-yellow));
+            color: var(--black);
+            box-shadow: 0 8px 24px rgba(252, 211, 77, 0.3);
+        }
+        
+        .plan-btn.accent:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(252, 211, 77, 0.4);
+        }
+        
+        /* FAQ Section */
+        .faq-section {
+            margin-bottom: 6rem;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .section-header p {
+            font-size: 1.2rem;
+            color: var(--medium-grey);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .faq-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .faq-item {
+            background: var(--white);
+            border: 2px solid var(--light-blue);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-item:hover {
+            border-color: var(--secondary-blue);
+            box-shadow: var(--shadow);
+        }
+        
+        .faq-question {
+            background: none;
+            border: none;
+            width: 100%;
+            padding: 2rem;
+            text-align: left;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-question:hover {
+            background: var(--light-blue);
+        }
+        
+        .faq-answer {
+            padding: 0 2rem 2rem;
+            color: var(--dark-grey);
+            line-height: 1.7;
+            font-size: 1.05rem;
+            display: none;
+        }
+        
+        .faq-answer.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+        
+        /* Enterprise Section */
+        .enterprise-section {
+            background: linear-gradient(135deg, var(--accent-yellow) 0%, var(--warning-yellow) 100%);
+            color: var(--black);
+            padding: 4rem 2rem;
+            border-radius: 24px;
+            margin-bottom: 6rem;
+            text-align: center;
+        }
+        
+        .enterprise-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+        }
+        
+        .enterprise-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .enterprise-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 3rem auto 2rem;
+        }
+        
+        .enterprise-feature {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .enterprise-feature i {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+        }
+        
+        .enterprise-feature span {
+            font-weight: 600;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            padding: 4rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+        
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .cta-buttons {
+            justify-content: center;
+            gap: 1.5rem;
+        }
+        
+        .btn-white {
+            background: var(--white);
+            color: var(--primary-blue);
+        }
+        
+        .btn-white:hover {
+            background: var(--light-grey);
+            transform: translateY(-3px) scale(1.05);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--black);
+            color: white;
+            padding: 4rem 5% 2rem;
+            margin-top: 6rem;
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 3rem;
+        }
+        
+        .footer-brand h3 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+        }
+        
+        .footer-brand p {
+            color: rgba(255,255,255,0.7);
+            line-height: 1.8;
+        }
+        
+        .footer-links h4 {
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-toggle:hover {
+            background: var(--light-blue);
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 2rem;
+                box-shadow: var(--shadow);
+                border-radius: 0 0 16px 16px;
+            }
+            
+            .nav-links.show {
+                display: flex;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pricing-card.featured {
+                transform: none;
+            }
+            
+            .pricing-card.featured:hover {
+                transform: translateY(-15px) scale(1.02);
+            }
+            
+            .plan-price {
+                font-size: 3rem;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .plan-price {
+                font-size: 2.5rem;
+            }
+            
+            .enterprise-features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <a href="./index.html" class="logo">
+                <img src="./assets/logo.svg" alt="Sapyyn">
+                Sapyyn
+            </a>
+            <ul class="nav-links">
+                <li><a href="./referrals.html">Referrals</a></li>
+                <li><a href="./about.html">About</a></li>
+                <li><a href="./pricing.html" class="active">Pricing</a></li>
+                <li><a href="./resources.html">Resources</a></li>
+                <li><a href="./surgical-instruction.html">Surgical Instruction</a></li>
+                <li><a href="./contact.html">Contact</a></li>
+            </ul>
+            <div class="cta-buttons">
+                <a href="./sapyyn-portal.html" class="btn btn-secondary">Sign In</a>
+                <a href="./portal-signup.html" class="btn btn-primary">Get Started</a>
+            </div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <h1>Simple, Transparent Pricing</h1>
+        <p>Choose the perfect plan for your dental practice. Start with our 14-day free trial and unlock the power of streamlined referrals with integrated rewards.</p>
+    </section>
+
+    <!-- Pricing Toggle -->
+    <section class="pricing-toggle">
+        <div class="toggle-container">
+            <button class="toggle-option active" onclick="togglePricing('monthly')">Monthly</button>
+            <button class="toggle-option" onclick="togglePricing('yearly')">Yearly</button>
+        </div>
+        <div class="discount-badge">Save 20% with yearly billing</div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Pricing Grid -->
+        <div class="pricing-grid" id="pricingGrid">
+            <!-- Free Trial -->
+            <div class="pricing-card">
+                <div class="plan-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <h3 class="plan-name">Free Trial</h3>
+                <p class="plan-description">Perfect for trying out our platform</p>
+                <div class="plan-price">
+                    <span class="currency">$</span>0
+                </div>
+                <div class="plan-period">14 days free</div>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> Up to 10 referrals</li>
+                    <li><i class="fas fa-check"></i> Basic rewards system</li>
+                    <li><i class="fas fa-check"></i> QR code generation</li>
+                    <li><i class="fas fa-check"></i> Standard support</li>
+                    <li><i class="fas fa-check"></i> HIPAA compliance</li>
+                    <li><i class="fas fa-check"></i> Mobile app access</li>
+                </ul>
+                <a href="./portal-signup.html" class="plan-btn accent">Start Free Trial</a>
+            </div>
+
+            <!-- Starter Plan -->
+            <div class="pricing-card">
+                <div class="plan-icon">
+                    <i class="fas fa-play"></i>
+                </div>
+                <h3 class="plan-name">Starter</h3>
+                <p class="plan-description">Ideal for small practices getting started</p>
+                <div class="plan-price monthly-price">
+                    <span class="currency">$</span>49<span class="decimal">.99</span>
+                </div>
+                <div class="plan-price yearly-price" style="display: none;">
+                    <span class="currency">$</span>39<span class="decimal">.99</span>
+                </div>
+                <div class="plan-period">per month</div>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> Unlimited referrals</li>
+                    <li><i class="fas fa-check"></i> <span class="feature-highlight">Full rewards system</span></li>
+                    <li><i class="fas fa-check"></i> QR code generation</li>
+                    <li><i class="fas fa-check"></i> Basic analytics</li>
+                    <li><i class="fas fa-check"></i> Email support</li>
+                    <li><i class="fas fa-check"></i> Document sharing</li>
+                    <li><i class="fas fa-check"></i> Mobile app access</li>
+                </ul>
+                <a href="./portal-signup.html?plan=starter" class="plan-btn secondary">Get Started</a>
+            </div>
+
+            <!-- Professional Plan (Most Popular) -->
+            <div class="pricing-card featured">
+                <div class="plan-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3 class="plan-name">Professional</h3>
+                <p class="plan-description">Best for growing practices and specialists</p>
+                <div class="plan-price monthly-price">
+                    <span class="currency">$</span>99<span class="decimal">.99</span>
+                </div>
+                <div class="plan-price yearly-price" style="display: none;">
+                    <span class="currency">$</span>79<span class="decimal">.99</span>
+                </div>
+                <div class="plan-period">per month</div>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> Everything in Starter</li>
+                    <li><i class="fas fa-check"></i> <span class="feature-highlight">Premium rewards tier</span></li>
+                    <li><i class="fas fa-check"></i> Advanced analytics</li>
+                    <li><i class="fas fa-check"></i> Priority support</li>
+                    <li><i class="fas fa-check"></i> API access</li>
+                    <li><i class="fas fa-check"></i> Custom branding</li>
+                    <li><i class="fas fa-check"></i> Team collaboration tools</li>
+                    <li><i class="fas fa-check"></i> Advanced reporting</li>
+                </ul>
+                <a href="./portal-signup.html?plan=professional" class="plan-btn primary">Choose Professional</a>
+            </div>
+
+            <!-- Enterprise Plan -->
+            <div class="pricing-card">
+                <div class="plan-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h3 class="plan-name">Enterprise</h3>
+                <p class="plan-description">For large practices and dental groups</p>
+                <div class="plan-price monthly-price">
+                    <span class="currency">$</span>499<span class="decimal">.99</span>
+                </div>
+                <div class="plan-price yearly-price" style="display: none;">
+                    <span class="currency">$</span>399<span class="decimal">.99</span>
+                </div>
+                <div class="plan-period">per month</div>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> Everything in Professional</li>
+                    <li><i class="fas fa-check"></i> <span class="feature-highlight">Platinum rewards tier</span></li>
+                    <li><i class="fas fa-check"></i> Multi-location support</li>
+                    <li><i class="fas fa-check"></i> Dedicated account manager</li>
+                    <li><i class="fas fa-check"></i> Custom integrations</li>
+                    <li><i class="fas fa-check"></i> White-label solutions</li>
+                    <li><i class="fas fa-check"></i> Advanced security features</li>
+                    <li><i class="fas fa-check"></i> 24/7 phone support</li>
+                </ul>
+                <a href="./contact.html" class="plan-btn secondary">Contact Sales</a>
+            </div>
+        </div>
+
+        <!-- Enterprise Section -->
+        <section class="enterprise-section">
+            <h2>Need Something Custom?</h2>
+            <p>Our Enterprise plan can be tailored to meet the specific needs of large dental groups, academic institutions, and healthcare networks.</p>
+            <div class="enterprise-features">
+                <div class="enterprise-feature">
+                    <i class="fas fa-cog"></i>
+                    <span>Custom Implementation</span>
+                </div>
+                <div class="enterprise-feature">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Enhanced Security</span>
+                </div>
+                <div class="enterprise-feature">
+                    <i class="fas fa-headset"></i>
+                    <span>Dedicated Support</span>
+                </div>
+                <div class="enterprise-feature">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Advanced Analytics</span>
+                </div>
+            </div>
+            <a href="./contact.html" class="btn btn-primary" style="background: var(--primary-blue);">
+                <i class="fas fa-phone"></i> Contact Sales Team
+            </a>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq-section">
+            <div class="section-header">
+                <h2>Frequently Asked Questions</h2>
+                <p>Get answers to common questions about our pricing and features.</p>
+            </div>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        What's included in the free trial?
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        The 14-day free trial includes up to 10 referrals, access to our basic rewards system, QR code generation, standard support, and full HIPAA compliance. No credit card required to start.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        How does the rewards system work?
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        You earn points for every successful referral (25 points), specialist feedback, and patient follow-ups. Points can be redeemed for cash, practice credits, or premium features. Higher plan tiers unlock better rewards multipliers and exclusive benefits.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        Can I change plans anytime?
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately, and we'll prorate any billing differences. Your rewards points and referral history are preserved across all plan changes.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        Is there a setup fee?
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        No setup fees for any plan. We believe in transparent pricing with no hidden costs. Your monthly subscription includes everything you need to get started immediately.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        What payment methods do you accept?
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and ACH bank transfers for Enterprise plans. All payments are processed securely with PCI compliance.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        Do you offer volume discounts?
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </button>
+                    <div class="faq-answer">
+                        Yes! Multi-location practices and dental groups with 5+ locations qualify for volume discounts. Contact our sales team for custom pricing based on your specific needs and number of locations.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <h2>Ready to Get Started?</h2>
+            <p>Join hundreds of dental professionals who are already earning rewards while streamlining their referral process.</p>
+            <div class="cta-buttons">
+                <a href="./portal-signup.html" class="btn btn-white">
+                    <i class="fas fa-rocket"></i> Start Free Trial
+                </a>
+                <a href="./contact.html" class="btn btn-secondary" style="border-color: white; color: white;">
+                    <i class="fas fa-phone"></i> Contact Sales
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>Sapyyn</h3>
+                <p>Revolutionizing dental referrals with our secure, HIPAA-compliant platform. Connect patients with specialists while earning rewards for your contributions to exceptional care.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="./index.html">Features</a></li>
+                    <li><a href="./pricing.html">Pricing</a></li>
+                    <li><a href="./resources.html">Resources</a></li>
+                    <li><a href="./referrals.html">Referrals</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="./about.html">About</a></li>
+                    <li><a href="./surgical-instruction.html">Surgical Instruction</a></li>
+                    <li><a href="./contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="./privacy.html">Privacy Policy</a></li>
+                    <li><a href="./terms.html">Terms of Service</a></li>
+                    <li><a href="./hipaa.html">HIPAA Compliance</a></li>
+                    <li><a href="./security.html">Security</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Sapyyn. All rights reserved. Transforming dental referrals nationwide.</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('show');
+        }
+
+        function togglePricing(period) {
+            const monthlyButtons = document.querySelectorAll('.toggle-option');
+            const monthlyPrices = document.querySelectorAll('.monthly-price');
+            const yearlyPrices = document.querySelectorAll('.yearly-price');
+            
+            monthlyButtons.forEach(btn => btn.classList.remove('active'));
+            
+            if (period === 'monthly') {
+                monthlyButtons[0].classList.add('active');
+                monthlyPrices.forEach(price => price.style.display = 'block');
+                yearlyPrices.forEach(price => price.style.display = 'none');
+            } else {
+                monthlyButtons[1].classList.add('active');
+                monthlyPrices.forEach(price => price.style.display = 'none');
+                yearlyPrices.forEach(price => price.style.display = 'block');
+            }
+        }
+
+        function toggleFAQ(button) {
+            const faqItem = button.closest('.faq-item');
+            const answer = faqItem.querySelector('.faq-answer');
+            const icon = button.querySelector('.faq-icon');
+            
+            // Close all other FAQs
+            document.querySelectorAll('.faq-item').forEach(item => {
+                if (item !== faqItem) {
+                    item.classList.remove('active');
+                    item.querySelector('.faq-answer').classList.remove('show');
+                }
+            });
+            
+            // Toggle current FAQ
+            faqItem.classList.toggle('active');
+            answer.classList.toggle('show');
+        }
+
+        // Auto-close mobile menu on window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 968) {
+                document.querySelector('.nav-links').classList.remove('show');
+            }
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+                header.style.backdropFilter = 'blur(25px)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(20px)';
+            }
+        });
+
+        // Animate cards on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.pricing-card, .faq-item');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'all 0.6s ease';
+                
+                setTimeout(() => {
+                    observer.observe(card);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
