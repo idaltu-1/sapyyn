@@ -90,12 +90,12 @@ app.post('/submit-referral', upload.array('documents', 10), (req, res) => {
         let referrals = [];
         
         if (fs.existsSync(referralsFile)) {
-            const data = fs.readFileSync(referralsFile, 'utf8');
+            const data = await fs.promises.readFile(referralsFile, 'utf8');
             referrals = JSON.parse(data);
         }
         
         referrals.push(referralData);
-        fs.writeFileSync(referralsFile, JSON.stringify(referrals, null, 2));
+        await fs.promises.writeFile(referralsFile, JSON.stringify(referrals, null, 2));
         
         res.json({
             message: 'Referral submitted successfully',
