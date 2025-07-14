@@ -1723,19 +1723,16 @@ def handle_subscription_cancellation(subscription):
 
 
 # ============================================================================
-# STATIC PAGE ROUTES
+# STATIC PAGE ROUTES & NAVIGATION LINKS
 # ============================================================================
 
 @app.route('/static-pages/<path:filename>')
 def serve_static_page(filename):
     """Serve static HTML pages with authentication checks"""
-    # URL decode the filename and remove .html extension if present
     from urllib.parse import unquote
     filename = unquote(filename)
     if filename.endswith('.html'):
         filename = filename[:-5]
-    
-    # Define page categories and access controls
     public_pages = [
         'about_page', 'pricing_page', 'resources_page', 'contact', 'contact-us',
         'blog', 'blog-article', 'case studies', 'educational content',
@@ -1743,13 +1740,11 @@ def serve_static_page(filename):
         'surgical-instruction', 'surgical_instruction_page', 'pre op consultation',
         'co_marketing', 'getstarted_page', 'resources'
     ]
-    
     admin_pages = [
         'admin', 'admin-1', 'admin-2', 'admin-3', 'admin-4', 'admin-users', 
         'admin-referrals', 'sapyyn-admin-panel', 'corrected_admin_html',
         'importDentists', 'importPatients', 'importSpecialist', 'users', 'roles'
     ]
-    
     portal_pages = [
         'Dashboard', 'Patient Referral', 'Patient Referrral Admin portal',
         'Patient Referrral Admin', 'Referral History', 'Track Referral',
@@ -1760,24 +1755,17 @@ def serve_static_page(filename):
         'updated_portal_rewards', 'appointments', 'forms', 'referrals',
         'referrals_page', 'referrals_page (1)', 'rewards', 'redeem list'
     ]
-    
-    # Check if file exists
     static_file_path = os.path.join('static', f'{filename}.html')
     if not os.path.exists(static_file_path):
         return render_template('404.html'), 404
-    
-    # Apply access controls
     if filename in admin_pages:
         if 'user_id' not in session or session.get('role') not in ['admin', 'dentist_admin', 'specialist_admin']:
             flash('Access denied. Administrator privileges required.', 'error')
             return redirect(url_for('login'))
-    
     elif filename in portal_pages:
         if 'user_id' not in session:
             flash('Please log in to access portal pages.', 'error')
             return redirect(url_for('login'))
-    
-    # Serve the static file
     return send_from_directory('static', f'{filename}.html')
 
 @app.route('/about')
@@ -1848,7 +1836,6 @@ def portal_dashboard():
     if 'user_id' not in session:
         flash('Please log in to access the portal.', 'error')
         return redirect(url_for('login'))
-    
     role = session.get('role', 'patient')
     if role in ['admin', 'dentist_admin', 'specialist_admin']:
         return redirect(url_for('serve_static_page', filename='admin'))
@@ -1859,7 +1846,84 @@ def portal_dashboard():
     else:
         return redirect(url_for('serve_static_page', filename='patient'))
 
+# Additional navigation routes from copilot branch not covered above
+@app.route('/original')
+def original_page():
+    """Serve the original static index.html page for comparison"""
+    return send_from_directory('.', 'index.html')
+
+@app.route('/referrals')
+def referrals():
+    """Referrals page - redirect to dashboard for logged in users"""
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
+    return redirect(url_for('login'))
+
+@app.route('/surgicalInstruction')
+def surgical_instruction():
+    """Surgical instruction page (legacy route)"""
+    return send_from_directory('static', 'surgical_instruction_page.html')
+
+@app.route('/casestudies')
+def case_studies():
+    """Case studies page"""
+    return render_template('case_studies.html')
+
+@app.route('/tutorials')
+def tutorials():
+    """Tutorials page"""
+    return render_template('tutorials.html')
+
+@app.route('/howtoguides')
+def how_to_guides():
+    """How-to guides page"""
+    return render_template('how_to_guides.html')
+
+@app.route('/loyaltyrewards')
+def loyalty_rewards():
+    """Loyalty rewards page - redirect to rewards dashboard"""
+    return redirect(url_for('rewards_dashboard'))
+
+@app.route('/hippa')
+def hipaa():
+    """HIPAA compliance page"""
+    return render_template('hipaa.html')
+
+@app.route('/privacy')
+def privacy():
+    """Privacy policy page"""
+    return render_template('privacy.html')
+
+@app.route('/faq')
+def faq():
+    """FAQ page"""
+    return render_template('faq.html')
+
+@app.route('/connectproviders')
+def connect_providers():
+    """Connect providers page - redirect to appropriate portal"""
+    if 'user_id' in session:
+        user_role = session.get('role', 'patient')
+        if user_role == 'dentist':
+            return redirect(url_for('dentist_portal'))
+        elif user_role == 'specialist':
+            return redirect(url_for('specialist_portal'))
+        else:
+            return redirect(url_for('patient_portal'))
+    return redirect(url_for('login'))
+
+@app.route('/sendpatientdocuments')
+def send_patient_documents():
+    """Send patient documents page - redirect to upload"""
+    if 'user_id' in session:
+        return redirect(url_for('upload_file'))
+    return redirect(url_for('login'))
+
 @app.errorhandler(404)
 def page_not_found(e):
     """Render custom 404 page"""
     return render_template('404.html'), 404
+
+if __name__ == '__main__':
+    init_db()
+    app.run(debug=True, host='0.0.0.0', port=5000)
