@@ -360,6 +360,8 @@ def get_started_page():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """User login"""
+    provider_code = request.args.get('provider_code')
+    
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -368,23 +370,76 @@ def login():
         cursor = conn.cursor()
         cursor.execute('SELECT id, username, password_hash, full_name, role FROM users WHERE username = ?', (username,))
         user = cursor.fetchone()
-        conn.close()
         
         if user and check_password_hash(user[2], password):
             session['user_id'] = user[0]
             session['username'] = user[1]
             session['full_name'] = user[3]
             session['role'] = user[4]
-            flash('Login successful!', 'success')
+            
+            # Handle provider code after login
+            if provider_code:
+                # Get provider information
+                cursor.execute('''
+                    SELECT pc.user_id, pc.practice_name, pc.provider_type, pc.specialization, u.full_name
+                    FROM provider_codes pc
+                    JOIN users u ON pc.user_id = u.id
+                    WHERE pc.provider_code = ? AND pc.is_active = TRUE
+                ''', (provider_code,))
+                provider_info = cursor.fetchone()
+                
+                if provider_info:
+                    # Create referral connection for existing user
+                    referral_id = str(uuid.uuid4())[:8]
+                    cursor.execute('''
+                        INSERT INTO referrals (user_id, referral_id, patient_name, target_doctor, 
+                                             medical_condition, status, notes)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                    ''', (provider_info[0], referral_id, user[3], provider_info[4],
+                          'Consultation request', 'pending', 
+                          f'Patient connected using provider code {provider_code}'))
+                    conn.commit()
+                    
+                    flash(f'Login successful! You have been connected to {provider_info[2]} {provider_info[4]} at {provider_info[1]}.', 'success')
+                    conn.close()
+                    return redirect(url_for('patient_portal'))
+                else:
+                    flash('Login successful, but the provider code was invalid.', 'warning')
+            else:
+                flash('Login successful!', 'success')
+            
+            conn.close()
             return redirect(url_for('dashboard'))
         else:
             flash('Invalid username or password', 'error')
+            conn.close()
     
-    return render_template('login.html')
+    return render_template('login.html', provider_code=provider_code)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     """User registration"""
+    provider_code = request.args.get('provider_code')
+    suggested_role = request.args.get('role', 'patient')
+    provider_info = None
+    
+    # If provider code is provided, validate it and get provider information
+    if provider_code:
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT pc.user_id, pc.practice_name, pc.provider_type, pc.specialization, u.full_name
+            FROM provider_codes pc
+            JOIN users u ON pc.user_id = u.id
+            WHERE pc.provider_code = ? AND pc.is_active = TRUE
+        ''', (provider_code,))
+        provider_info = cursor.fetchone()
+        conn.close()
+        
+        if not provider_info:
+            flash('Invalid provider code. Please check the code and try again.', 'error')
+            provider_code = None
+    
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
@@ -401,15 +456,36 @@ def register():
                 INSERT INTO users (username, email, password_hash, full_name, role)
                 VALUES (?, ?, ?, ?, ?)
             ''', (username, email, password_hash, full_name, role))
+            
+            user_id = cursor.lastrowid
+            
+            # If registering with a provider code, create a connection/referral
+            if provider_code and provider_info:
+                # Generate a referral for this patient-provider connection
+                referral_id = str(uuid.uuid4())[:8]
+                cursor.execute('''
+                    INSERT INTO referrals (user_id, referral_id, patient_name, target_doctor, 
+                                         medical_condition, status, notes)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                ''', (provider_info[0], referral_id, full_name, provider_info[4],
+                      'Initial consultation', 'pending', 
+                      f'Patient registered using provider code {provider_code}'))
+            
             conn.commit()
             conn.close()
             
-            flash('Registration successful! Please login.', 'success')
+            if provider_code and provider_info:
+                flash(f'Registration successful! You have been connected to {provider_info[2]} {provider_info[4]} at {provider_info[1]}. Please login.', 'success')
+            else:
+                flash('Registration successful! Please login.', 'success')
             return redirect(url_for('login'))
         except sqlite3.IntegrityError:
             flash('Username or email already exists', 'error')
     
-    return render_template('register.html')
+    return render_template('register.html', 
+                         provider_code=provider_code, 
+                         provider_info=provider_info, 
+                         suggested_role=suggested_role)
 
 @app.route('/logout')
 def logout():
