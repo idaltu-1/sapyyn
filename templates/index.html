@@ -16,7 +16,7 @@
                 </p>
                 <div class="d-grid d-md-flex gap-2">
                     {% if not session.user_id %}
-                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">
+                    <a href="{{ url_for('get_started_page') }}" class="btn btn-light btn-lg">
                         <i class="bi bi-person-plus"></i> Get Started
                     </a>
                     <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
@@ -321,7 +321,7 @@
                         </ul>
                     </div>
                     <div class="card-footer bg-transparent text-center border-0 pb-4">
-                        <a href="{{ url_for('subscribe', plan_name='starter') }}" class="btn btn-outline-primary w-100">Get Started</a>
+                        <a href="{{ url_for('get_started_page') }}" class="btn btn-outline-primary w-100">Get Started</a>
                     </div>
                 </div>
             </div>
