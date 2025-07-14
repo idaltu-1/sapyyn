@@ -200,7 +200,7 @@ document.getElementById('file').addEventListener('change', function(e) {
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function() {
     // Load referrals when the view tab is first shown
-    const viewTab = document.querySelector('[onclick="showTab(\'view\')"]');
+    const viewTab = document.querySelector('[data-tab="view"]');
     viewTab.addEventListener('click', function() {
         // Small delay to ensure tab is visible
         setTimeout(loadReferrals, 100);
