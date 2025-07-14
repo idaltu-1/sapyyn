@@ -352,6 +352,11 @@ def index():
     """Home page"""
     return render_template('index.html')
 
+@app.route('/get_started_page')
+def get_started_page():
+    """Get started onboarding page"""
+    return send_from_directory('static', 'getstarted_page.html')
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """User login"""
