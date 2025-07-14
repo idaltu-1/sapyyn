@@ -271,31 +271,6 @@
             box-shadow: var(--shadow-hover);
         }
         
-        /* Contact Float Button */
-        .contact-float-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--accent-yellow), var(--warning-yellow));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--black);
-            font-size: 1.5rem;
-            text-decoration: none;
-            box-shadow: var(--shadow-hover);
-            transition: all 0.3s ease;
-            z-index: 10;
-        }
-        
-        .contact-float-btn:hover {
-            transform: scale(1.1) rotate(10deg);
-            box-shadow: 0 20px 40px rgba(252, 211, 77, 0.4);
-        }
-        
         /* Hero Section */
         .hero {
             margin-top: 80px;
@@ -1100,10 +1075,6 @@
                 display: none;
             }
             
-            .contact-float-btn {
-                display: none;
-            }
-            
             .footer-content {
                 grid-template-columns: 1fr;
                 text-align: center;
@@ -1166,23 +1137,20 @@
     <!-- Header -->
     <header>
         <nav>
-            <a href="./index.html" class="logo">
-
+            <a href="#" class="logo">
                 <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMyNTYzRUIiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI4IiB5PSI4Ij4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+" alt="Sapyyn">
                 Sapyyn
             </a>
             <ul class="nav-links">
-                <li><a href="https://sapyyn.com/referrals">Referrals</a></li>
-                <li><a href="https://sapyyn.com/about">About</a></li>
-                <li><a href="https://sapyyn.com/pricing">Pricing</a></li>
-                <li><a href="https://sapyyn.com/resources">Resources</a></li>
-                <li><a href="https://sapyyn.com/surgicalInstruction">Surgical Instruction</a></li>
-                <li><a href="https://sapyyn.com/contact">Contact</a></li>
+                <li><a href="#referrals">Referrals</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#rewards">Rewards</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#contact">Contact</a></li>
             </ul>
             <div class="cta-buttons">
-                <a href="./Login.html" class="btn btn-secondary">Sign In</a>
-                <a href="./Sign Up.html" class="btn btn-primary">
-
+                <a href="#" class="btn btn-secondary">Sign In</a>
+                <a href="#" class="btn btn-primary">
                     <i class="fas fa-rocket"></i> Get Started
                 </a>
             </div>
@@ -1194,17 +1162,12 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <!-- Contact Button -->
-        <a href="https://sapyyn.com/contact" class="contact-float-btn" title="Contact Us">
-            <i class="fas fa-phone"></i>
-        </a>
         <div class="hero-content">
             <div class="hero-text">
                 <h1>Achieve the <span>Smile</span> You've Always Dreamed Of</h1>
                 <p>Our platform brings together skilled dental specialists committed to helping you restore and enhance your patients' smiles. Feel confident in the communication chain between dentist, patient and dental specialist while earning rewards for every referral.</p>
                 <div class="hero-buttons">
-                    <a href="./specialist.html" class="btn btn-primary" onclick="trackSignup()">
-=======
+                    <a href="#" class="btn btn-primary" onclick="trackSignup()">
                         <i class="fas fa-eye"></i> View Doctors
                     </a>
                     <a href="#rewards" class="btn btn-secondary">
@@ -1270,28 +1233,28 @@
     <!-- Features Grid Section -->
     <section class="features-grid-section" id="features">
         <div class="features-grid">
-            <div class="feature-card" onclick="highlightFeature(this); window.open('https://sapyyn.com/referrals', '_blank');">
+            <div class="feature-card" onclick="highlightFeature(this)">
                 <div class="feature-icon">
                     <i class="fas fa-qrcode"></i>
                 </div>
                 <h3>Instant Patient Referral via QR Code</h3>
                 <p>Simply scan the QR code to refer your patients to our practice. It's quick, convenient, and secure, ensuring your patients receive the care they need without any hassle.</p>
             </div>
-            <div class="feature-card" onclick="highlightFeature(this); window.open('https://sapyyn.com/referrals', '_blank');">
+            <div class="feature-card" onclick="highlightFeature(this)">
                 <div class="feature-icon">
                     <i class="fas fa-sms"></i>
                 </div>
                 <h3>Refer Patients with a Simple Text Message</h3>
                 <p>Just text us your patient's details using our dedicated referral number, and we'll take care of the rest. It's a fast and efficient way to ensure your patients get the specialized care they need.</p>
             </div>
-            <div class="feature-card" onclick="highlightFeature(this); window.open('https://sapyyn.com/connectproviders', '_blank');">
+            <div class="feature-card" onclick="highlightFeature(this)">
                 <div class="feature-icon">
                     <i class="fas fa-users"></i>
                 </div>
                 <h3>Connect with Fellow Providers</h3>
                 <p>Join our network to discuss cases, share insights, and collaborate with other dental professionals. Our platform makes it easy to connect and chat with peers, enhancing patient outcomes through teamwork.</p>
             </div>
-            <div class="feature-card" onclick="highlightFeature(this); window.open('https://sapyyn.com/sendpatientdocuments', '_blank');">
+            <div class="feature-card" onclick="highlightFeature(this)">
                 <div class="feature-icon">
                     <i class="fas fa-file-medical"></i>
                 </div>
@@ -1368,7 +1331,7 @@
                 </div>
             </div>
             
-            <a href="./rewards.html" class="btn btn-primary" style="background: var(--primary-blue);">
+            <a href="#" class="btn btn-primary" style="background: var(--primary-blue);">
                 <i class="fas fa-star"></i> Start Earning Rewards
             </a>
         </div>
@@ -1379,37 +1342,37 @@
         <div class="gallery-content">
             <h2 class="gallery-title">Gallery</h2>
             <div class="gallery-grid">
-                <div class="gallery-item" onclick="openGalleryModal(this)">
+                <div class="gallery-item">
                     <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=400&h=250&q=80" alt="Modern Dental Office">
                     <div class="gallery-overlay">
                         <i class="fas fa-search-plus"></i>
                     </div>
                 </div>
-                <div class="gallery-item" onclick="openGalleryModal(this)">
+                <div class="gallery-item">
                     <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=400&h=250&q=80" alt="Dental Implant Procedure">
                     <div class="gallery-overlay">
                         <i class="fas fa-search-plus"></i>
                     </div>
                 </div>
-                <div class="gallery-item" onclick="openGalleryModal(this)">
+                <div class="gallery-item">
                     <img src="https://images.unsplash.com/photo-1551601651-2a8555f1a136?auto=format&fit=crop&w=400&h=250&q=80" alt="Digital Dental Technology">
                     <div class="gallery-overlay">
                         <i class="fas fa-search-plus"></i>
                     </div>
                 </div>
-                <div class="gallery-item" onclick="openGalleryModal(this)">
+                <div class="gallery-item">
                     <img src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&w=400&h=250&q=80" alt="Dental Patient Care">
                     <div class="gallery-overlay">
                         <i class="fas fa-search-plus"></i>
                     </div>
                 </div>
-                <div class="gallery-item" onclick="openGalleryModal(this)">
+                <div class="gallery-item">
                     <img src="https://images.unsplash.com/photo-1559757175-0eb20b2fe735?auto=format&fit=crop&w=400&h=250&q=80" alt="Medical Network Collaboration">
                     <div class="gallery-overlay">
                         <i class="fas fa-search-plus"></i>
                     </div>
                 </div>
-                <div class="gallery-item" onclick="openGalleryModal(this)">
+                <div class="gallery-item">
                     <img src="https://images.unsplash.com/photo-1576669801775-ff43c5ab079d?auto=format&fit=crop&w=400&h=250&q=80" alt="Healthcare Digital Platform">
                     <div class="gallery-overlay">
                         <i class="fas fa-search-plus"></i>
@@ -1423,34 +1386,32 @@
     <section class="subscribe-section" id="contact">
         <div class="subscribe-content">
             <div class="subscribe-form">
-                <form action="https://sapyyn.com/subscribe" method="POST" onsubmit="return handleSubscribeForm(event)">
-                    <div class="user-type-selection">
-                        <p>I am a</p>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" name="userType" value="dentist" id="dentist" required>
-                                <label for="dentist">Dentist</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" name="userType" value="specialist" id="specialist" required>
-                                <label for="specialist">Specialist</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" name="userType" value="patient" id="patient" required>
-                                <label for="patient">Patient</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" name="userType" value="other" id="other" required>
-                                <label for="other">Other</label>
-                            </div>
+                <div class="user-type-selection">
+                    <p>I am a</p>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="userType" value="dentist" id="dentist">
+                            <label for="dentist">Dentist</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="userType" value="specialist" id="specialist">
+                            <label for="specialist">Specialist</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="userType" value="patient" id="patient">
+                            <label for="patient">Patient</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="userType" value="other" id="other">
+                            <label for="other">Other</label>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <input type="text" placeholder="Name" name="name" required>
-                        <input type="email" placeholder="Email ID" name="email" required>
-                        <button type="submit" class="subscribe-btn">Subscribe Now</button>
-                    </div>
-                </form>
+                </div>
+                <div class="form-row">
+                    <input type="text" placeholder="Name" name="name" required>
+                    <input type="email" placeholder="Email ID" name="email" required>
+                    <button type="submit" class="subscribe-btn" onclick="handleSubscribe()">Subscribe Now</button>
+                </div>
             </div>
         </div>
     </section>
@@ -1462,42 +1423,40 @@
                 <h3>Sapyyn</h3>
                 <p>Bridging the gap between dental providers and patients nationwide with our innovative, secure, and HIPAA-compliant referral platform. Transforming dental care one referral at a time while rewarding excellence.</p>
                 <div class="social-icons">
-                    <a href="https://facebook.com/sapyyn" target="_blank" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://twitter.com/sapyyn" target="_blank" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="https://linkedin.com/company/sapyyn" target="_blank" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="https://instagram.com/sapyyn" target="_blank" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
                 </div>
             </div>
             <div class="footer-links">
                 <h4>Quick Links</h4>
                 <ul>
-                    <li><a href="./case studies.html">Case Studies</a></li>
-                    <li><a href="./educational content.html">Tutorials</a></li>
-                    <li><a href="./how to guide.html">How-To Guides</a></li>
-                    <li><a href="./rewards.html">Loyalty Rewards</a></li>
-                    <li><a href="./about_page.html">HIPAA Compliance</a></li>
-                    <li><a href="./about_page.html">Privacy Terms</a></li>
-                    <li><a href="./about_page.html">FAQ</a></li>
+                    <li><a href="#">Case Studies</a></li>
+                    <li><a href="#">Tutorials</a></li>
+                    <li><a href="#">How-To Guides</a></li>
+                    <li><a href="#">Loyalty Rewards</a></li>
+                    <li><a href="#">HIPAA Compliance</a></li>
+                    <li><a href="#">Privacy Terms</a></li>
+                    <li><a href="#">FAQ</a></li>
                 </ul>
             </div>
             <div class="footer-links">
                 <h4>Contact Us</h4>
                 <ul>
                     <li><a href="mailto:contact@sapyyn.com">contact@sapyyn.com</a></li>
-                    <li><a href="./about_page.html">About</a></li>
-                    <li><a href="./referrals_page.html">Referrals</a></li>
-                    <li><a href="./surgical_instruction_page.html">Surgical Instruction</a></li>
-
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Referrals</a></li>
+                    <li><a href="#">Surgical Instruction</a></li>
                 </ul>
             </div>
             <div class="footer-links">
                 <h4>Legal</h4>
                 <ul>
-                    <li><a href="./about_page.html">Privacy Policy</a></li>
-                    <li><a href="./about_page.html">Terms of Service</a></li>
-                    <li><a href="./index.html">Sitemap</a></li>
-                    <li><a href="./about_page.html">Security</a></li>
-
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Sitemap</a></li>
+                    <li><a href="#">Security</a></li>
                 </ul>
             </div>
         </div>
@@ -1548,20 +1507,6 @@
             }
         }
 
-        // Gallery modal functionality
-        function openGalleryModal(item) {
-            const img = item.querySelector('img');
-            const alt = img.alt;
-            const src = img.src.replace('w=400&h=250', 'w=1200&h=800'); // Get higher resolution
-            
-            showSuccessMessage('🖼️ Opening ' + alt + ' in full size...');
-            
-            // Open image in new tab for full viewing
-            setTimeout(() => {
-                window.open(src, '_blank');
-            }, 500);
-        }
-
         // Feature highlighting
         function highlightFeature(card) {
             document.querySelectorAll('.feature-card').forEach(c => {
@@ -1573,41 +1518,25 @@
             card.style.transform = 'translateY(-15px) scale(1.02)';
             card.style.boxShadow = '0 20px 60px rgba(252, 211, 77, 0.3)';
             
-            showSuccessMessage('💡 Feature highlighted! Opening details...');
+            showSuccessMessage('💡 Feature highlighted!');
         }
 
-        // Handle subscription form
-        function handleSubscribeForm(event) {
-            event.preventDefault();
-            
-            const formData = new FormData(event.target);
-            const name = formData.get('name');
-            const email = formData.get('email');
-            const userType = formData.get('userType');
+        // Handle subscription
+        function handleSubscribe() {
+            const name = document.querySelector('input[name="name"]').value;
+            const email = document.querySelector('input[name="email"]').value;
+            const userType = document.querySelector('input[name="userType"]:checked');
 
             if (name && email && userType) {
                 showSuccessMessage('📧 Subscription successful! Welcome aboard!');
-                
-                // In a real implementation, you would send this data to your server
-                console.log('Subscription data:', { name, email, userType });
-                
                 // Clear form
                 setTimeout(() => {
-                    event.target.reset();
+                    document.querySelector('input[name="name"]').value = '';
+                    document.querySelector('input[name="email"]').value = '';
+                    if (userType) userType.checked = false;
                 }, 2000);
-                
-                return false;
             } else {
                 showSuccessMessage('⚠️ Please fill in all fields');
-                return false;
-            }
-        }
-
-        // Legacy function for backward compatibility
-        function handleSubscribe() {
-            const form = document.querySelector('.subscribe-form form');
-            if (form) {
-                handleSubscribeForm(new Event('submit'));
             }
         }
 
@@ -1624,10 +1553,7 @@
 
         // Track signup clicks
         function trackSignup() {
-            showSuccessMessage('🚀 Redirecting to portal...');
-            setTimeout(() => {
-                window.open('https://portal.sapyyn.com/login', '_blank');
-            }, 1000);
+            showSuccessMessage('🚀 Redirecting to login portal...');
         }
 
         // Header scroll effect

@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Chart.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         :root {
@@ -364,7 +364,7 @@
             margin-bottom: 2rem;
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
         }
         
         .page-header h2 {
@@ -382,7 +382,6 @@
         .page-actions {
             display: flex;
             gap: 1rem;
-            flex-shrink: 0;
         }
         
         /* Stats Grid */
@@ -584,7 +583,6 @@
             align-items: center;
             gap: 0.5rem;
             font-size: 0.875rem;
-            text-decoration: none;
         }
         
         .btn-primary {
@@ -650,7 +648,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             cursor: pointer;
-            transition: background 0.3s ease;
         }
         
         .data-table th:hover {
@@ -684,7 +681,6 @@
             font-size: 0.75rem;
             font-weight: 500;
             display: inline-block;
-            text-transform: capitalize;
         }
         
         .status-badge.active {
@@ -758,7 +754,6 @@
             font-size: 1rem;
             background: rgba(10, 36, 99, 0.1);
             color: var(--primary);
-            flex-shrink: 0;
         }
         
         .activity-content {
@@ -811,18 +806,6 @@
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            animation: modalSlideIn 0.3s ease-out;
-        }
-        
-        @keyframes modalSlideIn {
-            from {
-                transform: scale(0.95) translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1) translateY(0);
-                opacity: 1;
-            }
         }
         
         .modal-header {
@@ -1023,6 +1006,74 @@
             100% { transform: rotate(360deg); }
         }
         
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .header-left {
+                gap: 1rem;
+            }
+            
+            .search-bar input {
+                width: 200px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-content {
+                padding: 1rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+        
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+        
         /* Content Sections */
         .content-section {
             display: none;
@@ -1061,125 +1112,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
-        /* Mobile Menu Button */
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--gray);
-            font-size: 1.25rem;
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-        
-        /* Responsive */
-        @media (max-width: 1400px) {
-            .charts-section {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .main-content.expanded {
-                margin-left: 0;
-            }
-            
-            .header {
-                padding: 1rem;
-            }
-            
-            .header-left {
-                gap: 1rem;
-            }
-            
-            .search-bar input {
-                width: 200px;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .dashboard-content {
-                padding: 1rem;
-            }
-            
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .page-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-            
-            .mobile-menu-btn {
-                display: block;
-            }
-            
-            .charts-section {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            
-            .table-header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: stretch;
-            }
-            
-            .table-actions {
-                justify-content: stretch;
-            }
-            
-            .table-actions .btn {
-                flex: 1;
-                justify-content: center;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .search-bar {
-                display: none;
-            }
-            
-            .header-left {
-                gap: 0.5rem;
-            }
-            
-            .header-right {
-                gap: 0.5rem;
-            }
-            
-            .user-info {
-                display: none;
-            }
-            
-            .modal-content {
-                width: 95%;
-                margin: 1rem;
-            }
-            
-            .modal-body,
-            .modal-header,
-            .modal-footer {
-                padding: 1rem;
-            }
-        }
     </style>
 </head>
 <body>
@@ -1191,23 +1123,23 @@
                     <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230A2463'/%3E%3Ctext x='50' y='60' font-family='Arial' font-size='40' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E" alt="Sapyyn">
                     <span class="logo-text">Sapyyn Admin</span>
                 </div>
-                <button class="sidebar-toggle" onclick="AppController.toggleSidebar()">
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
             <nav class="sidebar-menu">
                 <div class="menu-section">
                     <h3 class="menu-title">Main</h3>
-                    <div class="menu-item active" data-section="dashboard">
-                        <i class="fas fa-tachometer-alt"></i>
+                    <div class="menu-item active" onclick="showSection('dashboard')">
+                        <i class="fas fa-dashboard"></i>
                         <span class="menu-text">Dashboard</span>
                     </div>
-                    <div class="menu-item" data-section="referrals">
+                    <div class="menu-item" onclick="showSection('referrals')">
                         <i class="fas fa-exchange-alt"></i>
                         <span class="menu-text">Referrals</span>
                         <span class="menu-badge" id="referrals-count">12</span>
                     </div>
-                    <div class="menu-item" data-section="appointments">
+                    <div class="menu-item" onclick="showSection('appointments')">
                         <i class="fas fa-calendar-check"></i>
                         <span class="menu-text">Appointments</span>
                         <span class="menu-badge" id="appointments-count">3</span>
@@ -1215,77 +1147,77 @@
                 </div>
                 <div class="menu-section">
                     <h3 class="menu-title">Users</h3>
-                    <div class="menu-item" data-section="patients">
+                    <div class="menu-item" onclick="showSection('patients')">
                         <i class="fas fa-users"></i>
                         <span class="menu-text">Patients</span>
                     </div>
-                    <div class="menu-item" data-section="specialists">
+                    <div class="menu-item" onclick="showSection('specialists')">
                         <i class="fas fa-user-md"></i>
                         <span class="menu-text">Specialists</span>
                     </div>
-                    <div class="menu-item" data-section="dentists">
+                    <div class="menu-item" onclick="showSection('dentists')">
                         <i class="fas fa-tooth"></i>
                         <span class="menu-text">Dentists</span>
                     </div>
-                    <div class="menu-item" data-section="practices">
+                    <div class="menu-item" onclick="showSection('practices')">
                         <i class="fas fa-hospital"></i>
                         <span class="menu-text">Healthcare Practices</span>
                     </div>
                 </div>
                 <div class="menu-section">
                     <h3 class="menu-title">Management</h3>
-                    <div class="menu-item" data-section="rewards">
+                    <div class="menu-item" onclick="showSection('rewards')">
                         <i class="fas fa-gift"></i>
                         <span class="menu-text">Rewards</span>
                     </div>
-                    <div class="menu-item" data-section="marketing">
+                    <div class="menu-item" onclick="showSection('marketing')">
                         <i class="fas fa-bullhorn"></i>
                         <span class="menu-text">Co-Marketing</span>
                     </div>
-                    <div class="menu-item" data-section="newsletter">
+                    <div class="menu-item" onclick="showSection('newsletter')">
                         <i class="fas fa-envelope"></i>
                         <span class="menu-text">Newsletter</span>
                         <span class="menu-badge">5</span>
                     </div>
-                    <div class="menu-item" data-section="analytics">
+                    <div class="menu-item" onclick="showSection('analytics')">
                         <i class="fas fa-chart-bar"></i>
                         <span class="menu-text">Analytics</span>
                     </div>
                 </div>
                 <div class="menu-section">
                     <h3 class="menu-title">Content</h3>
-                    <div class="menu-item" data-section="education">
+                    <div class="menu-item" onclick="showSection('education')">
                         <i class="fas fa-graduation-cap"></i>
                         <span class="menu-text">Educational Content</span>
                     </div>
-                    <div class="menu-item" data-section="training">
+                    <div class="menu-item" onclick="showSection('training')">
                         <i class="fas fa-video"></i>
                         <span class="menu-text">Training Videos</span>
                     </div>
-                    <div class="menu-item" data-section="cases">
+                    <div class="menu-item" onclick="showSection('cases')">
                         <i class="fas fa-clipboard-list"></i>
                         <span class="menu-text">Case Studies</span>
                     </div>
-                    <div class="menu-item" data-section="guides">
+                    <div class="menu-item" onclick="showSection('guides')">
                         <i class="fas fa-question-circle"></i>
                         <span class="menu-text">How-To Guides</span>
                     </div>
                 </div>
                 <div class="menu-section">
                     <h3 class="menu-title">System</h3>
-                    <div class="menu-item" data-section="settings">
+                    <div class="menu-item" onclick="showSection('settings')">
                         <i class="fas fa-cog"></i>
                         <span class="menu-text">Settings</span>
                     </div>
-                    <div class="menu-item" data-section="security">
+                    <div class="menu-item" onclick="showSection('security')">
                         <i class="fas fa-shield-alt"></i>
                         <span class="menu-text">Security</span>
                     </div>
-                    <div class="menu-item" data-section="billing">
+                    <div class="menu-item" onclick="showSection('billing')">
                         <i class="fas fa-file-invoice"></i>
                         <span class="menu-text">Billing</span>
                     </div>
-                    <div class="menu-item" data-section="audit">
+                    <div class="menu-item" onclick="showSection('audit')">
                         <i class="fas fa-history"></i>
                         <span class="menu-text">Audit Log</span>
                     </div>
@@ -1298,7 +1230,7 @@
             <!-- Header -->
             <header class="header">
                 <div class="header-left">
-                    <button class="mobile-menu-btn" onclick="AppController.toggleMobileSidebar()">
+                    <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">
                         <i class="fas fa-bars"></i>
                     </button>
                     <div class="breadcrumb">
@@ -1308,22 +1240,22 @@
                     </div>
                     <div class="search-bar">
                         <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Search patients, providers, clinics..." onkeyup="AppController.performSearch(this.value)">
+                        <input type="text" placeholder="Search patients, providers, clinics..." onkeyup="performSearch(this.value)">
                     </div>
                 </div>
                 <div class="header-right">
-                    <button class="header-btn" onclick="AppController.showNotifications()">
+                    <button class="header-btn" onclick="showNotifications()">
                         <i class="fas fa-bell"></i>
                         <span class="notification-badge" id="notification-count">8</span>
                     </button>
-                    <button class="header-btn" onclick="AppController.showMessages()">
+                    <button class="header-btn" onclick="showMessages()">
                         <i class="fas fa-envelope"></i>
                         <span class="notification-badge">5</span>
                     </button>
-                    <button class="header-btn" onclick="AppController.showSettings()">
+                    <button class="header-btn" onclick="showSettings()">
                         <i class="fas fa-cog"></i>
                     </button>
-                    <div class="user-menu" onclick="AppController.showUserMenu()">
+                    <div class="user-menu" onclick="showUserMenu()">
                         <div class="user-avatar">JA</div>
                         <div class="user-info">
                             <div style="font-weight: 600; font-size: 0.875rem;">John Admin</div>
@@ -1345,10 +1277,10 @@
                             <p>Welcome back! Here's what's happening with your dental referral network today.</p>
                         </div>
                         <div class="page-actions">
-                            <button class="btn btn-secondary" onclick="DataManager.exportData()">
+                            <button class="btn btn-secondary" onclick="exportData()">
                                 <i class="fas fa-download"></i> Export Data
                             </button>
-                            <button class="btn btn-primary" onclick="ModalController.openModal('newReferralModal')">
+                            <button class="btn btn-primary" onclick="openModal('newReferralModal')">
                                 <i class="fas fa-plus"></i> New Referral
                             </button>
                         </div>
@@ -1356,7 +1288,7 @@
 
                     <!-- Stats Grid -->
                     <div class="stats-grid">
-                        <div class="stat-card" data-section="patients">
+                        <div class="stat-card" onclick="showSection('patients')">
                             <div class="stat-header">
                                 <div>
                                     <div class="stat-title">Total Patients</div>
@@ -1371,7 +1303,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="stat-card" data-section="specialists">
+                        <div class="stat-card" onclick="showSection('specialists')">
                             <div class="stat-header">
                                 <div>
                                     <div class="stat-title">Active Specialists</div>
@@ -1386,7 +1318,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="stat-card" data-section="dentists">
+                        <div class="stat-card" onclick="showSection('dentists')">
                             <div class="stat-header">
                                 <div>
                                     <div class="stat-title">Total Dentists</div>
@@ -1401,7 +1333,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="stat-card" data-section="billing">
+                        <div class="stat-card" onclick="showSection('billing')">
                             <div class="stat-header">
                                 <div>
                                     <div class="stat-title">Monthly Revenue</div>
@@ -1424,9 +1356,9 @@
                             <div class="chart-header">
                                 <h3 class="chart-title">Referral Trends</h3>
                                 <div class="chart-options">
-                                    <button class="chart-option" data-period="daily">Daily</button>
-                                    <button class="chart-option active" data-period="weekly">Weekly</button>
-                                    <button class="chart-option" data-period="monthly">Monthly</button>
+                                    <button class="chart-option" onclick="updateChart('daily')">Daily</button>
+                                    <button class="chart-option active" onclick="updateChart('weekly')">Weekly</button>
+                                    <button class="chart-option" onclick="updateChart('monthly')">Monthly</button>
                                 </div>
                             </div>
                             <canvas id="referralChart" height="100"></canvas>
@@ -1446,10 +1378,10 @@
                             <div class="table-header">
                                 <h3 class="table-title">Recent Referrals</h3>
                                 <div class="table-actions">
-                                    <button class="btn btn-secondary" onclick="FilterController.toggleFilter('referrals-filter')">
+                                    <button class="btn btn-secondary" onclick="toggleFilter('referrals-filter')">
                                         <i class="fas fa-filter"></i> Filter
                                     </button>
-                                    <button class="btn btn-primary" onclick="ModalController.openModal('newReferralModal')">
+                                    <button class="btn btn-primary" onclick="openModal('newReferralModal')">
                                         <i class="fas fa-plus"></i> New Referral
                                     </button>
                                 </div>
@@ -1460,7 +1392,7 @@
                                 <div class="filter-row">
                                     <div class="form-group">
                                         <label class="form-label">Status</label>
-                                        <select class="form-select" onchange="FilterController.filterReferrals()">
+                                        <select class="form-select" onchange="filterReferrals()">
                                             <option value="">All Status</option>
                                             <option value="active">Active</option>
                                             <option value="pending">Pending</option>
@@ -1470,7 +1402,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Specialty</label>
-                                        <select class="form-select" onchange="FilterController.filterReferrals()">
+                                        <select class="form-select" onchange="filterReferrals()">
                                             <option value="">All Specialties</option>
                                             <option value="orthodontics">Orthodontics</option>
                                             <option value="endodontics">Endodontics</option>
@@ -1480,23 +1412,23 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Date Range</label>
-                                        <input type="date" class="form-control" onchange="FilterController.filterReferrals()">
+                                        <input type="date" class="form-control" onchange="filterReferrals()">
                                     </div>
                                 </div>
                                 <div style="display: flex; gap: 1rem;">
-                                    <button class="btn btn-secondary" onclick="FilterController.clearFilters()">Clear Filters</button>
-                                    <button class="btn btn-primary" onclick="FilterController.applyFilters()">Apply Filters</button>
+                                    <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+                                    <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
                                 </div>
                             </div>
                             
                             <table class="data-table" id="referrals-table">
                                 <thead>
                                     <tr>
-                                        <th data-sort="patient">Patient <i class="fas fa-sort"></i></th>
-                                        <th data-sort="provider">Provider <i class="fas fa-sort"></i></th>
-                                        <th data-sort="specialty">Specialty <i class="fas fa-sort"></i></th>
-                                        <th data-sort="date">Date <i class="fas fa-sort"></i></th>
-                                        <th data-sort="status">Status <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('patient')">Patient <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('provider')">Provider <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('specialty')">Specialty <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('date')">Date <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('status')">Status <i class="fas fa-sort"></i></th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -1521,7 +1453,7 @@
                     </div>
                 </div>
 
-                <!-- Other Sections -->
+                <!-- Other Sections (will be shown/hidden based on navigation) -->
                 <div id="referrals-section" class="content-section">
                     <div class="page-header">
                         <div>
@@ -1529,10 +1461,10 @@
                             <p>Manage all patient referrals and track their status</p>
                         </div>
                         <div class="page-actions">
-                            <button class="btn btn-secondary" onclick="DataManager.exportReferrals()">
+                            <button class="btn btn-secondary" onclick="exportReferrals()">
                                 <i class="fas fa-download"></i> Export
                             </button>
-                            <button class="btn btn-primary" onclick="ModalController.openModal('newReferralModal')">
+                            <button class="btn btn-primary" onclick="openModal('newReferralModal')">
                                 <i class="fas fa-plus"></i> New Referral
                             </button>
                         </div>
@@ -1557,22 +1489,24 @@
                         </div>
                     </div>
                     
+                    <!-- Referrals content here -->
                     <div class="table-card">
                         <div class="table-header">
                             <h3 class="table-title">All Referrals</h3>
                             <div class="table-actions">
-                                <button class="btn btn-secondary" onclick="FilterController.toggleFilter('all-referrals-filter')">
+                                <button class="btn btn-secondary" onclick="toggleFilter('all-referrals-filter')">
                                     <i class="fas fa-filter"></i> Filter
                                 </button>
-                                <button class="btn btn-primary" onclick="ModalController.openModal('newReferralModal')">
+                                <button class="btn btn-primary" onclick="openModal('newReferralModal')">
                                     <i class="fas fa-plus"></i> New Referral
                                 </button>
                             </div>
                         </div>
+                        <!-- Table content similar to dashboard but with more detailed view -->
                     </div>
                 </div>
 
-                <!-- Patients Section -->
+                <!-- Additional sections for other menu items -->
                 <div id="patients-section" class="content-section">
                     <div class="page-header">
                         <div>
@@ -1580,17 +1514,27 @@
                             <p>View and manage patient records and information</p>
                         </div>
                         <div class="page-actions">
-                            <button class="btn btn-secondary" onclick="DataManager.exportPatients()">
+                            <button class="btn btn-secondary" onclick="exportPatients()">
                                 <i class="fas fa-download"></i> Export
                             </button>
-                            <button class="btn btn-primary" onclick="ModalController.openModal('newPatientModal')">
+                            <button class="btn btn-primary" onclick="openModal('newPatientModal')">
                                 <i class="fas fa-plus"></i> Add Patient
                             </button>
                         </div>
                     </div>
+                    <!-- Patients content here -->
                 </div>
 
-                <!-- Settings Section -->
+                <!-- Similar sections for other menu items -->
+                <div id="specialists-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Specialist Management</h2>
+                            <p>Manage specialist profiles and availability</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="settings-section" class="content-section">
                     <div class="page-header">
                         <div>
@@ -1607,11 +1551,11 @@
                             <div style="padding: 2rem;">
                                 <div class="form-group">
                                     <label class="form-label">Site Name</label>
-                                    <input type="text" class="form-control" value="Sapyyn Admin" onchange="SettingsController.updateSetting('siteName', this.value)">
+                                    <input type="text" class="form-control" value="Sapyyn Admin" onchange="updateSetting('siteName', this.value)">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Timezone</label>
-                                    <select class="form-select" onchange="SettingsController.updateSetting('timezone', this.value)">
+                                    <select class="form-select" onchange="updateSetting('timezone', this.value)">
                                         <option value="UTC">UTC</option>
                                         <option value="EST" selected>Eastern Time</option>
                                         <option value="PST">Pacific Time</option>
@@ -1619,7 +1563,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Email Notifications</label>
-                                    <select class="form-select" onchange="SettingsController.updateSetting('emailNotifications', this.value)">
+                                    <select class="form-select" onchange="updateSetting('emailNotifications', this.value)">
                                         <option value="all" selected>All Notifications</option>
                                         <option value="important">Important Only</option>
                                         <option value="none">None</option>
@@ -1635,160 +1579,24 @@
                             <div style="padding: 2rem;">
                                 <div class="form-group">
                                     <label class="form-label">Two-Factor Authentication</label>
-                                    <select class="form-select" onchange="SettingsController.updateSetting('twoFactor', this.value)">
+                                    <select class="form-select" onchange="updateSetting('twoFactor', this.value)">
                                         <option value="enabled" selected>Enabled</option>
                                         <option value="disabled">Disabled</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Session Timeout (minutes)</label>
-                                    <input type="number" class="form-control" value="30" onchange="SettingsController.updateSetting('sessionTimeout', this.value)">
+                                    <input type="number" class="form-control" value="30" onchange="updateSetting('sessionTimeout', this.value)">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Password Policy</label>
-                                    <select class="form-select" onchange="SettingsController.updateSetting('passwordPolicy', this.value)">
+                                    <select class="form-select" onchange="updateSetting('passwordPolicy', this.value)">
                                         <option value="strong" selected>Strong</option>
                                         <option value="medium">Medium</option>
                                         <option value="basic">Basic</option>
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Other sections placeholders -->
-                <div id="specialists-section" class="content-section">
-                    <div class="page-header">
-                        <div>
-                            <h2>Specialist Management</h2>
-                            <p>Manage specialist profiles and availability</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="dentists-section" class="content-section">
-                    <div class="page-header">
-                        <div>
-                            <h2>Dentist Management</h2>
-                            <p>Manage dentist profiles and practices</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="practices-section" class="content-section">
-                    <div class="page-header">
-                        <div>
-                            <h2>Healthcare Practices</h2>
-                            <p>Manage healthcare practice information</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="appointments-section" class="content-section">
-                    <div class="page-header">
-                        <div>
-                            <h2>Appointment Management</h2>
-                            <p>View and manage all appointments</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="rewards-section" class="content-section">
-                    <div class="page-header">
-                        <div>
-                            <h2>Rewards Management</h2>
-                            <p>Manage reward programs and incentives</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="marketing-section" class="content-section">
-                    <div class="page-header">
-                        <div>
-                            <h2>Co-Marketing</h2>
-                            <p>Manage marketing campaigns and partnerships</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="newsletter-section" class="content-section">
-                    <div class="page-header">
-                        <div>
-                            <h2>Newsletter Management</h2>
-                            <p>Create and manage newsletter campaigns</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="analytics-section" class="content-section">
-                    <div class="page-header">
-                        <div>
-                            <h2>Analytics Dashboard</h2>
-                            <p>View detailed analytics and reports</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="education-section" class="content-section">
-                    <div class="page-header">
-                        <div>
-                            <h2>Educational Content</h2>
-                            <p>Manage educational materials and resources</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="training-section" class="content-section">
-                    <div class="page-header">
-                        <div>
-                            <h2>Training Videos</h2>
-                            <p>Manage training video library</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="cases-section" class="content-section">
-                    <div class="page-header">
-                        <div>
-                            <h2>Case Studies</h2>
-                            <p>Manage case study repository</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="guides-section" class="content-section">
-                    <div class="page-header">
-                        <div>
-                            <h2>How-To Guides</h2>
-                            <p>Manage instructional guides and documentation</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="security-section" class="content-section">
-                    <div class="page-header">
-                        <div>
-                            <h2>Security Management</h2>
-                            <p>Manage security settings and permissions</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="billing-section" class="content-section">
-                    <div class="page-header">
-                        <div>
-                            <h2>Billing Management</h2>
-                            <p>Manage billing and payment information</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="audit-section" class="content-section">
-                    <div class="page-header">
-                        <div>
-                            <h2>Audit Log</h2>
-                            <p>View system activity and audit trails</p>
                         </div>
                     </div>
                 </div>
@@ -1802,10 +1610,10 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">Create New Referral</h3>
-                <button class="modal-close" onclick="ModalController.closeModal('newReferralModal')">&times;</button>
+                <button class="modal-close" onclick="closeModal('newReferralModal')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="newReferralForm">
+                <form id="newReferralForm" onsubmit="submitReferral(event)">
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Patient Name</label>
@@ -1859,8 +1667,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="ModalController.closeModal('newReferralModal')">Cancel</button>
-                <button class="btn btn-primary" onclick="FormController.submitReferral()">
+                <button class="btn btn-secondary" onclick="closeModal('newReferralModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="document.getElementById('newReferralForm').requestSubmit()">
                     <span class="loading-spinner" style="display: none;"></span>
                     Create Referral
                 </button>
@@ -1873,10 +1681,10 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">Add New Patient</h3>
-                <button class="modal-close" onclick="ModalController.closeModal('newPatientModal')">&times;</button>
+                <button class="modal-close" onclick="closeModal('newPatientModal')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="newPatientForm">
+                <form id="newPatientForm" onsubmit="submitPatient(event)">
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">First Name</label>
@@ -1914,8 +1722,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="ModalController.closeModal('newPatientModal')">Cancel</button>
-                <button class="btn btn-primary" onclick="FormController.submitPatient()">
+                <button class="btn btn-secondary" onclick="closeModal('newPatientModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="document.getElementById('newPatientForm').requestSubmit()">
                     Add Patient
                 </button>
             </div>
@@ -1923,739 +1731,553 @@
     </div>
 
     <script>
-        // Application State Management
-        class AppState {
-            constructor() {
-                this.currentSection = 'dashboard';
-                this.currentSortColumn = '';
-                this.currentSortDirection = 'asc';
-                this.currentPage = 1;
-                this.itemsPerPage = 10;
-                this.searchQuery = '';
-                this.filters = {};
+        // Global variables
+        let currentSection = 'dashboard';
+        let currentSortColumn = '';
+        let currentSortDirection = 'asc';
+        let currentPage = 1;
+        let itemsPerPage = 10;
+
+        // Sample data
+        const sampleReferrals = [
+            { id: 1, patient: 'Mary Johnson', patientId: '#28471', provider: 'Dr. Sarah Miller', specialty: 'Orthodontics', date: '2024-12-15', status: 'active' },
+            { id: 2, patient: 'John Davis', patientId: '#28470', provider: 'Dr. Michael Chen', specialty: 'Endodontics', date: '2024-12-15', status: 'pending' },
+            { id: 3, patient: 'Emma Brown', patientId: '#28469', provider: 'Dr. James Wilson', specialty: 'Periodontics', date: '2024-12-14', status: 'completed' },
+            { id: 4, patient: 'Robert Miller', patientId: '#28468', provider: 'Dr. Lisa Anderson', specialty: 'Oral Surgery', date: '2024-12-14', status: 'active' },
+            { id: 5, patient: 'Sarah Wilson', patientId: '#28467', provider: 'Dr. David Thompson', specialty: 'Orthodontics', date: '2024-12-13', status: 'cancelled' }
+        ];
+
+        const sampleActivities = [
+            { icon: 'user-plus', title: 'New specialist registered', description: 'Dr. Jennifer Smith joined as Orthodontist', time: '2 minutes ago' },
+            { icon: 'calendar-check', title: 'Appointment completed', description: 'Patient consultation with Dr. Wilson', time: '15 minutes ago' },
+            { icon: 'exchange-alt', title: 'New referral created', description: 'Orthodontic referral for Mary Johnson', time: '1 hour ago' },
+            { icon: 'star', title: '5-star review received', description: 'Patient rated Dr. Chen\'s service', time: '3 hours ago' },
+            { icon: 'file-medical', title: 'Medical record updated', description: 'Patient history updated for John Davis', time: '5 hours ago' }
+        ];
+
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('mobile-open');
+        }
+
+        // Navigation functionality
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionName + '-section');
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // Update active menu item
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Update breadcrumb
+            document.getElementById('breadcrumb-text').textContent = sectionName.charAt(0).toUpperCase() + sectionName.slice(1);
+            
+            currentSection = sectionName;
+        }
+
+        // Modal functionality
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Search functionality
+        function performSearch(query) {
+            if (query.length < 2) return;
+            
+            console.log('Searching for:', query);
+            showNotification('Searching for: ' + query, 'info');
+            
+            // Implement actual search logic here
+            // Filter tables, highlight results, etc.
+        }
+
+        // Filter functionality
+        function toggleFilter(filterId) {
+            const filter = document.getElementById(filterId);
+            filter.classList.toggle('active');
+        }
+
+        function filterReferrals() {
+            // Implement filtering logic
+            console.log('Filtering referrals...');
+            populateReferralsTable(sampleReferrals);
+        }
+
+        function clearFilters() {
+            // Clear all filter inputs
+            document.querySelectorAll('#referrals-filter select, #referrals-filter input').forEach(input => {
+                input.value = '';
+            });
+            filterReferrals();
+        }
+
+        function applyFilters() {
+            filterReferrals();
+            showNotification('Filters applied successfully', 'success');
+        }
+
+        // Table functionality
+        function sortTable(column) {
+            if (currentSortColumn === column) {
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortColumn = column;
+                currentSortDirection = 'asc';
+            }
+            
+            const sortedData = [...sampleReferrals].sort((a, b) => {
+                let aVal = a[column];
+                let bVal = b[column];
+                
+                if (typeof aVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
+                }
+                
+                if (currentSortDirection === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+            
+            populateReferralsTable(sortedData);
+            
+            // Update sort indicators
+            document.querySelectorAll('#referrals-table th i').forEach(icon => {
+                icon.className = 'fas fa-sort';
+            });
+            
+            const currentHeader = document.querySelector(`#referrals-table th[onclick="sortTable('${column}')"] i`);
+            if (currentHeader) {
+                currentHeader.className = currentSortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
             }
         }
 
-        // Data Management
-        class DataManager {
-            static sampleReferrals = [
-                { id: 1, patient: 'Mary Johnson', patientId: '#28471', provider: 'Dr. Sarah Miller', specialty: 'Orthodontics', date: '2024-12-15', status: 'active' },
-                { id: 2, patient: 'John Davis', patientId: '#28470', provider: 'Dr. Michael Chen', specialty: 'Endodontics', date: '2024-12-15', status: 'pending' },
-                { id: 3, patient: 'Emma Brown', patientId: '#28469', provider: 'Dr. James Wilson', specialty: 'Periodontics', date: '2024-12-14', status: 'completed' },
-                { id: 4, patient: 'Robert Miller', patientId: '#28468', provider: 'Dr. Lisa Anderson', specialty: 'Oral Surgery', date: '2024-12-14', status: 'active' },
-                { id: 5, patient: 'Sarah Wilson', patientId: '#28467', provider: 'Dr. David Thompson', specialty: 'Orthodontics', date: '2024-12-13', status: 'cancelled' },
-                { id: 6, patient: 'Michael Brown', patientId: '#28466', provider: 'Dr. Jennifer Lee', specialty: 'Periodontics', date: '2024-12-13', status: 'pending' },
-                { id: 7, patient: 'Lisa Garcia', patientId: '#28465', provider: 'Dr. Robert Taylor', specialty: 'Endodontics', date: '2024-12-12', status: 'completed' },
-                { id: 8, patient: 'David Smith', patientId: '#28464', provider: 'Dr. Amanda White', specialty: 'Oral Surgery', date: '2024-12-12', status: 'active' }
-            ];
+        function populateReferralsTable(data) {
+            const tbody = document.getElementById('referrals-tbody');
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = data.slice(startIndex, endIndex);
+            
+            tbody.innerHTML = pageData.map(referral => `
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-avatar" style="font-size: 0.875rem; width: 32px; height: 32px;">
+                                ${referral.patient.split(' ').map(n => n[0]).join('')}
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.875rem;">${referral.patient}</div>
+                                <div style="font-size: 0.75rem; color: var(--gray);">ID: ${referral.patientId}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${referral.provider}</td>
+                    <td>${referral.specialty}</td>
+                    <td>${new Date(referral.date).toLocaleDateString()}</td>
+                    <td><span class="status-badge ${referral.status}">${referral.status.charAt(0).toUpperCase() + referral.status.slice(1)}</span></td>
+                    <td>
+                        <div class="table-actions-cell">
+                            <button class="action-btn" onclick="viewReferral(${referral.id})" title="View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn" onclick="editReferral(${referral.id})" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" onclick="deleteReferral(${referral.id})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            updatePagination(data.length);
+        }
 
-            static sampleActivities = [
-                { icon: 'user-plus', title: 'New specialist registered', description: 'Dr. Jennifer Smith joined as Orthodontist', time: '2 minutes ago' },
-                { icon: 'calendar-check', title: 'Appointment completed', description: 'Patient consultation with Dr. Wilson', time: '15 minutes ago' },
-                { icon: 'exchange-alt', title: 'New referral created', description: 'Orthodontic referral for Mary Johnson', time: '1 hour ago' },
-                { icon: 'star', title: '5-star review received', description: 'Patient rated Dr. Chen\'s service', time: '3 hours ago' },
-                { icon: 'file-medical', title: 'Medical record updated', description: 'Patient history updated for John Davis', time: '5 hours ago' }
-            ];
-
-            static getReferrals() {
-                return this.sampleReferrals;
+        function updatePagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const pagination = document.getElementById('referrals-pagination');
+            
+            let paginationHTML = '';
+            
+            // Previous button
+            paginationHTML += `<button class="pagination-btn ${currentPage === 1 ? 'disabled' : ''}" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>`;
+            
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage || i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    paginationHTML += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    paginationHTML += `<span>...</span>`;
+                }
             }
+            
+            // Next button
+            paginationHTML += `<button class="pagination-btn ${currentPage === totalPages ? 'disabled' : ''}" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>`;
+            
+            pagination.innerHTML = paginationHTML;
+        }
 
-            static getActivities() {
-                return this.sampleActivities;
+        function changePage(page) {
+            const totalPages = Math.ceil(sampleReferrals.length / itemsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                populateReferralsTable(sampleReferrals);
             }
+        }
 
-            static addReferral(referralData) {
+        function populateActivityFeed() {
+            const activityList = document.getElementById('activity-list');
+            activityList.innerHTML = sampleActivities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-${activity.icon}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">${activity.title}</div>
+                        <div class="activity-description">${activity.description}</div>
+                        <div class="activity-time">${activity.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Form submission handlers
+        function submitReferral(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const referralData = Object.fromEntries(formData.entries());
+            
+            console.log('Submitting referral:', referralData);
+            
+            // Show loading state
+            const submitBtn = event.target.closest('.modal').querySelector('.btn-primary');
+            const spinner = submitBtn.querySelector('.loading-spinner');
+            spinner.style.display = 'inline-block';
+            submitBtn.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Add to sample data
                 const newReferral = {
-                    id: this.sampleReferrals.length + 1,
+                    id: sampleReferrals.length + 1,
                     patient: referralData.patientName,
                     patientId: referralData.patientId,
-                    provider: this.getProviderName(referralData.referringProvider),
+                    provider: referralData.referringProvider,
                     specialty: referralData.specialty,
                     date: new Date().toISOString().split('T')[0],
                     status: 'pending'
                 };
-                this.sampleReferrals.unshift(newReferral);
-                return newReferral;
-            }
+                
+                sampleReferrals.unshift(newReferral);
+                
+                // Update UI
+                populateReferralsTable(sampleReferrals);
+                updateStats();
+                
+                // Hide loading state
+                spinner.style.display = 'none';
+                submitBtn.disabled = false;
+                
+                // Close modal and show success
+                closeModal('newReferralModal');
+                showNotification('Referral created successfully!', 'success');
+                
+                // Reset form
+                event.target.reset();
+            }, 1000);
+        }
 
-            static getProviderName(providerId) {
-                const providers = {
-                    'dr-smith': 'Dr. Sarah Smith',
-                    'dr-johnson': 'Dr. Michael Johnson',
-                    'dr-williams': 'Dr. Emily Williams'
-                };
-                return providers[providerId] || 'Unknown Provider';
-            }
+        function submitPatient(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const patientData = Object.fromEntries(formData.entries());
+            
+            console.log('Submitting patient:', patientData);
+            
+            // Simulate API call
+            setTimeout(() => {
+                closeModal('newPatientModal');
+                showNotification('Patient added successfully!', 'success');
+                updateStats();
+                event.target.reset();
+            }, 1000);
+        }
 
-            static deleteReferral(id) {
-                const index = this.sampleReferrals.findIndex(r => r.id === id);
+        // CRUD operations
+        function viewReferral(id) {
+            const referral = sampleReferrals.find(r => r.id === id);
+            if (referral) {
+                console.log('Viewing referral:', referral);
+                showNotification(`Viewing referral for ${referral.patient}`, 'info');
+            }
+        }
+
+        function editReferral(id) {
+            const referral = sampleReferrals.find(r => r.id === id);
+            if (referral) {
+                console.log('Editing referral:', referral);
+                showNotification(`Editing referral for ${referral.patient}`, 'info');
+                // Open edit modal with pre-filled data
+            }
+        }
+
+        function deleteReferral(id) {
+            if (confirm('Are you sure you want to delete this referral?')) {
+                const index = sampleReferrals.findIndex(r => r.id === id);
                 if (index > -1) {
-                    const referral = this.sampleReferrals[index];
-                    this.sampleReferrals.splice(index, 1);
-                    return referral;
+                    const referral = sampleReferrals[index];
+                    sampleReferrals.splice(index, 1);
+                    populateReferralsTable(sampleReferrals);
+                    updateStats();
+                    showNotification(`Referral for ${referral.patient} deleted`, 'success');
                 }
-                return null;
-            }
-
-            static exportData() {
-                NotificationController.showNotification('Exporting dashboard data...', 'info');
-            }
-
-            static exportReferrals() {
-                NotificationController.showNotification('Exporting referrals data...', 'info');
-            }
-
-            static exportPatients() {
-                NotificationController.showNotification('Exporting patients data...', 'info');
             }
         }
 
-        // Application Controller
-        class AppController {
-            static init() {
-                this.appState = new AppState();
-                this.setupEventListeners();
-                this.populateInitialData();
-                ChartController.initializeCharts();
-            }
+        // Utility functions
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : type === 'warning' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 3000);
+        }
 
-            static setupEventListeners() {
-                // Menu item clicks
-                document.querySelectorAll('.menu-item').forEach(item => {
-                    item.addEventListener('click', (e) => {
-                        const section = e.currentTarget.dataset.section;
-                        if (section) {
-                            this.showSection(section);
-                        }
-                    });
-                });
+        function updateStats() {
+            // Update dashboard statistics
+            document.getElementById('total-patients').textContent = (2847 + Math.floor(Math.random() * 10)).toLocaleString();
+            document.getElementById('total-specialists').textContent = (523 + Math.floor(Math.random() * 5)).toLocaleString();
+            document.getElementById('total-dentists').textContent = (1248 + Math.floor(Math.random() * 20)).toLocaleString();
+            
+            // Update badges
+            document.getElementById('referrals-count').textContent = sampleReferrals.length;
+            document.getElementById('appointments-count').textContent = Math.floor(Math.random() * 10) + 1;
+            document.getElementById('notification-count').textContent = Math.floor(Math.random() * 20) + 1;
+        }
 
-                // Stat card clicks
-                document.querySelectorAll('.stat-card').forEach(card => {
-                    card.addEventListener('click', (e) => {
-                        const section = e.currentTarget.dataset.section;
-                        if (section) {
-                            this.showSection(section);
-                        }
-                    });
-                });
+        // Header button handlers
+        function showNotifications() {
+            showNotification('Showing notifications panel', 'info');
+        }
 
-                // Table header clicks for sorting
-                document.querySelectorAll('#referrals-table th[data-sort]').forEach(header => {
-                    header.addEventListener('click', (e) => {
-                        const column = e.currentTarget.dataset.sort;
-                        TableController.sortTable(column);
-                    });
-                });
+        function showMessages() {
+            showNotification('Showing messages panel', 'info');
+        }
 
-                // Chart option clicks
-                document.querySelectorAll('.chart-option').forEach(option => {
-                    option.addEventListener('click', (e) => {
-                        const period = e.currentTarget.dataset.period;
-                        ChartController.updateChart(period);
-                    });
-                });
+        function showSettings() {
+            showSection('settings');
+        }
 
-                // Modal click outside to close
-                document.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('modal')) {
-                        e.target.classList.remove('active');
-                    }
-                });
+        function showUserMenu() {
+            showNotification('User menu clicked', 'info');
+        }
 
-                // Close mobile sidebar when clicking outside
-                document.addEventListener('click', (e) => {
-                    const sidebar = document.getElementById('sidebar');
-                    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-                    
-                    if (window.innerWidth <= 768 && 
-                        !sidebar.contains(e.target) && 
-                        !mobileMenuBtn.contains(e.target) &&
-                        sidebar.classList.contains('mobile-open')) {
-                        sidebar.classList.remove('mobile-open');
-                    }
-                });
+        // Export functions
+        function exportData() {
+            showNotification('Exporting dashboard data...', 'info');
+            // Implement export logic
+        }
 
-                // Handle window resize
-                window.addEventListener('resize', () => {
-                    const sidebar = document.getElementById('sidebar');
-                    if (window.innerWidth > 768) {
-                        sidebar.classList.remove('mobile-open');
-                    }
-                });
-            }
+        function exportReferrals() {
+            showNotification('Exporting referrals data...', 'info');
+            // Implement export logic
+        }
 
-            static populateInitialData() {
-                TableController.populateReferralsTable(DataManager.getReferrals());
-                ActivityController.populateActivityFeed();
-                StatsController.updateStats();
-            }
+        function exportPatients() {
+            showNotification('Exporting patients data...', 'info');
+            // Implement export logic
+        }
 
-            static showSection(sectionName) {
-                // Hide all sections
-                document.querySelectorAll('.content-section').forEach(section => {
-                    section.classList.remove('active');
-                });
-                
-                // Show selected section
-                const targetSection = document.getElementById(sectionName + '-section');
-                if (targetSection) {
-                    targetSection.classList.add('active');
+        // Settings functions
+        function updateSetting(setting, value) {
+            console.log(`Updating ${setting} to ${value}`);
+            showNotification(`${setting} updated successfully`, 'success');
+        }
+
+        // Chart functionality
+        function updateChart(period) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.chart-option').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            console.log('Updating chart for period:', period);
+            showNotification(`Chart updated for ${period} view`, 'info');
+            
+            // Update chart data based on period
+            // This would typically involve updating the Chart.js instance
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Populate initial data
+            populateReferralsTable(sampleReferrals);
+            populateActivityFeed();
+            updateStats();
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Close modals when clicking outside
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal')) {
+                    e.target.classList.remove('active');
                 }
-                
-                // Update active menu item
-                document.querySelectorAll('.menu-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                
-                const activeMenuItem = document.querySelector(`[data-section="${sectionName}"]`);
-                if (activeMenuItem) {
-                    activeMenuItem.classList.add('active');
-                }
-                
-                // Update breadcrumb
-                const breadcrumbText = document.getElementById('breadcrumb-text');
-                if (breadcrumbText) {
-                    breadcrumbText.textContent = sectionName.charAt(0).toUpperCase() + sectionName.slice(1);
-                }
-                
-                this.appState.currentSection = sectionName;
-            }
-
-            static toggleSidebar() {
+            });
+            
+            // Close mobile sidebar when clicking outside
+            document.addEventListener('click', function(e) {
                 const sidebar = document.getElementById('sidebar');
-                const mainContent = document.getElementById('mainContent');
+                const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
                 
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('expanded');
-            }
-
-            static toggleMobileSidebar() {
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(e.target) && 
+                    !mobileMenuBtn.contains(e.target) &&
+                    sidebar.classList.contains('mobile-open')) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
                 const sidebar = document.getElementById('sidebar');
-                sidebar.classList.toggle('mobile-open');
-            }
-
-            static performSearch(query) {
-                if (query.length < 2) return;
-                
-                this.appState.searchQuery = query;
-                NotificationController.showNotification('Searching for: ' + query, 'info');
-                
-                // Filter table data based on search
-                const filteredData = DataManager.getReferrals().filter(referral => 
-                    referral.patient.toLowerCase().includes(query.toLowerCase()) ||
-                    referral.provider.toLowerCase().includes(query.toLowerCase()) ||
-                    referral.specialty.toLowerCase().includes(query.toLowerCase())
-                );
-                
-                TableController.populateReferralsTable(filteredData);
-            }
-
-            static showNotifications() {
-                NotificationController.showNotification('Showing notifications panel', 'info');
-            }
-
-            static showMessages() {
-                NotificationController.showNotification('Showing messages panel', 'info');
-            }
-
-            static showSettings() {
-                this.showSection('settings');
-            }
-
-            static showUserMenu() {
-                NotificationController.showNotification('User menu clicked', 'info');
-            }
-        }
-
-        // Modal Controller
-        class ModalController {
-            static openModal(modalId) {
-                const modal = document.getElementById(modalId);
-                if (modal) {
-                    modal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('mobile-open');
                 }
-            }
+            });
+        });
 
-            static closeModal(modalId) {
-                const modal = document.getElementById(modalId);
-                if (modal) {
-                    modal.classList.remove('active');
-                    document.body.style.overflow = '';
-                    
-                    // Reset form if exists
-                    const form = modal.querySelector('form');
-                    if (form) {
-                        form.reset();
+        function initializeCharts() {
+            // Chart options
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                elements: {
+                    line: {
+                        tension: 0.4
+                    },
+                    point: {
+                        radius: 6,
+                        hoverRadius: 8
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
                     }
                 }
-            }
-        }
+            };
 
-        // Table Controller
-        class TableController {
-            static populateReferralsTable(data) {
-                const tbody = document.getElementById('referrals-tbody');
-                if (!tbody) return;
+            // Referral Chart
+            const referralCtx = document.getElementById('referralChart').getContext('2d');
+            new Chart(referralCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                    datasets: [{
+                        label: 'Referrals',
+                        data: [120, 135, 125, 145, 160, 175],
+                        borderColor: '#3E92CC',
+                        backgroundColor: 'rgba(62, 146, 204, 0.1)',
+                        borderWidth: 3,
+                        fill: true
+                    }]
+                },
+                options: chartOptions
+            });
 
-                const startIndex = (AppController.appState.currentPage - 1) * AppController.appState.itemsPerPage;
-                const endIndex = startIndex + AppController.appState.itemsPerPage;
-                const pageData = data.slice(startIndex, endIndex);
-                
-                tbody.innerHTML = pageData.map(referral => `
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar" style="font-size: 0.875rem; width: 32px; height: 32px;">
-                                    ${referral.patient.split(' ').map(n => n[0]).join('')}
-                                </div>
-                                <div>
-                                    <div style="font-weight: 600; font-size: 0.875rem;">${referral.patient}</div>
-                                    <div style="font-size: 0.75rem; color: var(--gray);">ID: ${referral.patientId}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>${referral.provider}</td>
-                        <td>${referral.specialty}</td>
-                        <td>${new Date(referral.date).toLocaleDateString()}</td>
-                        <td><span class="status-badge ${referral.status}">${referral.status}</span></td>
-                        <td>
-                            <div class="table-actions-cell">
-                                <button class="action-btn" onclick="CRUDController.viewReferral(${referral.id})" title="View">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="action-btn" onclick="CRUDController.editReferral(${referral.id})" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="action-btn" onclick="CRUDController.deleteReferral(${referral.id})" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `).join('');
-                
-                PaginationController.updatePagination(data.length);
-            }
-
-            static sortTable(column) {
-                const appState = AppController.appState;
-                
-                if (appState.currentSortColumn === column) {
-                    appState.currentSortDirection = appState.currentSortDirection === 'asc' ? 'desc' : 'asc';
-                } else {
-                    appState.currentSortColumn = column;
-                    appState.currentSortDirection = 'asc';
-                }
-                
-                const sortedData = [...DataManager.getReferrals()].sort((a, b) => {
-                    let aVal = a[column];
-                    let bVal = b[column];
-                    
-                    if (typeof aVal === 'string') {
-                        aVal = aVal.toLowerCase();
-                        bVal = bVal.toLowerCase();
-                    }
-                    
-                    if (appState.currentSortDirection === 'asc') {
-                        return aVal > bVal ? 1 : -1;
-                    } else {
-                        return aVal < bVal ? 1 : -1;
-                    }
-                });
-                
-                this.populateReferralsTable(sortedData);
-                
-                // Update sort indicators
-                document.querySelectorAll('#referrals-table th i').forEach(icon => {
-                    icon.className = 'fas fa-sort';
-                });
-                
-                const currentHeader = document.querySelector(`#referrals-table th[data-sort="${column}"] i`);
-                if (currentHeader) {
-                    currentHeader.className = appState.currentSortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
-                }
-            }
-        }
-
-        // Pagination Controller
-        class PaginationController {
-            static updatePagination(totalItems) {
-                const appState = AppController.appState;
-                const totalPages = Math.ceil(totalItems / appState.itemsPerPage);
-                const pagination = document.getElementById('referrals-pagination');
-                
-                if (!pagination) return;
-
-                let paginationHTML = '';
-                
-                // Previous button
-                paginationHTML += `<button class="pagination-btn ${appState.currentPage === 1 ? 'disabled' : ''}" onclick="PaginationController.changePage(${appState.currentPage - 1})" ${appState.currentPage === 1 ? 'disabled' : ''}>Previous</button>`;
-                
-                // Page numbers
-                for (let i = 1; i <= totalPages; i++) {
-                    if (i === appState.currentPage || i === 1 || i === totalPages || (i >= appState.currentPage - 1 && i <= appState.currentPage + 1)) {
-                        paginationHTML += `<button class="pagination-btn ${i === appState.currentPage ? 'active' : ''}" onclick="PaginationController.changePage(${i})">${i}</button>`;
-                    } else if (i === appState.currentPage - 2 || i === appState.currentPage + 2) {
-                        paginationHTML += `<span>...</span>`;
-                    }
-                }
-                
-                // Next button
-                paginationHTML += `<button class="pagination-btn ${appState.currentPage === totalPages ? 'disabled' : ''}" onclick="PaginationController.changePage(${appState.currentPage + 1})" ${appState.currentPage === totalPages ? 'disabled' : ''}>Next</button>`;
-                
-                pagination.innerHTML = paginationHTML;
-            }
-
-            static changePage(page) {
-                const appState = AppController.appState;
-                const totalPages = Math.ceil(DataManager.getReferrals().length / appState.itemsPerPage);
-                
-                if (page >= 1 && page <= totalPages) {
-                    appState.currentPage = page;
-                    TableController.populateReferralsTable(DataManager.getReferrals());
-                }
-            }
-        }
-
-        // Activity Controller
-        class ActivityController {
-            static populateActivityFeed() {
-                const activityList = document.getElementById('activity-list');
-                if (!activityList) return;
-
-                activityList.innerHTML = DataManager.getActivities().map(activity => `
-                    <div class="activity-item">
-                        <div class="activity-icon">
-                            <i class="fas fa-${activity.icon}"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">${activity.title}</div>
-                            <div class="activity-description">${activity.description}</div>
-                            <div class="activity-time">${activity.time}</div>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        // Form Controller
-        class FormController {
-            static submitReferral() {
-                const form = document.getElementById('newReferralForm');
-                if (!form) return;
-
-                if (!form.checkValidity()) {
-                    form.reportValidity();
-                    return;
-                }
-
-                const formData = new FormData(form);
-                const referralData = Object.fromEntries(formData.entries());
-                
-                // Show loading state
-                const submitBtn = document.querySelector('#newReferralModal .btn-primary');
-                const spinner = submitBtn.querySelector('.loading-spinner');
-                spinner.style.display = 'inline-block';
-                submitBtn.disabled = true;
-                
-                // Simulate API call
-                setTimeout(() => {
-                    const newReferral = DataManager.addReferral(referralData);
-                    
-                    // Update UI
-                    TableController.populateReferralsTable(DataManager.getReferrals());
-                    StatsController.updateStats();
-                    
-                    // Hide loading state
-                    spinner.style.display = 'none';
-                    submitBtn.disabled = false;
-                    
-                    // Close modal and show success
-                    ModalController.closeModal('newReferralModal');
-                    NotificationController.showNotification('Referral created successfully!', 'success');
-                }, 1000);
-            }
-
-            static submitPatient() {
-                const form = document.getElementById('newPatientForm');
-                if (!form) return;
-
-                if (!form.checkValidity()) {
-                    form.reportValidity();
-                    return;
-                }
-
-                const formData = new FormData(form);
-                const patientData = Object.fromEntries(formData.entries());
-                
-                // Simulate API call
-                setTimeout(() => {
-                    ModalController.closeModal('newPatientModal');
-                    NotificationController.showNotification('Patient added successfully!', 'success');
-                    StatsController.updateStats();
-                }, 1000);
-            }
-        }
-
-        // CRUD Controller
-        class CRUDController {
-            static viewReferral(id) {
-                const referral = DataManager.getReferrals().find(r => r.id === id);
-                if (referral) {
-                    NotificationController.showNotification(`Viewing referral for ${referral.patient}`, 'info');
-                }
-            }
-
-            static editReferral(id) {
-                const referral = DataManager.getReferrals().find(r => r.id === id);
-                if (referral) {
-                    NotificationController.showNotification(`Editing referral for ${referral.patient}`, 'info');
-                }
-            }
-
-            static deleteReferral(id) {
-                if (confirm('Are you sure you want to delete this referral?')) {
-                    const referral = DataManager.deleteReferral(id);
-                    if (referral) {
-                        TableController.populateReferralsTable(DataManager.getReferrals());
-                        StatsController.updateStats();
-                        NotificationController.showNotification(`Referral for ${referral.patient} deleted`, 'success');
-                    }
-                }
-            }
-        }
-
-        // Filter Controller
-        class FilterController {
-            static toggleFilter(filterId) {
-                const filter = document.getElementById(filterId);
-                if (filter) {
-                    filter.classList.toggle('active');
-                }
-            }
-
-            static filterReferrals() {
-                // Implement filtering logic
-                console.log('Filtering referrals...');
-                TableController.populateReferralsTable(DataManager.getReferrals());
-            }
-
-            static clearFilters() {
-                // Clear all filter inputs
-                document.querySelectorAll('#referrals-filter select, #referrals-filter input').forEach(input => {
-                    input.value = '';
-                });
-                this.filterReferrals();
-            }
-
-            static applyFilters() {
-                this.filterReferrals();
-                NotificationController.showNotification('Filters applied successfully', 'success');
-            }
-        }
-
-        // Stats Controller
-        class StatsController {
-            static updateStats() {
-                // Update dashboard statistics with some randomization
-                const totalPatientsEl = document.getElementById('total-patients');
-                const totalSpecialistsEl = document.getElementById('total-specialists');
-                const totalDentistsEl = document.getElementById('total-dentists');
-                const referralsCountEl = document.getElementById('referrals-count');
-                const appointmentsCountEl = document.getElementById('appointments-count');
-                const notificationCountEl = document.getElementById('notification-count');
-
-                if (totalPatientsEl) totalPatientsEl.textContent = (2847 + Math.floor(Math.random() * 10)).toLocaleString();
-                if (totalSpecialistsEl) totalSpecialistsEl.textContent = (523 + Math.floor(Math.random() * 5)).toLocaleString();
-                if (totalDentistsEl) totalDentistsEl.textContent = (1248 + Math.floor(Math.random() * 20)).toLocaleString();
-                
-                // Update badges
-                if (referralsCountEl) referralsCountEl.textContent = DataManager.getReferrals().length;
-                if (appointmentsCountEl) appointmentsCountEl.textContent = Math.floor(Math.random() * 10) + 1;
-                if (notificationCountEl) notificationCountEl.textContent = Math.floor(Math.random() * 20) + 1;
-            }
-        }
-
-        // Settings Controller
-        class SettingsController {
-            static updateSetting(setting, value) {
-                console.log(`Updating ${setting} to ${value}`);
-                NotificationController.showNotification(`${setting} updated successfully`, 'success');
-            }
-        }
-
-        // Chart Controller
-        class ChartController {
-            static referralChart = null;
-            static appointmentChart = null;
-
-            static initializeCharts() {
-                this.initReferralChart();
-                this.initAppointmentChart();
-            }
-
-            static initReferralChart() {
-                const ctx = document.getElementById('referralChart');
-                if (!ctx) return;
-
-                const chartOptions = {
+            // Appointment Chart
+            const appointmentCtx = document.getElementById('appointmentChart').getContext('2d');
+            new Chart(appointmentCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Scheduled', 'Completed', 'Pending', 'Cancelled'],
+                    datasets: [{
+                        data: [45, 35, 15, 5],
+                        backgroundColor: [
+                            '#0A2463',
+                            '#3E92CC',
+                            '#FFC107',
+                            '#DC3545'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            display: false
-                        }
-                    },
-                    elements: {
-                        line: {
-                            tension: 0.4
-                        },
-                        point: {
-                            radius: 6,
-                            hoverRadius: 8
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0,0,0,0.1)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                color: 'rgba(0,0,0,0.1)'
-                            }
-                        }
-                    }
-                };
-
-                this.referralChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
-                        datasets: [{
-                            label: 'Referrals',
-                            data: [120, 135, 125, 145, 160, 175],
-                            borderColor: '#3E92CC',
-                            backgroundColor: 'rgba(62, 146, 204, 0.1)',
-                            borderWidth: 3,
-                            fill: true
-                        }]
-                    },
-                    options: chartOptions
-                });
-            }
-
-            static initAppointmentChart() {
-                const ctx = document.getElementById('appointmentChart');
-                if (!ctx) return;
-
-                this.appointmentChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Scheduled', 'Completed', 'Pending', 'Cancelled'],
-                        datasets: [{
-                            data: [45, 35, 15, 5],
-                            backgroundColor: [
-                                '#0A2463',
-                                '#3E92CC',
-                                '#FFC107',
-                                '#DC3545'
-                            ],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    padding: 20,
-                                    font: {
-                                        size: 12
-                                    }
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 12
                                 }
                             }
                         }
                     }
-                });
-            }
-
-            static updateChart(period) {
-                // Remove active class from all buttons
-                document.querySelectorAll('.chart-option').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                
-                // Add active class to clicked button
-                event.target.classList.add('active');
-                
-                NotificationController.showNotification(`Chart updated for ${period} view`, 'info');
-                
-                // Update chart data based on period
-                if (this.referralChart) {
-                    let newData, newLabels;
-                    
-                    switch(period) {
-                        case 'daily':
-                            newLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                            newData = [15, 20, 18, 25, 22, 8, 12];
-                            break;
-                        case 'monthly':
-                            newLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-                            newData = [450, 520, 480, 600, 580, 650];
-                            break;
-                        default: // weekly
-                            newLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'];
-                            newData = [120, 135, 125, 145, 160, 175];
-                    }
-                    
-                    this.referralChart.data.labels = newLabels;
-                    this.referralChart.data.datasets[0].data = newData;
-                    this.referralChart.update();
                 }
-            }
+            });
         }
-
-        // Notification Controller
-        class NotificationController {
-            static showNotification(message, type = 'info') {
-                const notification = document.createElement('div');
-                notification.className = `notification ${type}`;
-                notification.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : type === 'warning' ? 'exclamation-circle' : 'info-circle'}"></i>
-                        <span>${message}</span>
-                    </div>
-                `;
-                
-                document.body.appendChild(notification);
-                
-                // Show notification
-                setTimeout(() => notification.classList.add('show'), 100);
-                
-                // Hide notification after 3 seconds
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                    setTimeout(() => {
-                        if (document.body.contains(notification)) {
-                            document.body.removeChild(notification);
-                        }
-                    }, 300);
-                }, 3000);
-            }
-        }
-
-        // Initialize application when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            AppController.init();
-        });
     </script>
 </body>
 </html>
