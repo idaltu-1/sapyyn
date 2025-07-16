@@ -1,4 +1,4 @@
-// Sapyyn Patient Referral System - Main JavaScript
+// Sapyyn Patient Referral System - Enhanced Main JavaScript
 // Copyright (c) 2025 Sapyyn. All rights reserved.
 
 // Global variables and configuration
@@ -8,6 +8,269 @@ const SapyynApp = {
     debug: true,
     year: 2025
 };
+
+// ============================================================================
+// STICKY CTA FUNCTIONALITY - High Converting Floating Action
+// ============================================================================
+
+class StickyCTA {
+    constructor() {
+        this.element = document.getElementById('stickyCTA');
+        this.threshold = 500; // Show after scrolling 500px
+        this.isVisible = false;
+        this.init();
+    }
+
+    init() {
+        if (!this.element) return;
+        
+        // Show/hide based on scroll position
+        window.addEventListener('scroll', this.handleScroll.bind(this));
+        
+        // Track CTA clicks for analytics
+        this.element.addEventListener('click', this.trackClick.bind(this));
+        
+        // Hide on mobile to avoid interference
+        this.checkMobile();
+        window.addEventListener('resize', this.checkMobile.bind(this));
+    }
+
+    handleScroll() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > this.threshold && !this.isVisible) {
+            this.show();
+        } else if (scrollTop <= this.threshold && this.isVisible) {
+            this.hide();
+        }
+    }
+
+    show() {
+        if (!this.element) return;
+        this.element.classList.add('visible');
+        this.isVisible = true;
+        
+        // Announce to screen readers
+        this.element.setAttribute('aria-live', 'polite');
+        this.element.setAttribute('aria-label', 'Free trial call-to-action appeared');
+    }
+
+    hide() {
+        if (!this.element) return;
+        this.element.classList.remove('visible');
+        this.isVisible = false;
+    }
+
+    checkMobile() {
+        if (window.innerWidth <= 768 && this.element) {
+            this.element.style.display = 'none';
+        } else if (this.element) {
+            this.element.style.display = 'block';
+        }
+    }
+
+    trackClick() {
+        // Track CTA click for analytics
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'click', {
+                event_category: 'CTA',
+                event_label: 'Sticky CTA',
+                value: 1
+            });
+        }
+        
+        console.log('Sticky CTA clicked');
+    }
+}
+
+// ============================================================================
+// ENHANCED FORM INTERACTIONS & ACCESSIBILITY
+// ============================================================================
+
+class FormEnhancements {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        this.enhanceProviderCodeInput();
+        this.addFormValidation();
+        this.improveAccessibility();
+    }
+
+    enhanceProviderCodeInput() {
+        const providerCodeInput = document.getElementById('homeProviderCode');
+        if (!providerCodeInput) return;
+
+        // Format input as user types
+        providerCodeInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+            
+            if (value.length > 6) {
+                value = value.substring(0, 6);
+            }
+            
+            e.target.value = value;
+            
+            // Validate in real-time
+            this.validateProviderCode(e.target);
+        });
+
+        // Add paste handling
+        providerCodeInput.addEventListener('paste', (e) => {
+            setTimeout(() => {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 6) value = value.substring(0, 6);
+                e.target.value = value;
+                this.validateProviderCode(e.target);
+            }, 0);
+        });
+    }
+
+    validateProviderCode(input) {
+        const isValid = input.value.length === 6 && /^\d{6}$/.test(input.value);
+        
+        if (isValid) {
+            input.classList.remove('is-invalid');
+            input.classList.add('is-valid');
+            input.setAttribute('aria-describedby', 'valid-feedback');
+        } else if (input.value.length > 0) {
+            input.classList.remove('is-valid');
+            input.classList.add('is-invalid');
+            input.setAttribute('aria-describedby', 'invalid-feedback');
+        } else {
+            input.classList.remove('is-valid', 'is-invalid');
+            input.removeAttribute('aria-describedby');
+        }
+    }
+
+    addFormValidation() {
+        const forms = document.querySelectorAll('form[data-validate]');
+        forms.forEach(form => {
+            form.addEventListener('submit', this.handleFormSubmit.bind(this));
+        });
+    }
+
+    handleFormSubmit(e) {
+        const form = e.target;
+        const requiredFields = form.querySelectorAll('[required]');
+        let isValid = true;
+
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+            }
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+            // Focus first invalid field
+            const firstInvalid = form.querySelector('.is-invalid');
+            if (firstInvalid) firstInvalid.focus();
+        }
+    }
+
+    improveAccessibility() {
+        // Add aria-live regions for dynamic content
+        const dynamicElements = document.querySelectorAll('[data-dynamic]');
+        dynamicElements.forEach(el => {
+            if (!el.getAttribute('aria-live')) {
+                el.setAttribute('aria-live', 'polite');
+            }
+        });
+
+        // Improve focus management
+        this.addFocusIndicators();
+    }
+
+    addFocusIndicators() {
+        // Add visible focus indicators for better accessibility
+        const focusableElements = document.querySelectorAll(
+            'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+
+        focusableElements.forEach(el => {
+            el.addEventListener('focus', () => {
+                el.classList.add('focused');
+            });
+
+            el.addEventListener('blur', () => {
+                el.classList.remove('focused');
+            });
+        });
+    }
+}
+
+// ============================================================================
+// IMAGE LAZY LOADING & OPTIMIZATION
+// ============================================================================
+
+class ImageOptimization {
+    constructor() {
+        this.lazyImages = document.querySelectorAll('img[data-src]');
+        this.init();
+    }
+
+    init() {
+        if ('IntersectionObserver' in window) {
+            this.lazyImageObserver = new IntersectionObserver(this.onIntersection.bind(this));
+            this.lazyImages.forEach(img => this.lazyImageObserver.observe(img));
+        } else {
+            // Fallback for older browsers
+            this.loadAllImages();
+        }
+
+        this.addWebPSupport();
+    }
+
+    onIntersection(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                this.loadImage(img);
+                this.lazyImageObserver.unobserve(img);
+            }
+        });
+    }
+
+    loadImage(img) {
+        img.src = img.dataset.src;
+        img.classList.remove('lazy');
+        img.classList.add('loaded');
+        
+        img.addEventListener('load', () => {
+            img.classList.add('fade-in');
+        });
+    }
+
+    loadAllImages() {
+        this.lazyImages.forEach(img => this.loadImage(img));
+    }
+
+    addWebPSupport() {
+        // Check WebP support and update image sources
+        const webpSupported = this.supportsWebP();
+        if (webpSupported) {
+            const images = document.querySelectorAll('img[data-webp]');
+            images.forEach(img => {
+                if (img.dataset.webp) {
+                    img.src = img.dataset.webp;
+                }
+            });
+        }
+    }
+
+    supportsWebP() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1;
+        canvas.height = 1;
+        return canvas.toDataURL('image/webp').indexOf('webp') !== -1;
+    }
+}
 
 // Utility functions
 const Utils = {
@@ -604,4 +867,198 @@ window.Dashboard = Dashboard;
 window.Search = Search;
 window.Forms = Forms;
 window.QRCode = QRCode;
+
+// ============================================================================
+// INITIALIZATION - DOM Content Loaded
+// ============================================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log(`🚀 Sapyyn v${SapyynApp.version} initialized`);
+    
+    // Initialize core functionality
+    try {
+        // Initialize sticky CTA
+        const stickyCTA = new StickyCTA();
+        
+        // Initialize form enhancements
+        const formEnhancements = new FormEnhancements();
+        
+        // Initialize image optimization
+        const imageOptimization = new ImageOptimization();
+        
+        // Initialize existing features
+        FileUpload.init();
+        Forms.init();
+        
+        // Initialize dashboard if on dashboard page
+        if (document.querySelector('[data-page="dashboard"]')) {
+            Dashboard.init();
+        }
+        
+        // Initialize search if search elements exist
+        if (document.querySelector('[data-search]')) {
+            Search.init();
+        }
+        
+        // Add smooth scrolling for anchor links
+        initSmoothScrolling();
+        
+        // Add scroll-to-top functionality
+        initScrollToTop();
+        
+        // Initialize performance monitoring
+        initPerformanceMonitoring();
+        
+        console.log('✅ All Sapyyn components initialized successfully');
+        
+    } catch (error) {
+        console.error('❌ Error during Sapyyn initialization:', error);
+    }
+});
+
+// ============================================================================
+// SMOOTH SCROLLING & NAVIGATION ENHANCEMENTS
+// ============================================================================
+
+function initSmoothScrolling() {
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                
+                // Update focus for accessibility
+                target.focus();
+                if (!target.hasAttribute('tabindex')) {
+                    target.setAttribute('tabindex', '-1');
+                }
+            }
+        });
+    });
+}
+
+function initScrollToTop() {
+    // Create scroll to top button
+    const scrollBtn = document.createElement('button');
+    scrollBtn.innerHTML = '<i class="bi bi-arrow-up" aria-hidden="true"></i>';
+    scrollBtn.className = 'btn btn-primary scroll-to-top';
+    scrollBtn.setAttribute('aria-label', 'Scroll to top');
+    scrollBtn.style.cssText = `
+        position: fixed;
+        bottom: 2rem;
+        left: 2rem;
+        z-index: 999;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        opacity: 0;
+        transform: translateY(100px);
+        transition: all 0.3s ease;
+        pointer-events: none;
+    `;
+    
+    document.body.appendChild(scrollBtn);
+    
+    // Show/hide scroll to top button
+    let scrollToTopVisible = false;
+    window.addEventListener('scroll', () => {
+        const shouldShow = window.pageYOffset > 300;
+        
+        if (shouldShow && !scrollToTopVisible) {
+            scrollBtn.style.opacity = '1';
+            scrollBtn.style.transform = 'translateY(0)';
+            scrollBtn.style.pointerEvents = 'auto';
+            scrollToTopVisible = true;
+        } else if (!shouldShow && scrollToTopVisible) {
+            scrollBtn.style.opacity = '0';
+            scrollBtn.style.transform = 'translateY(100px)';
+            scrollBtn.style.pointerEvents = 'none';
+            scrollToTopVisible = false;
+        }
+    });
+    
+    // Handle click
+    scrollBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
+
+// ============================================================================
+// PERFORMANCE MONITORING & OPTIMIZATION
+// ============================================================================
+
+function initPerformanceMonitoring() {
+    // Monitor Core Web Vitals
+    if ('web-vital' in window) {
+        // Largest Contentful Paint
+        getLCP(console.log);
+        
+        // First Input Delay
+        getFID(console.log);
+        
+        // Cumulative Layout Shift
+        getCLS(console.log);
+    }
+    
+    // Monitor page load time
+    window.addEventListener('load', () => {
+        const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+        console.log(`📊 Page load time: ${loadTime}ms`);
+        
+        // Track slow loads
+        if (loadTime > 3000) {
+            console.warn('⚠️ Slow page load detected');
+        }
+    });
+}
+
+// ============================================================================
+// ACCESSIBILITY ENHANCEMENTS
+// ============================================================================
+
+// Add keyboard navigation improvements
+document.addEventListener('keydown', function(e) {
+    // Escape key to close modals/dropdowns
+    if (e.key === 'Escape') {
+        const activeModal = document.querySelector('.modal.show');
+        if (activeModal) {
+            const modalInstance = bootstrap.Modal.getInstance(activeModal);
+            if (modalInstance) modalInstance.hide();
+        }
+        
+        const openDropdowns = document.querySelectorAll('.dropdown-menu.show');
+        openDropdowns.forEach(dropdown => {
+            const dropdownInstance = bootstrap.Dropdown.getInstance(dropdown.previousElementSibling);
+            if (dropdownInstance) dropdownInstance.hide();
+        });
+    }
+});
+
+// Announce page changes to screen readers
+function announcePageChange(message) {
+    const announcement = document.createElement('div');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.setAttribute('aria-atomic', 'true');
+    announcement.className = 'sr-only';
+    announcement.textContent = message;
+    
+    document.body.appendChild(announcement);
+    
+    setTimeout(() => {
+        document.body.removeChild(announcement);
+    }, 1000);
+}
+
+// Export new classes for global use
+window.StickyCTA = StickyCTA;
+window.FormEnhancements = FormEnhancements;
+window.ImageOptimization = ImageOptimization;
 window.Notifications = Notifications;

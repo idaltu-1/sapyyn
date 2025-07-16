@@ -1,103 +1,237 @@
 {% extends "base.html" %}
 
+{% block meta_description %}Streamline patient referrals with Sapyyn's secure, HIPAA-compliant platform. QR code tracking, document management, and real-time collaboration for healthcare professionals.{% endblock %}
+
+{% block extra_head %}
+<!-- Preload critical images for better performance -->
+<link rel="preload" as="image" href="{{ url_for('static', filename='images/dental/dental-team.webp') }}" media="(min-width: 768px)">
+<link rel="preload" as="image" href="{{ url_for('static', filename='images/dental/dental-patient.webp') }}" media="(min-width: 768px)">
+<link rel="preload" as="image" href="{{ url_for('static', filename='images/dental/pleasant-smile.webp') }}" media="(min-width: 768px)">
+
+<!-- Open Graph for social sharing -->
+<meta property="og:title" content="Sapyyn - Patient Referral System">
+<meta property="og:description" content="Streamline patient referrals with secure document management, QR code tracking, and HIPAA-compliant data handling.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ request.url }}">
+
+<!-- Schema.org structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Sapyyn Patient Referral System",
+  "description": "Secure, HIPAA-compliant patient referral management platform",
+  "applicationCategory": "HealthApplication",
+  "operatingSystem": "Web Browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "description": "14-day free trial"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.9",
+    "ratingCount": "127"
+  }
+}
+</script>
+{% endblock %}
+
 {% block content %}
-<!-- Hero Section -->
-<div class="bg-primary text-white py-5">
+<!-- Hero Section with Enhanced Accessibility -->
+<section class="bg-primary text-white py-5" role="banner" aria-label="Main hero section">
     <div class="container">
-        <div class="row align-items-center">
+        <div class="row align-items-center min-vh-75">
             <div class="col-lg-6">
+                <!-- Trust Badge -->
+                <div class="hero-badge mb-4">
+                    <span class="badge bg-success bg-opacity-20 text-white px-3 py-2 rounded-pill">
+                        <i class="bi bi-shield-check me-2" aria-hidden="true"></i>
+                        HIPAA Compliant & SOC 2 Certified
+                    </span>
+                </div>
+
                 <h1 class="display-4 fw-bold mb-4">
-                    <i class="bi bi-hospital me-3"></i>
-                    Sapyyn Patient Referral System
+                    <i class="bi bi-hospital me-3" aria-hidden="true"></i>
+                    <span class="title-gradient">Sapyyn Patient Referral System</span>
                 </h1>
-                <p class="lead mb-4">
+                
+                <p class="lead mb-4" role="text">
                     Streamline patient referrals with secure document management, 
                     QR code tracking, and HIPAA-compliant data handling.
                 </p>
-                <div class="d-grid d-md-flex gap-2">
+
+                <!-- Key Features List -->
+                <div class="hero-features mb-4">
+                    <div class="feature-point">
+                        <i class="bi bi-check-circle-fill text-success" aria-hidden="true"></i>
+                        <span>Instant QR Code Access</span>
+                    </div>
+                    <div class="feature-point">
+                        <i class="bi bi-check-circle-fill text-success" aria-hidden="true"></i>
+                        <span>Real-time Tracking</span>
+                    </div>
+                    <div class="feature-point">
+                        <i class="bi bi-check-circle-fill text-success" aria-hidden="true"></i>
+                        <span>Secure Document Sharing</span>
+                    </div>
+                </div>
+
+                <!-- Primary CTAs -->
+                <div class="d-grid d-md-flex gap-3 mb-4">
                     {% if not session.user_id %}
-                    <a href="{{ url_for('get_started_page') }}" class="btn btn-light btn-lg">
-                        <i class="bi bi-person-plus"></i> Get Started
+                    <a href="{{ url_for('get_started_page') }}" 
+                       class="btn btn-light btn-lg"
+                       aria-label="Start your 14-day free trial">
+                        <i class="bi bi-rocket-takeoff me-2" aria-hidden="true"></i> 
+                        Start Free Trial
                     </a>
-                    <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
-                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    <a href="{{ url_for('login') }}" 
+                       class="btn btn-outline-light btn-lg"
+                       aria-label="Login to your account">
+                        <i class="bi bi-box-arrow-in-right me-2" aria-hidden="true"></i> 
+                        Login
                     </a>
                     {% else %}
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg">
-                        <i class="bi bi-speedometer2"></i> Go to Dashboard
+                    <a href="{{ url_for('dashboard') }}" 
+                       class="btn btn-light btn-lg"
+                       aria-label="Go to your dashboard">
+                        <i class="bi bi-speedometer2 me-2" aria-hidden="true"></i> 
+                        Go to Dashboard
                     </a>
-                    <a href="{{ url_for('new_referral') }}" class="btn btn-outline-light btn-lg">
-                        <i class="bi bi-plus-circle"></i> Create Referral
+                    <a href="{{ url_for('new_referral') }}" 
+                       class="btn btn-outline-light btn-lg"
+                       aria-label="Create a new referral">
+                        <i class="bi bi-plus-circle me-2" aria-hidden="true"></i> 
+                        Create Referral
                     </a>
                     {% endif %}
                 </div>
+
+                <!-- Social Proof in Hero -->
+                <div class="hero-stats-mini border rounded-3 p-3">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="stat-mini">
+                                <div class="stat-number-mini fw-bold">1000+</div>
+                                <div class="stat-label-mini small">Active Users</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-mini">
+                                <div class="stat-number-mini fw-bold">5000+</div>
+                                <div class="stat-label-mini small">Referrals</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-mini">
+                                <div class="d-flex justify-content-center gap-1 mb-1">
+                                    {% for i in range(5) %}
+                                    <i class="bi bi-star-fill text-warning small" aria-hidden="true"></i>
+                                    {% endfor %}
+                                </div>
+                                <div class="stat-label-mini small">4.9/5 Rating</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+            
             <div class="col-lg-6 text-center">
                 <div class="hero-image-container">
                     <div class="rotating-images">
                         <div class="image-slide active" id="slide1">
                             <div class="dental-image">
                                 <img src="{{ url_for('static', filename='images/dental/dental-team.jpg') }}"
-                                     alt="Experienced Dental Team"
-                                     class="img-fluid rounded-3 shadow-lg">
+                                     data-webp="{{ url_for('static', filename='images/dental/dental-team.webp') }}"
+                                     alt="Experienced dental team of professionals in a modern clinic setting"
+                                     class="img-fluid rounded-3 shadow-lg"
+                                     width="500" height="400"
+                                     loading="eager">
                             </div>
                             <div class="slide-caption">
                                 <h5>Caring Professionals</h5>
-                                <p>Friendly staff ready to help</p>
+                                <p>Friendly staff ready to help with your referral needs</p>
                             </div>
                         </div>
                         <div class="image-slide" id="slide2">
                             <div class="dental-image">
                                 <img src="{{ url_for('static', filename='images/dental/dental-patient.jpg') }}"
-                                     alt="Happy Dental Patients"
-                                     class="img-fluid rounded-3 shadow-lg">
+                                     data-webp="{{ url_for('static', filename='images/dental/dental-patient.webp') }}"
+                                     alt="Happy patient receiving quality dental care with modern equipment"
+                                     class="img-fluid rounded-3 shadow-lg"
+                                     width="500" height="400"
+                                     loading="lazy">
                             </div>
                             <div class="slide-caption">
                                 <h5>Patient Focused</h5>
-                                <p>Your comfort is our priority</p>
+                                <p>Your comfort and satisfaction is our priority</p>
                             </div>
                         </div>
                         <div class="image-slide" id="slide3">
                             <div class="dental-image">
                                 <img src="{{ url_for('static', filename='images/dental/pleasant-smile.jpg') }}"
-                                     alt="Beautiful Smiles"
-                                     class="img-fluid rounded-3 shadow-lg">
+                                     data-webp="{{ url_for('static', filename='images/dental/pleasant-smile.webp') }}"
+                                     alt="Beautiful healthy smile showcasing successful dental treatment results"
+                                     class="img-fluid rounded-3 shadow-lg"
+                                     width="500" height="400"
+                                     loading="lazy">
                             </div>
                             <div class="slide-caption">
                                 <h5>Results That Shine</h5>
-                                <p>Creating bright, healthy smiles</p>
+                                <p>Creating bright, healthy smiles through expert care</p>
                             </div>
                         </div>
                     </div>
-                    <div class="image-dots">
-                        <span class="dot active" onclick="currentSlide(1)"></span>
-                        <span class="dot" onclick="currentSlide(2)"></span>
-                        <span class="dot" onclick="currentSlide(3)"></span>
+                    <div class="image-dots" role="tablist" aria-label="Image carousel controls">
+                        <button class="dot active" onclick="currentSlide(1)" role="tab" aria-selected="true" aria-label="View slide 1"></button>
+                        <button class="dot" onclick="currentSlide(2)" role="tab" aria-selected="false" aria-label="View slide 2"></button>
+                        <button class="dot" onclick="currentSlide(3)" role="tab" aria-selected="false" aria-label="View slide 3"></button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- Quick Referral Section -->
-<div class="bg-light py-5 quick-referral-section">
+<!-- Quick Referral Section with Enhanced UX -->
+<section class="bg-light py-5 quick-referral-section" aria-label="Quick referral access">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="card shadow-sm border-0 quick-referral-card">
+                <div class="card shadow-lg border-0 quick-referral-card position-relative">
+                    <!-- Urgency Badge -->
+                    <div class="position-absolute top-0 start-50 translate-middle">
+                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill shadow">
+                            <i class="bi bi-lightning-charge-fill me-1" aria-hidden="true"></i>
+                            Instant Access
+                        </span>
+                    </div>
+                    
                     <div class="card-body p-5 text-center">
                         <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-4">
-                            <i class="bi bi-lightning-charge-fill text-primary fs-1"></i>
+                            <i class="bi bi-lightning-charge-fill text-primary fs-1" aria-hidden="true"></i>
                         </div>
-                        <h3 class="fw-bold mb-3">Quick Referral Access</h3>
-                        <p class="text-muted mb-4">Have a 6-digit provider code? Enter it below for instant referral</p>
                         
-                        <form id="quickReferralForm" class="row g-3 justify-content-center">
+                        <h2 class="fw-bold mb-3">Quick Referral Access</h2>
+                        <p class="text-muted mb-4 lead">
+                            Have a 6-digit provider code? Enter it below for instant referral connection
+                        </p>
+                        
+                        <form id="quickReferralForm" class="row g-3 justify-content-center" data-validate aria-label="Quick referral form">
                             <div class="col-md-6">
-                                <label for="homeProviderCode" class="form-label">6-Digit Provider Code</label>
-                                <input type="text" class="form-control form-control-lg text-center" 
-                                       id="homeProviderCode" placeholder="000000" maxlength="6" pattern="[0-9]{6}">
+                                <label for="homeProviderCode" class="form-label visually-hidden">6-Digit Provider Code</label>
+                                <input type="text" 
+                                       class="form-control form-control-lg text-center" 
+                                       id="homeProviderCode" 
+                                       placeholder="000000" 
+                                       maxlength="6" 
+                                       pattern="[0-9]{6}"
+                                       aria-label="Enter 6-digit provider code"
+                                       aria-describedby="provider-code-help"
+                                       autocomplete="off"
+                                       inputmode="numeric">
                             </div>
                             <div class="col-md-6 d-flex align-items-end">
                                 <button type="submit" class="btn btn-primary btn-lg w-100">

@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}Sapyyn Patient Referral System - Secure, HIPAA-compliant patient referral management with QR code tracking and document handling{% endblock %}">
     <title>{% block title %}Sapyyn - Patient Referral System{% endblock %}</title>
+    
+    <!-- Preconnect to Google Fonts for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
     <!-- Bootstrap CSS -->
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css'">
@@ -15,39 +20,43 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="skip-to-main">Skip to main content</a>
+    
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary" role="navigation" aria-label="Main navigation">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
-                <i class="bi bi-hospital"></i>
+            <a class="navbar-brand" href="{{ url_for('index') }}" aria-label="Sapyyn homepage">
+                <i class="bi bi-hospital" aria-hidden="true"></i>
                 Sapyyn
             </a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+                <ul class="navbar-nav me-auto" role="menubar">
                     {% if session.user_id %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('dashboard') }}">
-                            <i class="bi bi-speedometer2"></i> Dashboard
+                    <li class="nav-item" role="none">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}" role="menuitem">
+                            <i class="bi bi-speedometer2" aria-hidden="true"></i> Dashboard
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('new_referral') }}">
-                            <i class="bi bi-plus-circle"></i> New Referral
+                    <li class="nav-item" role="none">
+                        <a class="nav-link" href="{{ url_for('new_referral') }}" role="menuitem">
+                            <i class="bi bi-plus-circle" aria-hidden="true"></i> New Referral
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('upload_file') }}">
-                            <i class="bi bi-cloud-upload"></i> Upload Documents
+                    <li class="nav-item" role="none">
+                        <a class="nav-link" href="{{ url_for('upload_file') }}" role="menuitem">
+                            <i class="bi bi-cloud-upload" aria-hidden="true"></i> Upload Documents
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('view_documents') }}">
-                            <i class="bi bi-files"></i> My Documents
+                    <li class="nav-item" role="none">
+                        <a class="nav-link" href="{{ url_for('view_documents') }}" role="menuitem">
+                            <i class="bi bi-files" aria-hidden="true"></i> My Documents
                         </a>
                     </li>
                     
@@ -172,33 +181,118 @@
     {% endwith %}
 
     <!-- Main Content -->
-    <main class="container-fluid">
+    <main id="main-content" class="container-fluid" tabindex="-1">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-light mt-5 py-4">
+    <!-- Sticky CTA for non-authenticated users -->
+    {% if not session.user_id %}
+    <div class="sticky-cta" id="stickyCTA" aria-live="polite">
+        <a href="{{ url_for('get_started_page') }}" class="btn" aria-label="Start your free trial today">
+            <i class="bi bi-rocket-takeoff" aria-hidden="true"></i>
+            Start Free Trial
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Enhanced Footer -->
+    <footer class="bg-dark text-light py-5 mt-5" role="contentinfo">
         <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>Sapyyn Patient Referral System</h5>
-                    <p class="text-muted">Secure, efficient patient referral management</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="text-muted">
-                        <i class="bi bi-shield-check"></i>
-                        HIPAA Compliant | Secure Document Handling
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-hospital text-primary" aria-hidden="true"></i>
+                        Sapyyn Patient Referral System
+                    </h5>
+                    <p class="text-light opacity-75 mb-3">
+                        Secure, efficient patient referral management with HIPAA-compliant document handling 
+                        and real-time tracking for healthcare professionals.
                     </p>
+                    <div class="d-flex gap-3">
+                        <span class="badge bg-success">
+                            <i class="bi bi-shield-check" aria-hidden="true"></i>
+                            HIPAA Compliant
+                        </span>
+                        <span class="badge bg-primary">
+                            <i class="bi bi-award" aria-hidden="true"></i>
+                            SOC 2 Certified
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="fw-semibold mb-3">Platform</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('index') }}" class="text-light text-decoration-none opacity-75 hover-opacity-100">Home</a></li>
+                        <li><a href="{{ url_for('about') }}" class="text-light text-decoration-none opacity-75 hover-opacity-100">About</a></li>
+                        <li><a href="{{ url_for('pricing') }}" class="text-light text-decoration-none opacity-75 hover-opacity-100">Pricing</a></li>
+                        <li><a href="{{ url_for('contact') }}" class="text-light text-decoration-none opacity-75 hover-opacity-100">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="fw-semibold mb-3">Resources</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('resources') }}" class="text-light text-decoration-none opacity-75 hover-opacity-100">Resource Library</a></li>
+                        <li><a href="{{ url_for('surgical_instructions') }}" class="text-light text-decoration-none opacity-75 hover-opacity-100">Surgical Instructions</a></li>
+                        <li><a href="{{ url_for('training') }}" class="text-light text-decoration-none opacity-75 hover-opacity-100">Training & Support</a></li>
+                        <li><a href="{{ url_for('blog') }}" class="text-light text-decoration-none opacity-75 hover-opacity-100">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="fw-semibold mb-3">Legal</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('privacy') }}" class="text-light text-decoration-none opacity-75 hover-opacity-100">Privacy Policy</a></li>
+                        <li><a href="#" class="text-light text-decoration-none opacity-75 hover-opacity-100">Terms of Service</a></li>
+                        <li><a href="{{ url_for('hipaa') }}" class="text-light text-decoration-none opacity-75 hover-opacity-100">HIPAA Compliance</a></li>
+                        <li><a href="#" class="text-light text-decoration-none opacity-75 hover-opacity-100">Security</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="fw-semibold mb-3">Get Started</h6>
+                    {% if not session.user_id %}
+                    <a href="{{ url_for('get_started_page') }}" class="btn btn-primary mb-2 w-100">
+                        <i class="bi bi-rocket-takeoff" aria-hidden="true"></i>
+                        Start Free Trial
+                    </a>
+                    <p class="text-light opacity-75 small">
+                        14-day free trial<br>
+                        No credit card required
+                    </p>
+                    {% else %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light mb-2 w-100">
+                        <i class="bi bi-speedometer2" aria-hidden="true"></i>
+                        Go to Dashboard
+                    </a>
+                    <p class="text-light opacity-75 small">
+                        Welcome back,<br>
+                        {{ session.full_name or session.username }}
+                    </p>
+                    {% endif %}
                 </div>
             </div>
-            <hr>
-            <div class="row">
-                <div class="col-12 text-center">
-                    <p class="text-muted mb-0">
-                        &copy; 2025 Sapyyn. All rights reserved. | 
-                        <a href="#" class="text-decoration-none">Privacy Policy</a> | 
-                        <a href="#" class="text-decoration-none">Terms of Service</a>
+            
+            <hr class="my-4 opacity-25">
+            
+            <!-- Social Proof & Trust Indicators -->
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="text-light opacity-75 mb-0 small">
+                        &copy; 2025 Sapyyn. All rights reserved. Made with ❤️ for healthcare professionals.
                     </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex justify-content-md-end justify-content-start gap-3 align-items-center">
+                        <span class="text-light opacity-75 small">Trusted by 1000+ providers</span>
+                        <div class="d-flex gap-1">
+                            {% for i in range(5) %}
+                            <i class="bi bi-star-fill text-warning" aria-hidden="true"></i>
+                            {% endfor %}
+                            <span class="text-light opacity-75 small ms-1">4.9/5</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

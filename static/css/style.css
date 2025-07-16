@@ -1,66 +1,534 @@
-/* Sapyyn Patient Referral System - Enhanced Aesthetic Styles */
+/* Sapyyn Patient Referral System - Enhanced UI/UX Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-    /* Primary Color Palette - Professional Blue (like sapyyn.com) */
-    --sapyyn-primary: #1e40af;
+    /* WCAG AA Compliant Color Palette */
+    --sapyyn-primary: #1d4ed8;
     --sapyyn-primary-light: #3b82f6;
-    --sapyyn-primary-dark: #1d4ed8;
+    --sapyyn-primary-dark: #1e3a8a;
+    --sapyyn-primary-contrast: #ffffff;
     
-    /* Secondary Colors - Clean & Medical */
-    --sapyyn-secondary: #64748b;
-    --sapyyn-success: #10b981;
-    --sapyyn-success-light: #34d399;
-    --sapyyn-warning: #f59e0b;
-    --sapyyn-warning-light: #fbbf24;
-    --sapyyn-danger: #ef4444;
-    --sapyyn-info: #0ea5e9;
+    /* Secondary Colors - Healthcare Focused */
+    --sapyyn-secondary: #475569;
+    --sapyyn-success: #059669;
+    --sapyyn-success-light: #10b981;
+    --sapyyn-warning: #d97706;
+    --sapyyn-warning-light: #f59e0b;
+    --sapyyn-danger: #dc2626;
+    --sapyyn-info: #0284c7;
     
-    /* Neutral Palette - High Readability */
+    /* Neutral Palette - High Contrast */
     --sapyyn-light: #f8fafc;
-    --sapyyn-light-blue: #f0f9ff;
-    --sapyyn-dark: #1e293b;
+    --sapyyn-light-blue: #eff6ff;
+    --sapyyn-dark: #0f172a;
     --sapyyn-gray-50: #f9fafb;
     --sapyyn-gray-100: #f3f4f6;
     --sapyyn-gray-200: #e5e7eb;
-    --sapyyn-gray-600: #4b5563;
-    --sapyyn-gray-700: #374151;
-    --sapyyn-gray-800: #1f2937;
+    --sapyyn-gray-300: #d1d5db;
+    --sapyyn-gray-600: #374151;
+    --sapyyn-gray-700: #1f2937;
+    --sapyyn-gray-800: #111827;
+    --sapyyn-gray-900: #030712;
     
-    /* Dental-specific Colors - Blue focused */
-    --dental-blue: #1e40af;
-    --dental-blue-light: #3b82f6;
-    --dental-teal: #0891b2;
-    --dental-mint: #059669;
+    /* Typography - Professional Sans-Serif */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     
-    /* Typography */
-    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-heading: 'Inter', system-ui, sans-serif;
+    /* Typography Scale - Consistent Hierarchy */
+    --font-size-xs: 0.75rem;     /* 12px */
+    --font-size-sm: 0.875rem;    /* 14px */
+    --font-size-base: 1rem;      /* 16px */
+    --font-size-lg: 1.125rem;    /* 18px */
+    --font-size-xl: 1.25rem;     /* 20px */
+    --font-size-2xl: 1.5rem;     /* 24px */
+    --font-size-3xl: 1.875rem;   /* 30px */
+    --font-size-4xl: 2.25rem;    /* 36px */
+    --font-size-5xl: 3rem;       /* 48px */
+    
+    /* Line Heights - Optimal Readability */
+    --line-height-tight: 1.25;
+    --line-height-snug: 1.375;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.625;
+    --line-height-loose: 2;
+    
+    /* Font Weights */
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
     
     /* Spacing & Layout */
-    --border-radius-sm: 8px;
+    --border-radius-sm: 6px;
     --border-radius-md: 12px;
     --border-radius-lg: 16px;
     --border-radius-xl: 24px;
+    --border-radius-2xl: 32px;
     
-    /* Shadows - Subtle & Professional */
-    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    /* Shadows - Layered & Professional */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    
+    /* Focus Styles for Accessibility */
+    --focus-ring-color: rgb(59 130 246 / 0.5);
+    --focus-ring-offset: 2px;
+    --focus-ring-width: 2px;
+    
+    /* Transitions & Animations */
+    --transition-fast: 150ms ease-in-out;
+    --transition-normal: 250ms ease-in-out;
+    --transition-slow: 350ms ease-in-out;
 }
 
 /* Global Styles */
 body {
     font-family: var(--font-primary);
-    line-height: 1.7;
-    color: var(--sapyyn-gray-700);
-    background-color: var(--sapyyn-gray-50);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    color: var(--sapyyn-gray-900);
+    background-color: var(--sapyyn-light);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'kern' 1;
 }
 
-.navbar-brand {
-    font-weight: 700;
-    font-size: 1.5rem;
+/* ============================================================================
+   TYPOGRAPHY HIERARCHY - Consistent & Accessible
+   ============================================================================ */
+
+h1, .h1 {
     font-family: var(--font-heading);
+    font-size: var(--font-size-5xl);
+    font-weight: var(--font-weight-extrabold);
+    line-height: var(--line-height-tight);
+    letter-spacing: -0.025em;
+    color: var(--sapyyn-gray-900);
+    margin-bottom: 1.5rem;
+}
+
+h2, .h2 {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    letter-spacing: -0.025em;
+    color: var(--sapyyn-gray-900);
+    margin-bottom: 1.25rem;
+}
+
+h3, .h3 {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-snug);
+    color: var(--sapyyn-gray-900);
+    margin-bottom: 1rem;
+}
+
+h4, .h4 {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-snug);
+    color: var(--sapyyn-gray-900);
+    margin-bottom: 0.75rem;
+}
+
+h5, .h5 {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-snug);
+    color: var(--sapyyn-gray-900);
+    margin-bottom: 0.5rem;
+}
+
+h6, .h6 {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-normal);
+    color: var(--sapyyn-gray-700);
+    margin-bottom: 0.5rem;
+}
+
+/* Body Text - Optimized for Reading */
+p {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--sapyyn-gray-700);
+    margin-bottom: 1rem;
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    line-height: var(--line-height-relaxed);
+    font-weight: var(--font-weight-normal);
+    color: var(--sapyyn-gray-600);
+}
+
+/* ============================================================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================================================ */
+
+/* Focus Styles for Accessibility */
+*:focus {
+    outline: none;
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+    border-radius: var(--border-radius-sm);
+}
+
+*:focus:not(:focus-visible) {
+    box-shadow: none;
+}
+
+*:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+}
+
+/* Skip to main content for screen readers */
+.skip-to-main {
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--sapyyn-primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-md);
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    z-index: 9999;
+    transition: top var(--transition-fast);
+}
+
+.skip-to-main:focus {
+    top: 1rem;
+}
+
+/* Screen reader only content */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --sapyyn-primary: #000080;
+        --sapyyn-gray-700: #000000;
+        --sapyyn-gray-600: #2d2d2d;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ============================================================================
+   ENHANCED BUTTON STYLES - Better UX & Accessibility
+   ============================================================================ */
+
+.btn {
+    font-family: var(--font-primary);
+    font-weight: var(--font-weight-medium);
+    border-radius: var(--border-radius-md);
+    border: 2px solid transparent;
+    padding: 0.75rem 1.5rem;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.btn:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left var(--transition-slow);
+}
+
+.btn:hover:before {
+    left: 100%;
+}
+
+/* Primary Button - High Contrast CTA */
+.btn-primary {
+    background: var(--sapyyn-primary);
+    color: var(--sapyyn-primary-contrast);
+    border-color: var(--sapyyn-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+    background: var(--sapyyn-primary-dark);
+    border-color: var(--sapyyn-primary-dark);
+    color: var(--sapyyn-primary-contrast);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:focus {
+    box-shadow: 0 0 0 3px var(--focus-ring-color), var(--shadow-md);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Large Primary Button for Hero CTAs */
+.btn-primary.btn-lg {
+    padding: 1rem 2rem;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary.btn-lg:hover {
+    box-shadow: var(--shadow-xl);
+    transform: translateY(-3px);
+}
+
+/* Secondary Button */
+.btn-outline-primary {
+    background: transparent;
+    color: var(--sapyyn-primary);
+    border-color: var(--sapyyn-primary);
+}
+
+.btn-outline-primary:hover {
+    background: var(--sapyyn-primary);
+    color: var(--sapyyn-primary-contrast);
+    border-color: var(--sapyyn-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-outline-primary:focus {
+    box-shadow: 0 0 0 3px var(--focus-ring-color);
+    background: var(--sapyyn-primary);
+    color: var(--sapyyn-primary-contrast);
+}
+
+/* Light Button for Dark Backgrounds */
+.btn-light {
+    background: white;
+    color: var(--sapyyn-gray-900);
+    border-color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-light:hover {
+    background: var(--sapyyn-gray-50);
+    color: var(--sapyyn-gray-900);
+    border-color: var(--sapyyn-gray-50);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-outline-light {
+    background: transparent;
+    color: white;
+    border-color: rgba(255, 255, 255, 0.7);
+}
+
+.btn-outline-light:hover {
+    background: white;
+    color: var(--sapyyn-gray-900);
+    border-color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Success Button */
+.btn-success {
+    background: var(--sapyyn-success);
+    color: white;
+    border-color: var(--sapyyn-success);
+}
+
+.btn-success:hover {
+    background: var(--sapyyn-success-light);
+    border-color: var(--sapyyn-success-light);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Warning Button */
+.btn-warning {
+    background: var(--sapyyn-warning);
+    color: white;
+    border-color: var(--sapyyn-warning);
+}
+
+.btn-warning:hover {
+    background: var(--sapyyn-warning-light);
+    border-color: var(--sapyyn-warning-light);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Disabled State */
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+    pointer-events: none;
+}
+
+/* Button Group Spacing */
+.btn-group .btn + .btn {
+    margin-left: 0.5rem;
+}
+
+/* Mobile Button Improvements */
+@media (max-width: 768px) {
+    .btn {
+        padding: 0.875rem 1.25rem;
+        font-size: var(--font-size-base);
+        min-height: 44px; /* Touch target size */
+    }
+    
+    .btn-lg {
+        padding: 1rem 1.5rem;
+        font-size: var(--font-size-lg);
+        min-height: 48px;
+    }
+}
+
+/* ============================================================================
+   STICKY CTA - High Converting Floating Action
+   ============================================================================ */
+
+.sticky-cta {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(100px) scale(0.8);
+    transition: all var(--transition-normal);
+    pointer-events: none;
+}
+
+.sticky-cta.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.sticky-cta .btn {
+    background: var(--sapyyn-primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 1rem 1.5rem;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-base);
+    box-shadow: var(--shadow-xl);
+    animation: pulse-glow 2s infinite;
+}
+
+.sticky-cta .btn:hover {
+    background: var(--sapyyn-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-2xl);
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: var(--shadow-xl), 0 0 0 0 rgba(29, 78, 216, 0.4);
+    }
+    50% {
+        box-shadow: var(--shadow-xl), 0 0 0 10px rgba(29, 78, 216, 0);
+    }
+}
+
+/* Hide on mobile to avoid interference */
+@media (max-width: 768px) {
+    .sticky-cta {
+        display: none;
+    }
+}
+
+/* ============================================================================
+   FORM ENHANCEMENTS - Better UX & Accessibility
+   ============================================================================ */
+
+.form-control {
+    font-family: var(--font-primary);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--sapyyn-gray-300);
+    border-radius: var(--border-radius-md);
+    background-color: white;
+    color: var(--sapyyn-gray-900);
+    transition: all var(--transition-normal);
+}
+
+.form-control:focus {
+    border-color: var(--sapyyn-primary);
+    box-shadow: 0 0 0 3px var(--focus-ring-color);
+    outline: none;
+}
+
+.form-control::placeholder {
+    color: var(--sapyyn-gray-600);
+    opacity: 0.7;
+}
+
+.form-label {
+    font-weight: var(--font-weight-medium);
+    color: var(--sapyyn-gray-900);
+    margin-bottom: 0.5rem;
+    font-size: var(--font-size-sm);
+}
+
+.form-control-lg {
+    padding: 1rem 1.25rem;
+    font-size: var(--font-size-lg);
+    border-radius: var(--border-radius-lg);
 }
 
 /* Enhanced Hero Section */
