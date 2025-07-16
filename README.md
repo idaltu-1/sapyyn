@@ -271,6 +271,22 @@ The application uses a modular CSS approach:
 - **Bootstrap Variables**: Can be customized for branding
 - **Responsive Design**: Mobile-first approach with breakpoints
 
+#### Visual Design Guidelines
+
+The overall look and feel should convey professionalism while remaining friendly
+and approachable:
+
+- **Use authentic imagery** such as photos of real dental professionals or
+  patients (with consent) to build trust. High-quality 3D graphics can also be
+  effective.
+- **Color scheme** should lean toward calming medical greens and avoid overly
+  cartoonish palettes.
+- **Modern illustrations only**; avoid outdated clip-art that makes the product
+  appear less sophisticated.
+- **Clean layouts with ample whitespace** keep the interface focused and easy to
+  navigate.
+
+
 ### Feature Extensions
 
 The system is designed for extensibility:
