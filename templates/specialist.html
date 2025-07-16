@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Specialist Portal{% endblock %}
+{% block content %}
+<div class="container mt-5">
+  <h1 class="mb-4">Specialist Portal</h1>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h3>Welcome, {{ current_user.name if current_user else 'Specialist' }}!</h3>
+      <p>Here you can view and manage your referrals, appointments, and profile.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">My Referrals</div>
+        <div class="card-body">
+          <p>View all patient referrals assigned to you.</p>
+          <a href="/referrals" class="btn btn-primary">View Referrals</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">My Appointments</div>
+        <div class="card-body">
+          <p>Manage your upcoming appointments and schedule.</p>
+          <a href="/appointments" class="btn btn-primary">View Appointments</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">Profile</div>
+        <div class="card-body">
+          <p>Update your specialist profile and contact information.</p>
+          <a href="/profile" class="btn btn-secondary">Edit Profile</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">Rewards</div>
+        <div class="card-body">
+          <p>Track your referral rewards and achievements.</p>
+          <a href="/rewards" class="btn btn-success">View Rewards</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

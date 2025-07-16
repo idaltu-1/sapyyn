@@ -120,7 +120,7 @@ gunicorn -w 4 -b 0.0.0.0:8000 app:app
 
 - **GitHub Repository**: https://github.com/idaltu-1/sapyyn
 - **Demo Login**: doctor1/patient1/admin1 (password: password123)
-- **Local Development**: http://localhost:5001
+- **Local Development**: [http://localhost:5001](http://localhost:5001) *(Requires the application to be running locally)*
 
 ---
 
