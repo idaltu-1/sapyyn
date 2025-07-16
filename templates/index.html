@@ -1,8 +1,41 @@
 {% extends "base.html" %}
 
+{% block title %}Sapyyn - Secure Patient Referral System | HIPAA Compliant Healthcare{% endblock %}
+
+{% block description %}Transform your patient referrals with Sapyyn's secure, HIPAA-compliant platform. Streamline document management, track referrals with QR codes, and connect providers seamlessly.{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Sapyyn Patient Referral System",
+    "description": "Secure, HIPAA-compliant patient referral management platform for healthcare providers",
+    "url": "{{ request.url }}",
+    "mainEntity": {
+        "@type": "SoftwareApplication",
+        "name": "Sapyyn",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "HIPAA Compliant Document Management",
+            "QR Code Patient Tracking", 
+            "Secure Provider Communication",
+            "Real-time Referral Status Updates"
+        ]
+    }
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <!-- Hero Section -->
-<div class="bg-primary text-white py-5">
+<div class="bg-primary text-white py-5" id="hero-section">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
@@ -16,17 +49,29 @@
                 </p>
                 <div class="d-grid d-md-flex gap-2">
                     {% if not session.user_id %}
-                    <a href="{{ url_for('get_started_page') }}" class="btn btn-light btn-lg">
+                    <a href="{{ url_for('get_started_page') }}" 
+                       class="btn btn-light btn-lg cta-primary" 
+                       data-cta="get-started-hero"
+                       onclick="trackEvent('cta_click', {cta_name: 'get_started_hero', cta_location: 'hero'})">
                         <i class="bi bi-person-plus"></i> Get Started
                     </a>
-                    <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                    <a href="{{ url_for('login') }}" 
+                       class="btn btn-outline-light btn-lg cta-secondary"
+                       data-cta="login-hero"
+                       onclick="trackEvent('cta_click', {cta_name: 'login_hero', cta_location: 'hero'})">
                         <i class="bi bi-box-arrow-in-right"></i> Login
                     </a>
                     {% else %}
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg">
+                    <a href="{{ url_for('dashboard') }}" 
+                       class="btn btn-light btn-lg cta-primary"
+                       data-cta="dashboard-hero"
+                       onclick="trackEvent('cta_click', {cta_name: 'dashboard_hero', cta_location: 'hero'})">
                         <i class="bi bi-speedometer2"></i> Go to Dashboard
                     </a>
-                    <a href="{{ url_for('new_referral') }}" class="btn btn-outline-light btn-lg">
+                    <a href="{{ url_for('new_referral') }}" 
+                       class="btn btn-outline-light btn-lg cta-secondary"
+                       data-cta="new-referral-hero"
+                       onclick="trackEvent('cta_click', {cta_name: 'new_referral_hero', cta_location: 'hero'})">
                         <i class="bi bi-plus-circle"></i> Create Referral
                     </a>
                     {% endif %}
