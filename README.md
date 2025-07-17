@@ -271,6 +271,22 @@ The application uses a modular CSS approach:
 - **Bootstrap Variables**: Can be customized for branding
 - **Responsive Design**: Mobile-first approach with breakpoints
 
+#### Visual Design Guidelines
+
+The overall look and feel should convey professionalism while remaining friendly
+and approachable:
+
+- **Use authentic imagery** such as photos of real dental professionals or
+  patients (with consent) to build trust. High-quality 3D graphics can also be
+  effective.
+- **Color scheme** should lean toward calming medical greens and avoid overly
+  cartoonish palettes.
+- **Modern illustrations only**; avoid outdated clip-art that makes the product
+  appear less sophisticated.
+- **Clean layouts with ample whitespace** keep the interface focused and easy to
+  navigate.
+
+
 ### Feature Extensions
 
 The system is designed for extensibility:
@@ -328,6 +344,8 @@ python app.py
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+> **Note:** If the LICENSE file is missing, please create one in the root directory with the MIT License text.
+
 ## 📞 Support
 
 For support and questions:
@@ -363,13 +381,19 @@ For support and questions:
 ## 📸 Screenshots
 
 ### Homepage
-![Homepage](https://github.com/user-attachments/assets/349d1fc8-fed1-4394-9ca5-eb65c9249d48)
+[![Demo Screenshot](https://via.placeholder.com/600x400?text=Demo+Screenshot)](https://via.placeholder.com/600x400?text=Demo+Screenshot)
+
+> **Note:** Some images previously linked here were unavailable. Please update with your own screenshots or assets as needed.
 
 ### Dashboard
-![Dashboard](https://github.com/user-attachments/assets/5e3b1404-520e-4d01-b9ae-dc45eb169d0a)
+[![Dashboard Screenshot](https://via.placeholder.com/600x400?text=Dashboard+Screenshot)](https://via.placeholder.com/600x400?text=Dashboard+Screenshot)
+
+> **Note:** Some images previously linked here were unavailable. Please update with your own screenshots or assets as needed.
 
 ### Dashboard with Referral
-![Dashboard with Referral](https://github.com/user-attachments/assets/1b8af067-3064-4ab8-9677-7132ea828ab2)
+[![Referral Screenshot](https://via.placeholder.com/600x400?text=Referral+Screenshot)](https://via.placeholder.com/600x400?text=Referral+Screenshot)
+
+> **Note:** Some images previously linked here were unavailable. Please update with your own screenshots or assets as needed.
 
 ---
 

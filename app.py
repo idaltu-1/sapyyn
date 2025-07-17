@@ -25,6 +25,15 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY', 'sk_test_...')  # Replace with your Stripe secret key
 STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', 'pk_test_...')  # Replace with your Stripe publishable key
 
+# Analytics configuration
+ANALYTICS_CONFIG = {
+    'GA4_MEASUREMENT_ID': os.environ.get('GA4_MEASUREMENT_ID', 'G-XXXXXXXXXX'),
+    'GTM_CONTAINER_ID': os.environ.get('GTM_CONTAINER_ID', 'GTM-XXXXXXX'),
+    'HOTJAR_SITE_ID': os.environ.get('HOTJAR_SITE_ID', '3842847'),
+    'ENABLE_ANALYTICS': os.environ.get('ENABLE_ANALYTICS', 'true').lower() == 'true',
+    'ENVIRONMENT': os.environ.get('FLASK_ENV', 'development')
+}
+
 # Configuration
 UPLOAD_FOLDER = 'patient-referral'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'xls', 'xlsx'}
@@ -347,6 +356,18 @@ def generate_qr_code(data):
     
     return base64.b64encode(buffer.getvalue()).decode()
 
+# Template context processor for analytics config
+@app.context_processor
+def inject_analytics_config():
+    """Make analytics configuration available in templates"""
+    return {
+        'analytics_config': ANALYTICS_CONFIG,
+        'ga4_id': ANALYTICS_CONFIG['GA4_MEASUREMENT_ID'],
+        'gtm_id': ANALYTICS_CONFIG['GTM_CONTAINER_ID'],
+        'hotjar_id': ANALYTICS_CONFIG['HOTJAR_SITE_ID'],
+        'analytics_enabled': ANALYTICS_CONFIG['ENABLE_ANALYTICS']
+    }
+
 @app.route('/')
 def index():
     """Home page"""
@@ -441,11 +462,28 @@ def register():
             provider_code = None
     
     if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        full_name = request.form['full_name']
-        role = request.form.get('role', 'patient')
+        signup_type = request.form.get('signup_type')
+        
+        if signup_type in ['inline', 'cta']:
+            # Handle inline/CTA signup - simplified process
+            email = request.form['email']
+            full_name = request.form.get('full_name', email.split('@')[0])
+            username = email
+            password = request.form.get('password', 'temp_password_' + str(uuid.uuid4())[:8])
+            role = request.form.get('role', 'dentist')  # Default to dentist for inline signups
+            
+            # Generate a more user-friendly password
+            if password.startswith('temp_password_'):
+                # Create a memorable password from email
+                password = email.split('@')[0] + '123!'
+            
+        else:
+            # Handle full registration form
+            username = request.form['username']
+            email = request.form['email']
+            password = request.form['password']
+            full_name = request.form['full_name']
+            role = request.form.get('role', 'patient')
         
         password_hash = generate_password_hash(password)
         
@@ -471,14 +509,51 @@ def register():
                       'Initial consultation', 'pending', 
                       f'Patient registered using provider code {provider_code}'))
             
+            # For inline signups, automatically start free trial
+            if signup_type in ['inline', 'cta']:
+                # Get trial plan
+                cursor.execute('SELECT id FROM subscription_plans WHERE plan_name = ?', ('Free Trial',))
+                trial_plan = cursor.fetchone()
+                if trial_plan:
+                    trial_end = datetime.now() + timedelta(days=14)
+                    cursor.execute('''
+                        INSERT INTO user_subscriptions 
+                        (user_id, plan_id, subscription_status, trial_end_date, end_date, auto_renew)
+                        VALUES (?, ?, 'trial', ?, ?, TRUE)
+                    ''', (user_id, trial_plan[0], trial_end, trial_end))
+                
+                # Generate provider code
+                provider_code_new = create_provider_code(
+                    user_id, 
+                    role,
+                    'Professional Practice',
+                    'General'
+                )
+            
             conn.commit()
             conn.close()
             
-            if provider_code and provider_info:
-                flash(f'Registration successful! You have been connected to {provider_info[2]} {provider_info[4]} at {provider_info[1]}. Please login.', 'success')
+            if signup_type in ['inline', 'cta']:
+                # For inline signups, automatically log them in and redirect to onboarding
+                session['user_id'] = user_id
+                session['username'] = username
+                session['full_name'] = full_name
+                session['role'] = role
+                
+                success_message = f'🎉 Welcome to Sapyyn! Your 14-day free trial has started.'
+                if 'provider_code_new' in locals():
+                    success_message += f' Your provider code is: {provider_code_new}'
+                
+                flash(success_message, 'success')
+                return redirect(url_for('dashboard'))
             else:
-                flash('Registration successful! Please login.', 'success')
-            return redirect(url_for('login'))
+                # For full registration, show success and redirect to login
+                if provider_code and provider_info:
+                    flash(f'Registration successful! You have been connected to {provider_info[2]} {provider_info[4]} at {provider_info[1]}. Please login.', 'success')
+                else:
+                    flash('Registration successful! Please login.', 'success')
+                return redirect(url_for('login'))
+                
         except sqlite3.IntegrityError:
             flash('Username or email already exists', 'error')
     
@@ -1995,11 +2070,321 @@ def send_patient_documents():
         return redirect(url_for('upload_file'))
     return redirect(url_for('login'))
 
+@app.route('/api/feedback', methods=['POST'])
+def submit_feedback():
+    """Submit user feedback for UX optimization"""
+    try:
+        feedback_data = request.get_json()
+        
+        if not feedback_data:
+            return jsonify({'error': 'No feedback data provided'}), 400
+        
+        # Add server-side data
+        feedback_data['server_timestamp'] = datetime.now().isoformat()
+        feedback_data['ip_address'] = request.remote_addr
+        feedback_data['user_id'] = session.get('user_id')
+        feedback_data['user_role'] = session.get('role')
+        
+        # Save to database
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        # Create feedback table if it doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS user_feedback (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                visit_purpose TEXT,
+                ease_of_use TEXT,
+                confusion_feedback TEXT,
+                nps_score INTEGER,
+                additional_comments TEXT,
+                contact_email TEXT,
+                page_url TEXT,
+                page_title TEXT,
+                timestamp TEXT,
+                server_timestamp TEXT,
+                ip_address TEXT,
+                user_agent TEXT,
+                screen_resolution TEXT,
+                session_duration INTEGER,
+                user_role TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Insert feedback
+        cursor.execute('''
+            INSERT INTO user_feedback (
+                user_id, visit_purpose, ease_of_use, confusion_feedback, nps_score,
+                additional_comments, contact_email, page_url, page_title, timestamp,
+                server_timestamp, ip_address, user_agent, screen_resolution,
+                session_duration, user_role
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            feedback_data.get('user_id'),
+            feedback_data.get('visit_purpose'),
+            feedback_data.get('ease_of_use'),
+            feedback_data.get('confusion_feedback'),
+            feedback_data.get('nps_score'),
+            feedback_data.get('additional_comments'),
+            feedback_data.get('contact_email'),
+            feedback_data.get('page_url'),
+            feedback_data.get('page_title'),
+            feedback_data.get('timestamp'),
+            feedback_data.get('server_timestamp'),
+            feedback_data.get('ip_address'),
+            feedback_data.get('user_agent'),
+            feedback_data.get('screen_resolution'),
+            feedback_data.get('session_duration'),
+            feedback_data.get('user_role')
+        ))
+        
+        conn.commit()
+        conn.close()
+        
+        # Track feedback submission in analytics
+        if ANALYTICS_CONFIG['ENABLE_ANALYTICS']:
+            # You could send this to external analytics services here
+            pass
+        
+        return jsonify({'success': True, 'message': 'Feedback submitted successfully'})
+        
+    except Exception as e:
+        app.logger.error(f'Error submitting feedback: {str(e)}')
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/analytics/stats')
+def analytics_stats():
+    """Get analytics statistics for admin dashboard"""
+    if 'user_id' not in session or session.get('role') not in ['admin', 'dentist_admin', 'specialist_admin']:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    try:
+        days = request.args.get('days', 30, type=int)
+        
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        # Get feedback stats by purpose
+        cursor.execute('''
+            SELECT 
+                visit_purpose,
+                COUNT(*) as purpose_count
+            FROM user_feedback 
+            WHERE created_at >= date('now', '-{} days')
+            GROUP BY visit_purpose
+            ORDER BY purpose_count DESC
+        '''.format(days))
+        feedback_stats = cursor.fetchall()
+        
+        # Get overall stats
+        cursor.execute('''
+            SELECT 
+                COUNT(*) as total_feedback,
+                AVG(CASE WHEN nps_score IS NOT NULL THEN nps_score END) as avg_nps,
+                AVG(CASE 
+                    WHEN ease_of_use = 'very_easy' THEN 5
+                    WHEN ease_of_use = 'easy' THEN 4
+                    WHEN ease_of_use = 'neutral' THEN 3
+                    WHEN ease_of_use = 'difficult' THEN 2
+                    WHEN ease_of_use = 'very_difficult' THEN 1
+                    ELSE NULL
+                END) as avg_ease_score,
+                COUNT(DISTINCT CASE WHEN user_id IS NOT NULL THEN user_id 
+                     ELSE ip_address END) as unique_users
+            FROM user_feedback 
+            WHERE created_at >= date('now', '-{} days')
+        '''.format(days))
+        user_stats = cursor.fetchone()
+        
+        # Get recent feedback for table
+        cursor.execute('''
+            SELECT id, visit_purpose, ease_of_use, nps_score, confusion_feedback, 
+                   additional_comments, page_url, created_at, user_role
+            FROM user_feedback 
+            WHERE created_at >= date('now', '-{} days')
+            ORDER BY created_at DESC
+            LIMIT 20
+        '''.format(days))
+        recent_feedback_raw = cursor.fetchall()
+        
+        # Convert recent feedback to dictionaries
+        columns = [description[0] for description in cursor.description]
+        recent_feedback = [dict(zip(columns, row)) for row in recent_feedback_raw]
+        
+        # Get ease of use distribution
+        cursor.execute('''
+            SELECT ease_of_use, COUNT(*) as count
+            FROM user_feedback 
+            WHERE created_at >= date('now', '-{} days')
+            AND ease_of_use IS NOT NULL
+            GROUP BY ease_of_use
+        '''.format(days))
+        ease_distribution = cursor.fetchall()
+        
+        conn.close()
+        
+        return jsonify({
+            'feedback_stats': feedback_stats,
+            'user_stats': user_stats,
+            'recent_feedback': recent_feedback,
+            'ease_distribution': ease_distribution,
+            'period': f'last_{days}_days'
+        })
+        
+    except Exception as e:
+        app.logger.error(f'Error getting analytics stats: {str(e)}')
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/admin/analytics')
+def analytics_dashboard():
+    """Analytics dashboard for administrators"""
+    if 'user_id' not in session or session.get('role') not in ['admin', 'dentist_admin', 'specialist_admin']:
+        flash('Access denied. Administrator privileges required.', 'error')
+        return redirect(url_for('login'))
+    
+    return render_template('analytics_dashboard.html')
+
+@app.route('/api/feedback/<int:feedback_id>')
+def get_feedback_detail(feedback_id):
+    """Get detailed feedback information"""
+    if 'user_id' not in session or session.get('role') not in ['admin', 'dentist_admin', 'specialist_admin']:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    try:
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT * FROM user_feedback WHERE id = ?
+        ''', (feedback_id,))
+        
+        feedback = cursor.fetchone()
+        conn.close()
+        
+        if not feedback:
+            return jsonify({'error': 'Feedback not found'}), 404
+        
+        # Convert to dictionary
+        columns = [description[0] for description in cursor.description]
+        feedback_dict = dict(zip(columns, feedback))
+        
+        return jsonify(feedback_dict)
+        
+    except Exception as e:
+        app.logger.error(f'Error getting feedback detail: {str(e)}')
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/feedback/export')
+def export_feedback():
+    """Export feedback data as CSV"""
+    if 'user_id' not in session or session.get('role') not in ['admin', 'dentist_admin', 'specialist_admin']:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    try:
+        days = request.args.get('days', 30, type=int)
+        
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT * FROM user_feedback 
+            WHERE created_at >= date('now', '-{} days')
+            ORDER BY created_at DESC
+        '''.format(days))
+        
+        feedback_data = cursor.fetchall()
+        columns = [description[0] for description in cursor.description]
+        conn.close()
+        
+        # Create CSV response
+        from io import StringIO
+        import csv
+        
+        output = StringIO()
+        writer = csv.writer(output)
+        
+        # Write header
+        writer.writerow(columns)
+        
+        # Write data
+        for row in feedback_data:
+            writer.writerow(row)
+        
+        output.seek(0)
+        
+        from flask import Response
+        return Response(
+            output.getvalue(),
+            mimetype='text/csv',
+            headers={'Content-Disposition': f'attachment; filename=feedback_export_{days}days.csv'}
+        )
+        
+    except Exception as e:
+        app.logger.error(f'Error exporting feedback: {str(e)}')
+        return jsonify({'error': 'Internal server error'}), 500
+
 @app.errorhandler(404)
 def page_not_found(e):
     """Render custom 404 page"""
     return render_template('404.html'), 404
 
+def create_demo_users_if_needed():
+    """Create demo users if they don't exist"""
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Check if demo users already exist
+    cursor.execute('SELECT COUNT(*) FROM users WHERE username IN (?, ?, ?)', 
+                   ('doctor1', 'patient1', 'admin1'))
+    existing_count = cursor.fetchone()[0]
+    
+    if existing_count == 0:
+        # Demo users don't exist, create them
+        demo_users = [
+            {
+                'username': 'doctor1',
+                'email': 'doctor@sapyyn.com',
+                'password': 'password123',
+                'full_name': 'Dr. Sarah Johnson',
+                'role': 'doctor'
+            },
+            {
+                'username': 'patient1',
+                'email': 'patient@sapyyn.com',
+                'password': 'password123',
+                'full_name': 'John Smith',
+                'role': 'patient'
+            },
+            {
+                'username': 'admin1',
+                'email': 'admin@sapyyn.com',
+                'password': 'password123',
+                'full_name': 'Admin User',
+                'role': 'admin'
+            }
+        ]
+        
+        for user in demo_users:
+            try:
+                password_hash = generate_password_hash(user['password'])
+                cursor.execute('''
+                    INSERT OR IGNORE INTO users (username, email, password_hash, full_name, role)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (user['username'], user['email'], password_hash, user['full_name'], user['role']))
+                print(f"Created demo user: {user['username']} ({user['role']})")
+            except Exception as e:
+                print(f"Error creating demo user {user['username']}: {e}")
+        
+        conn.commit()
+        print("Demo users created successfully!")
+    else:
+        print("Demo users already exist.")
+    
+    conn.close()
+
 if __name__ == '__main__':
     init_db()
+    create_demo_users_if_needed()
     app.run(debug=True, host='0.0.0.0', port=5000)
