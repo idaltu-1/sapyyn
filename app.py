@@ -1889,7 +1889,7 @@ def serve_static_page(filename):
     public_pages = [
         'about_page', 'pricing_page', 'resources_page', 'contact', 'contact-us',
         'blog', 'blog-article', 'case studies', 'educational content',
-        'training and support', 'how to guide', 'short video', 'newsletter',
+        'training and support', 'how-to-guide', 'short video', 'newsletter',
         'surgical-instruction', 'surgical_instruction_page', 'pre op consultation',
         'co_marketing', 'getstarted_page', 'resources'
     ]
