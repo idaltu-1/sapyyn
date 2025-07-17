@@ -330,12 +330,55 @@ def init_db():
         INSERT OR IGNORE INTO subscription_plans 
         (plan_name, plan_type, price_monthly, price_annual, features, max_referrals, max_users, storage_gb, support_level)
         VALUES 
-        ('Starter', 'individual', 49.99, 499.99, 'Basic referral management, Up to 50 referrals/month, Email support', 50, 1, 5, 'email'),
-        ('Professional', 'practice', 99.99, 999.99, 'Advanced features, Up to 200 referrals/month, Priority support, Multi-user access', 200, 5, 25, 'priority'),
-        ('Enterprise', 'enterprise', 499.00, 4999.00, 'Unlimited referrals, Unlimited users, Custom integrations, 24/7 phone support', -1, -1, 100, 'phone'),
-        ('Free Trial', 'trial', 0.00, 0.00, '14-day free trial, Up to 10 referrals, Auto-renews to Professional', 10, 1, 1, 'email')
+        ('Basic', 'free', 0.00, 0.00, 'Up to 5 referrals/month, Basic messaging, Limited network access', 5, 1, 1, 'email'),
+        ('Professional', 'practice', 49.99, 499.99, 'Unlimited referrals, Priority support, Full network access, QR codes, CE credits', -1, 3, 10, 'priority'),
+        ('Enterprise', 'enterprise', 149.99, 1499.99, 'Everything in Professional, Multi-practice management, Advanced analytics, API access', -1, -1, 50, 'phone')
     ''')
     
+    # User Profiles table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_profiles (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER UNIQUE NOT NULL,
+            phone TEXT,
+            license_number TEXT,
+            specialization TEXT,
+            practice_name TEXT,
+            practice_address TEXT,
+            years_experience TEXT,
+            website TEXT,
+            bio TEXT,
+            account_type TEXT,
+            avatar_url TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+    
+    # User Preferences table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_preferences (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            preference_key TEXT NOT NULL,
+            preference_value TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id),
+            UNIQUE(user_id, preference_key)
+        )
+    ''')
+    
+    # Add is_verified column to users table if it doesn't exist
+    try:
+        cursor.execute('''
+            ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT FALSE
+        ''')
+    except sqlite3.OperationalError:
+        # Column already exists, skip
+        pass
+
     conn.commit()
     conn.close()
 
@@ -377,6 +420,148 @@ def index():
 def get_started_page():
     """Get started onboarding page"""
     return send_from_directory('static', 'getstarted_page.html')
+
+@app.route('/api/complete_onboarding', methods=['POST'])
+def complete_onboarding():
+    """Complete the onboarding process and create user account"""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'success': False, 'message': 'No data provided'}), 400
+        
+        # Validate required fields
+        required_fields = ['firstName', 'lastName', 'email', 'accountType']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({'success': False, 'message': f'Missing required field: {field}'}), 400
+        
+        # Check if email already exists
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT id FROM users WHERE email = ?', (data['email'],))
+        if cursor.fetchone():
+            conn.close()
+            return jsonify({'success': False, 'message': 'Email already registered'}), 400
+        
+        # Create user account
+        full_name = f"{data['firstName']} {data['lastName']}"
+        password_hash = generate_password_hash('temp123')  # Temporary password - user should reset
+        
+        # Map account types to roles
+        role_mapping = {
+            'dentist': 'dentist',
+            'specialist': 'specialist', 
+            'hygienist': 'dentist',
+            'practice-manager': 'dentist',
+            'assistant': 'dentist',
+            'student': 'patient'
+        }
+        
+        role = role_mapping.get(data['accountType'], 'dentist')
+        
+        cursor.execute('''
+            INSERT INTO users (username, email, password_hash, full_name, role, created_at, is_verified)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            data['email'],
+            data['email'], 
+            password_hash,
+            full_name,
+            role,
+            datetime.now(),
+            True  # Auto-verify onboarding users
+        ))
+        
+        user_id = cursor.lastrowid
+        
+        # Add profile information
+        cursor.execute('''
+            INSERT INTO user_profiles (
+                user_id, phone, license_number, specialization, practice_name, 
+                practice_address, years_experience, website, bio, account_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            user_id,
+            data.get('phone', ''),
+            data.get('licenseNumber', ''),
+            data.get('specialization', ''),
+            data.get('practiceName', ''),
+            data.get('practiceAddress', ''),
+            data.get('yearsExperience', ''),
+            data.get('website', ''),
+            data.get('bio', ''),
+            data['accountType']
+        ))
+        
+        # Handle plan selection and create subscription
+        selected_plan = data.get('selectedPlan', 'basic')
+        
+        if selected_plan == 'trial':
+            # Get Professional plan details for trial
+            cursor.execute('SELECT * FROM subscription_plans WHERE plan_name = ?', ('Professional',))
+            plan = cursor.fetchone()
+            
+            if plan:
+                # Calculate trial end date (14 days from now)
+                trial_end = datetime.now() + timedelta(days=14)
+                
+                # Create trial subscription
+                cursor.execute('''
+                    INSERT INTO user_subscriptions 
+                    (user_id, plan_id, subscription_status, trial_end_date, end_date, auto_renew)
+                    VALUES (?, ?, 'trial', ?, ?, FALSE)
+                ''', (user_id, plan[0], trial_end, trial_end))
+                
+                # Generate provider code for trial users
+                provider_code = create_provider_code(
+                    user_id, 
+                    role,
+                    data.get('practiceName', 'Practice'),
+                    data.get('specialization', 'General')
+                )
+        
+        elif selected_plan == 'basic':
+            # Get Basic plan details
+            cursor.execute('SELECT * FROM subscription_plans WHERE plan_name = ?', ('Basic',))
+            plan = cursor.fetchone()
+            
+            if plan:
+                # Create basic subscription (no end date for free plan)
+                cursor.execute('''
+                    INSERT INTO user_subscriptions 
+                    (user_id, plan_id, subscription_status, auto_renew)
+                    VALUES (?, ?, 'active', FALSE)
+                ''', (user_id, plan[0]))
+        
+        # Save preferences if provided
+        preferences = data.get('preferences', {})
+        for pref_key, pref_value in preferences.items():
+            cursor.execute('''
+                INSERT INTO user_preferences (user_id, preference_key, preference_value)
+                VALUES (?, ?, ?)
+            ''', (user_id, pref_key, str(pref_value)))
+        
+        conn.commit()
+        conn.close()
+        
+        # Set session for auto-login
+        session['user_id'] = user_id
+        session['username'] = data['email']
+        session['full_name'] = full_name
+        session['role'] = role
+        session['email'] = data['email']
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Account created successfully',
+            'user_id': user_id,
+            'redirect_url': '/dashboard'
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
