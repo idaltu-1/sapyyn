@@ -34,73 +34,87 @@
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section with Inline Email Signup -->
-<div class="bg-primary text-white py-5" id="hero">
-    <div class="container">
-        <div class="row align-items-center">
+<!-- Enhanced Hero Section with Gradient Background -->
+<div class="hero-section" id="hero">
+    <div class="hero-background">
+        <div class="gradient-overlay"></div>
+    </div>
+    <div class="container position-relative">
+        <div class="row align-items-center min-vh-75">
             <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-4">
-                    <i class="bi bi-hospital me-3"></i>
-                    Streamline Patient Referrals in Seconds
-                </h1>
-                <p class="lead mb-4">
-                    Join 1000+ healthcare providers using our secure, HIPAA-compliant platform 
-                    to manage patient referrals, track progress, and improve patient outcomes.
-                </p>
-                
-                {% if not session.user_id %}
-                <!-- Inline Email Signup Form -->
-                <div class="card bg-white text-dark p-4 mb-4 shadow-lg border-0 rounded-3">
-                    <div class="card-body p-0">
-                        <h5 class="fw-bold mb-3 text-primary">
-                            <i class="bi bi-gift me-2"></i>Start Your Free 14-Day Trial
-                        </h5>
-                        <form id="inlineSignupForm" class="row g-2" method="post" action="{{ url_for('register') }}">
-                            <div class="col-md-8">
-                                <input type="email" class="form-control form-control-lg" 
+                <div class="hero-content">
+                    <div class="hero-badge mb-3">
+                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
+                            <i class="bi bi-star-fill me-1"></i>
+                            Trusted by 1000+ Healthcare Providers
+                        </span>
+                    </div>
+                    <h1 class="hero-title display-3 fw-bold mb-4 text-white">
+                        <span class="text-gradient">Streamline Patient Referrals</span>
+                        <br>in Seconds
+                    </h1>
+                    <p class="hero-subtitle lead mb-4 text-white-75">
+                        Transform your practice with our secure, HIPAA-compliant platform. 
+                        Manage referrals, track progress, and improve patient outcomes with ease.
+                    </p>
+                    
+                    {% if not session.user_id %}
+                    <!-- Enhanced Inline Email Signup Form -->
+                    <div class="cta-card bg-white p-4 mb-4 shadow-lg border-0 rounded-4">
+                        <div class="text-center mb-3">
+                            <h5 class="fw-bold text-primary mb-2">
+                                <i class="bi bi-rocket-takeoff me-2"></i>Start Your Free 14-Day Trial
+                            </h5>
+                            <p class="text-muted small mb-0">Join thousands of healthcare professionals already using Sapyyn</p>
+                        </div>
+                        <form id="inlineSignupForm" class="signup-form" method="post" action="{{ url_for('register') }}">
+                            <div class="input-group input-group-lg mb-3">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-envelope text-muted"></i>
+                                </span>
+                                <input type="email" 
+                                       class="form-control border-start-0 ps-0" 
                                        name="email" 
                                        id="heroEmail" 
                                        placeholder="Enter your work email" 
                                        required>
-                            </div>
-                            <div class="col-md-4">
-                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <button type="submit" class="btn btn-primary btn-lg px-4">
                                     <i class="bi bi-arrow-right me-1"></i>Get Started
                                 </button>
                             </div>
                             <input type="hidden" name="signup_type" value="inline">
                         </form>
-                        <div class="text-center mt-3">
-                            <small class="text-muted">
-                                <i class="bi bi-check-circle text-success me-1"></i>No credit card required
+                        <div class="text-center">
+                            <div class="trust-indicators small text-muted">
+                                <i class="bi bi-shield-check text-success me-1"></i>No credit card required
                                 <span class="mx-2">•</span>
-                                <i class="bi bi-check-circle text-success me-1"></i>14-day free trial
+                                <i class="bi bi-clock text-primary me-1"></i>14-day free trial
                                 <span class="mx-2">•</span>
-                                <i class="bi bi-check-circle text-success me-1"></i>Cancel anytime
-                            </small>
+                                <i class="bi bi-x-circle text-info me-1"></i>Cancel anytime
+                            </div>
                         </div>
                     </div>
+                    <!-- Secondary CTAs with Better Styling -->
+                    <div class="hero-actions d-flex flex-wrap gap-3 align-items-center">
+                        <a href="#" class="btn btn-outline-light btn-lg px-4" data-bs-toggle="modal" data-bs-target="#demoModal">
+                            <i class="bi bi-play-circle me-2"></i>Watch Demo
+                        </a>
+                        <a href="{{ url_for('login') }}" class="btn btn-link text-white text-decoration-none fw-medium">
+                            Already have an account? <u class="text-warning">Sign in</u>
+                        </a>
+                    </div>
+                    {% else %}
+                    <!-- Logged in user CTAs -->
+                    <div class="hero-actions d-grid d-md-flex gap-3">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg px-4">
+                            <i class="bi bi-speedometer2 me-2"></i>Go to Dashboard
+                        </a>
+                        <a href="{{ url_for('new_referral') }}" class="btn btn-warning btn-lg px-4">
+                            <i class="bi bi-plus-circle me-2"></i>Create Referral
+                        </a>
+                    </div>
+                    {% endif %}
                 </div>
-                <!-- Secondary CTAs -->
-                <div class="d-grid d-md-flex gap-2">
-                    <a href="#" class="btn btn-outline-light btn-lg" data-bs-toggle="modal" data-bs-target="#demoModal">
-                        <i class="bi bi-play-circle me-2"></i>Watch Demo
-                    </a>
-                    <a href="{{ url_for('login') }}" class="btn btn-link text-white text-decoration-none">
-                        Already have an account? <u>Sign in</u>
-                    </a>
-                </div>
-                {% else %}
-                <!-- Logged in user CTAs -->
-                <div class="d-grid d-md-flex gap-2">
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg">
-                        <i class="bi bi-speedometer2"></i> Go to Dashboard
-                    </a>
-                    <a href="{{ url_for('new_referral') }}" class="btn btn-outline-light btn-lg">
-                        <i class="bi bi-plus-circle"></i> Create Referral
-                    </a>
-                </div>
-                {% endif %}
             </div>
             <div class="col-lg-6 text-center">
                 <div class="hero-image-container">
