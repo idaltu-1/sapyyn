@@ -34,13 +34,8 @@
 {% endblock %}
 
 {% block content %}
-<<<<<<< HEAD
-<!-- Hero Section -->
-<div class="bg-primary text-white py-5" id="hero-section">
-=======
 <!-- Hero Section with Inline Email Signup -->
 <div class="bg-primary text-white py-5" id="hero">
->>>>>>> main
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
@@ -86,29 +81,8 @@
                         </div>
                     </div>
                 </div>
-                
                 <!-- Secondary CTAs -->
                 <div class="d-grid d-md-flex gap-2">
-<<<<<<< HEAD
-                    {% if not session.user_id %}
-                    <a href="{{ url_for('get_started_page') }}" 
-                       class="btn btn-light btn-lg cta-primary" 
-                       data-cta="get-started-hero"
-                       onclick="trackEvent('cta_click', {cta_name: 'get_started_hero', cta_location: 'hero'})">
-                        <i class="bi bi-person-plus"></i> Get Started
-                    </a>
-                    <a href="{{ url_for('login') }}" 
-                       class="btn btn-outline-light btn-lg cta-secondary"
-                       data-cta="login-hero"
-                       onclick="trackEvent('cta_click', {cta_name: 'login_hero', cta_location: 'hero'})">
-                        <i class="bi bi-box-arrow-in-right"></i> Login
-                    </a>
-                    {% else %}
-                    <a href="{{ url_for('dashboard') }}" 
-                       class="btn btn-light btn-lg cta-primary"
-                       data-cta="dashboard-hero"
-                       onclick="trackEvent('cta_click', {cta_name: 'dashboard_hero', cta_location: 'hero'})">
-=======
                     <a href="#" class="btn btn-outline-light btn-lg" data-bs-toggle="modal" data-bs-target="#demoModal">
                         <i class="bi bi-play-circle me-2"></i>Watch Demo
                     </a>
@@ -120,13 +94,9 @@
                 <!-- Logged in user CTAs -->
                 <div class="d-grid d-md-flex gap-2">
                     <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg">
->>>>>>> main
                         <i class="bi bi-speedometer2"></i> Go to Dashboard
                     </a>
-                    <a href="{{ url_for('new_referral') }}" 
-                       class="btn btn-outline-light btn-lg cta-secondary"
-                       data-cta="new-referral-hero"
-                       onclick="trackEvent('cta_click', {cta_name: 'new_referral_hero', cta_location: 'hero'})">
+                    <a href="{{ url_for('new_referral') }}" class="btn btn-outline-light btn-lg">
                         <i class="bi bi-plus-circle"></i> Create Referral
                     </a>
                 </div>
