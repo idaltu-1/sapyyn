@@ -2166,6 +2166,24 @@ def submit_feedback():
         app.logger.error(f'Error submitting feedback: {str(e)}')
         return jsonify({'error': 'Internal server error'}), 500
 
+@app.route('/newsletter_subscribe', methods=['POST'])
+def newsletter_subscribe():
+    """Handle newsletter subscription"""
+    try:
+        name = request.form.get('name', '')
+        email = request.form.get('email', '')
+        user_type = request.form.get('userType', '')
+        
+        if not email:
+            return jsonify({'success': False, 'message': 'Email is required'}), 400
+        
+        # Store newsletter subscription (you can add to database if needed)
+        # For now, just return success
+        flash(f'Thank you for subscribing to our newsletter, {name}!', 'success')
+        return jsonify({'success': True, 'message': 'Subscription successful'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': 'Subscription failed'}), 500
+
 @app.route('/api/analytics/stats')
 def analytics_stats():
     """Get analytics statistics for admin dashboard"""
