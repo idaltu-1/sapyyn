@@ -1874,6 +1874,7 @@ def handle_subscription_cancellation(subscription):
 
 
 
+
 # ============================================================================
 # STATIC PAGE ROUTES & NAVIGATION LINKS
 # ============================================================================
@@ -2335,6 +2336,7 @@ def export_feedback():
 def page_not_found(e):
     """Render custom 404 page"""
     return render_template('404.html'), 404
+
 
 
 def create_demo_users_if_needed():
