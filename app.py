@@ -1890,7 +1890,7 @@ def serve_static_page(filename):
         'about_page', 'pricing_page', 'resources_page', 'contact', 'contact-us',
         'blog', 'blog-article', 'case studies', 'educational content',
         'training and support', 'how to guide', 'short video', 'newsletter',
-        'surgical-instruction', 'surgical_instruction_page', 'pre op consultation',
+        'surgical-instruction', 'surgical-instruction-page', 'pre op consultation',
         'co_marketing', 'getstarted_page', 'resources'
     ]
     admin_pages = [
@@ -2017,7 +2017,7 @@ def referrals():
 @app.route('/surgicalInstruction')
 def surgical_instruction():
     """Surgical instruction page (legacy route)"""
-    return send_from_directory('static', 'surgical_instruction_page.html')
+    return send_from_directory('static', 'surgical-instruction-page.html')
 
 @app.route('/casestudies')
 def case_studies():
