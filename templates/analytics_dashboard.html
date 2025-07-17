@@ -1,0 +1,392 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics Dashboard - Sapyyn Admin{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="bi bi-graph-up"></i> Analytics Dashboard</h1>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary" onclick="refreshData(7)">7 Days</button>
+                    <button type="button" class="btn btn-primary" onclick="refreshData(30)">30 Days</button>
+                    <button type="button" class="btn btn-outline-primary" onclick="refreshData(90)">90 Days</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title" id="total-feedback">-</h4>
+                            <p class="card-text">Total Feedback</p>
+                        </div>
+                        <div>
+                            <i class="bi bi-chat-square-text fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title" id="avg-nps">-</h4>
+                            <p class="card-text">Average NPS</p>
+                        </div>
+                        <div>
+                            <i class="bi bi-star-fill fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title" id="avg-ease">-</h4>
+                            <p class="card-text">Ease of Use</p>
+                        </div>
+                        <div>
+                            <i class="bi bi-speedometer2 fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title" id="unique-users">-</h4>
+                            <p class="card-text">Unique Users</p>
+                        </div>
+                        <div>
+                            <i class="bi bi-people-fill fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-pie-chart"></i> Visit Purposes</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="purposeChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-bar-chart"></i> Ease of Use Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="easeChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Feedback Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="bi bi-table"></i> Recent Feedback</h5>
+                    <button class="btn btn-sm btn-outline-primary" onclick="exportFeedback()">
+                        <i class="bi bi-download"></i> Export
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="feedbackTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Purpose</th>
+                                    <th>Ease</th>
+                                    <th>NPS</th>
+                                    <th>Comments</th>
+                                    <th>Page</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Detail Modal -->
+    <div class="modal fade" id="feedbackModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Feedback Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="feedbackModalBody">
+                    <!-- Populated by JavaScript -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentPeriod = 30;
+let purposeChart, easeChart;
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+    refreshData(30);
+});
+
+function initializeCharts() {
+    // Purpose Chart
+    const purposeCtx = document.getElementById('purposeChart').getContext('2d');
+    purposeChart = new Chart(purposeCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [],
+            datasets: [{
+                data: [],
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Ease Chart
+    const easeCtx = document.getElementById('easeChart').getContext('2d');
+    easeChart = new Chart(easeCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Very Difficult', 'Difficult', 'Neutral', 'Easy', 'Very Easy'],
+            datasets: [{
+                label: 'Count',
+                data: [0, 0, 0, 0, 0],
+                backgroundColor: [
+                    '#dc3545', '#fd7e14', '#ffc107', '#198754', '#20c997'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+async function refreshData(days) {
+    currentPeriod = days;
+    
+    // Update active button
+    document.querySelectorAll('.btn-group .btn').forEach(btn => {
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-outline-primary');
+    });
+    event.target.classList.remove('btn-outline-primary');
+    event.target.classList.add('btn-primary');
+    
+    try {
+        const response = await fetch(`/api/analytics/stats?days=${days}`);
+        if (!response.ok) throw new Error('Failed to fetch analytics data');
+        
+        const data = await response.json();
+        updateDashboard(data);
+    } catch (error) {
+        console.error('Error fetching analytics:', error);
+        showAlert('Error loading analytics data', 'danger');
+    }
+}
+
+function updateDashboard(data) {
+    // Update key metrics
+    document.getElementById('total-feedback').textContent = data.user_stats?.[0] || 0;
+    document.getElementById('avg-nps').textContent = data.user_stats?.[1]?.toFixed(1) || 'N/A';
+    document.getElementById('avg-ease').textContent = data.user_stats?.[2]?.toFixed(1) || 'N/A';
+    document.getElementById('unique-users').textContent = data.user_stats?.[3] || 0;
+    
+    // Update purpose chart
+    if (data.feedback_stats && data.feedback_stats.length > 0) {
+        const purposes = data.feedback_stats.map(item => item[3] || 'Other');
+        const counts = data.feedback_stats.map(item => item[4]);
+        
+        purposeChart.data.labels = purposes;
+        purposeChart.data.datasets[0].data = counts;
+        purposeChart.update();
+    }
+    
+    // Update recent feedback table
+    updateFeedbackTable(data.recent_feedback || []);
+}
+
+function updateFeedbackTable(feedback) {
+    const tbody = document.querySelector('#feedbackTable tbody');
+    tbody.innerHTML = '';
+    
+    feedback.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${new Date(item.created_at).toLocaleDateString()}</td>
+            <td><span class="badge bg-primary">${item.visit_purpose || 'N/A'}</span></td>
+            <td>${getEaseDisplay(item.ease_of_use)}</td>
+            <td>${item.nps_score !== null ? item.nps_score : 'N/A'}</td>
+            <td>${truncateText(item.confusion_feedback || item.additional_comments || 'No comments', 50)}</td>
+            <td>${getPageDisplay(item.page_url)}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary" onclick="showFeedbackDetail(${item.id})">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function getEaseDisplay(ease) {
+    const easeMap = {
+        'very_easy': '<span class="badge bg-success">Very Easy</span>',
+        'easy': '<span class="badge bg-success">Easy</span>',
+        'neutral': '<span class="badge bg-warning">Neutral</span>',
+        'difficult': '<span class="badge bg-danger">Difficult</span>',
+        'very_difficult': '<span class="badge bg-danger">Very Difficult</span>'
+    };
+    return easeMap[ease] || '<span class="badge bg-secondary">N/A</span>';
+}
+
+function getPageDisplay(url) {
+    if (!url) return 'N/A';
+    const path = new URL(url).pathname;
+    return path === '/' ? 'Homepage' : path;
+}
+
+function truncateText(text, length) {
+    return text.length > length ? text.substring(0, length) + '...' : text;
+}
+
+async function showFeedbackDetail(feedbackId) {
+    try {
+        const response = await fetch(`/api/feedback/${feedbackId}`);
+        if (!response.ok) throw new Error('Failed to fetch feedback details');
+        
+        const feedback = await response.json();
+        
+        const modalBody = document.getElementById('feedbackModalBody');
+        modalBody.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Visit Information</h6>
+                    <table class="table table-sm">
+                        <tr><td><strong>Purpose:</strong></td><td>${feedback.visit_purpose || 'N/A'}</td></tr>
+                        <tr><td><strong>Date:</strong></td><td>${new Date(feedback.created_at).toLocaleString()}</td></tr>
+                        <tr><td><strong>Page:</strong></td><td>${feedback.page_url || 'N/A'}</td></tr>
+                        <tr><td><strong>Session Duration:</strong></td><td>${feedback.session_duration}s</td></tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6>Ratings</h6>
+                    <table class="table table-sm">
+                        <tr><td><strong>Ease of Use:</strong></td><td>${getEaseDisplay(feedback.ease_of_use)}</td></tr>
+                        <tr><td><strong>NPS Score:</strong></td><td>${feedback.nps_score !== null ? feedback.nps_score + '/10' : 'N/A'}</td></tr>
+                        <tr><td><strong>User Role:</strong></td><td>${feedback.user_role || 'Anonymous'}</td></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h6>Feedback Comments</h6>
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">Confusion/Issues:</h6>
+                            <p class="card-text">${feedback.confusion_feedback || 'No specific issues mentioned'}</p>
+                            
+                            <h6 class="card-subtitle mb-2 text-muted">Additional Comments:</h6>
+                            <p class="card-text">${feedback.additional_comments || 'No additional comments'}</p>
+                            
+                            ${feedback.contact_email ? `
+                                <h6 class="card-subtitle mb-2 text-muted">Contact:</h6>
+                                <p class="card-text"><a href="mailto:${feedback.contact_email}">${feedback.contact_email}</a></p>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+        modal.show();
+        
+    } catch (error) {
+        console.error('Error fetching feedback details:', error);
+        showAlert('Error loading feedback details', 'danger');
+    }
+}
+
+function exportFeedback() {
+    window.open(`/api/feedback/export?days=${currentPeriod}`, '_blank');
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.container-fluid');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+</script>
+{% endblock %}

@@ -147,6 +147,56 @@
     </div>
 </div>
 {% endblock %}
+                                Login
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <p class="mb-0">Don't have an account?</p>
+                        <a href="{{ url_for('register') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-person-plus"></i>
+                            Create Account
+                        </a>
+                    </div>
+                    
+                    <div class="text-center mt-3">
+                        <a href="#" class="text-decoration-none text-muted small">
+                            <i class="bi bi-question-circle"></i>
+                            Forgot Password?
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Demo Credentials -->
+            <div class="card mt-3 border-info">
+                <div class="card-body">
+                    <h6 class="card-title text-info">
+                        <i class="bi bi-info-circle"></i>
+                        Demo Credentials
+                    </h6>
+                    <p class="small mb-2">For testing purposes:</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Doctor:</strong><br>
+                            <code>doctor1</code><br>
+                            <code>password123</code>
+                        </div>
+                        <div class="col-6">
+                            <strong>Patient:</strong><br>
+                            <code>patient1</code><br>
+                            <code>password123</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
 {% block extra_scripts %}
 <script>

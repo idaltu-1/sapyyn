@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Admin Portal{% endblock %}
+{% block content %}
+<div class="container mt-5">
+  <h1 class="mb-4">Admin Portal</h1>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h3>Welcome, {{ current_user.name if current_user else 'Admin' }}!</h3>
+      <p>Manage users, referrals, analytics, and system settings from this dashboard.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">User Management</div>
+        <div class="card-body">
+          <p>View and manage all users in the system.</p>
+          <a href="/admin/users" class="btn btn-primary">Manage Users</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">Referrals</div>
+        <div class="card-body">
+          <p>Monitor and manage all patient referrals.</p>
+          <a href="/admin/referrals" class="btn btn-primary">View Referrals</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">Analytics</div>
+        <div class="card-body">
+          <p>View system analytics and reports.</p>
+          <a href="/admin/analytics" class="btn btn-secondary">View Analytics</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">Settings</div>
+        <div class="card-body">
+          <p>Configure system settings and preferences.</p>
+          <a href="/admin/settings" class="btn btn-success">System Settings</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
