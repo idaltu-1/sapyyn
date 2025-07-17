@@ -41,6 +41,9 @@
 /login  /static/login.html  200
 /signup  /static/signup.html  200
 
+# Test page for navigation
+/test-navigation  /static/test-navigation.html  200
+
 # Fallback for any other routes - serve the main index.html for SPA
 # This ensures that direct URLs work when the app is served as an SPA
 /*    /index.html   200
