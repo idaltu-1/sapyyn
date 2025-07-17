@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Tutorials - Sapyyn Patient Referral System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <h1 class="text-center mb-5">Tutorials</h1>
+            <p class="lead text-center mb-5">
+                Learn how to use Sapyyn effectively with our step-by-step tutorials.
+            </p>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-play-circle-fill text-primary me-2"></i>
+                                Getting Started
+                            </h5>
+                            <p class="card-text">Learn the basics of creating your first referral and navigating the platform.</p>
+                            <a href="#" class="btn btn-outline-primary">Watch Tutorial</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-qr-code text-success me-2"></i>
+                                QR Code Usage
+                            </h5>
+                            <p class="card-text">Master QR code generation and scanning for quick patient referrals.</p>
+                            <a href="#" class="btn btn-outline-primary">Watch Tutorial</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-cloud-upload text-warning me-2"></i>
+                                Document Management
+                            </h5>
+                            <p class="card-text">Upload, organize, and share patient documents securely.</p>
+                            <a href="#" class="btn btn-outline-primary">Watch Tutorial</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -190,7 +190,7 @@ Beyond your requirements, I also added:
 **Status: ✅ FULLY OPERATIONAL**
 
 The rewards system is:
-- ✅ **Live and Running** at http://localhost:5001/rewards
+- ✅ **Live and Running** at [http://localhost:5001/rewards](http://localhost:5001/rewards) *(Requires the application to be running locally)*
 - ✅ **Sample Data Loaded** with demo programs and achievements
 - ✅ **Ready for Production** with all compliance features
 - ✅ **Fully Integrated** with existing Sapyyn platform

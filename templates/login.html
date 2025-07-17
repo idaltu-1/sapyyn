@@ -3,93 +3,143 @@
 {% block title %}Login - Sapyyn{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <i class="bi bi-hospital text-primary" style="font-size: 3rem;"></i>
-                        <h2 class="fw-bold mt-2">Login to Sapyyn</h2>
-                        <p class="text-muted">Access your patient referral dashboard</p>
-                    </div>
-                    
-                    <form method="POST">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-person"></i>
-                                </span>
-                                <input type="text" class="form-control" id="username" name="username" required>
+<div class="login-page-wrapper">
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+            <!-- Left Side - Branding/Info -->
+            <div class="col-lg-6 d-none d-lg-flex login-brand-section">
+                <div class="d-flex align-items-center justify-content-center w-100">
+                    <div class="text-center text-white">
+                        <div class="brand-logo mb-4">
+                            <i class="bi bi-hospital-fill display-1 mb-3"></i>
+                            <h1 class="fw-bold">Sapyyn</h1>
+                            <p class="lead">Secure Patient Referral System</p>
+                        </div>
+                        <div class="feature-highlights">
+                            <div class="feature-item mb-3">
+                                <i class="bi bi-shield-check text-warning me-2"></i>
+                                <span>HIPAA Compliant & Secure</span>
+                            </div>
+                            <div class="feature-item mb-3">
+                                <i class="bi bi-clock text-warning me-2"></i>
+                                <span>Instant Referral Processing</span>
+                            </div>
+                            <div class="feature-item mb-3">
+                                <i class="bi bi-people text-warning me-2"></i>
+                                <span>Trusted by 1000+ Providers</span>
                             </div>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-lock"></i>
-                                </span>
-                                <input type="password" class="form-control" id="password" name="password" required>
-                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="rememberMe">
-                            <label class="form-check-label" for="rememberMe">
-                                Remember me
-                            </label>
-                        </div>
-                        
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-box-arrow-in-right"></i>
-                                Login
-                            </button>
-                        </div>
-                    </form>
-                    
-                    <hr class="my-4">
-                    
-                    <div class="text-center">
-                        <p class="mb-0">Don't have an account?</p>
-                        <a href="{{ url_for('register') }}" class="btn btn-outline-primary">
-                            <i class="bi bi-person-plus"></i>
-                            Create Account
-                        </a>
-                    </div>
-                    
-                    <div class="text-center mt-3">
-                        <a href="{{ url_for('forgot_password') }}" class="text-decoration-none text-muted small">
-                            <i class="bi bi-question-circle"></i>
-                            Forgot Password?
-                        </a>
                     </div>
                 </div>
             </div>
             
-            <!-- Demo Credentials -->
-            <div class="card mt-3 border-info">
-                <div class="card-body">
-                    <h6 class="card-title text-info">
-                        <i class="bi bi-info-circle"></i>
-                        Demo Credentials
-                    </h6>
-                    <p class="small mb-2">For testing purposes:</p>
-                    <div class="row">
-                        <div class="col-6">
-                            <strong>Doctor:</strong><br>
-                            <code>doctor1</code><br>
-                            <code>password123</code>
+            <!-- Right Side - Login Form -->
+            <div class="col-lg-6">
+                <div class="login-form-section d-flex align-items-center justify-content-center min-vh-100">
+                    <div class="login-form-container">
+                        <div class="text-center mb-4">
+                            <!-- Mobile logo -->
+                            <div class="d-lg-none mb-3">
+                                <i class="bi bi-hospital text-primary" style="font-size: 3rem;"></i>
+                                <h3 class="fw-bold text-primary mt-2">Sapyyn</h3>
+                            </div>
+                            
+                            <h2 class="fw-bold mb-2">Welcome Back</h2>
+                            <p class="text-muted">Sign in to your Sapyyn account</p>
                         </div>
-                        <div class="col-6">
-                            <strong>Patient:</strong><br>
-                            <code>patient1</code><br>
-                            <code>password123</code>
+                        
+                        <form method="POST" class="login-form">
+                            <!-- Username Field -->
+                            <div class="form-floating mb-3">
+                                <input type="text" 
+                                       class="form-control form-control-lg" 
+                                       id="username" 
+                                       name="username" 
+                                       placeholder="Username" 
+                                       required>
+                                <label for="username">
+                                    <i class="bi bi-person me-2"></i>Username
+                                </label>
+                            </div>
+                            
+                            <!-- Password Field -->
+                            <div class="form-floating mb-3">
+                                <input type="password" 
+                                       class="form-control form-control-lg" 
+                                       id="password" 
+                                       name="password" 
+                                       placeholder="Password" 
+                                       required>
+                                <label for="password">
+                                    <i class="bi bi-lock me-2"></i>Password
+                                </label>
+                                <button class="btn btn-outline-secondary password-toggle" 
+                                        type="button" 
+                                        id="togglePassword"
+                                        aria-label="Toggle password visibility">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Remember Me and Forgot Password -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                                    <label class="form-check-label text-muted" for="rememberMe">
+                                        Remember me
+                                    </label>
+                                </div>
+                                <a href="#" class="text-decoration-none">
+                                    Forgot password?
+                                </a>
+                            </div>
+                            
+                            <!-- Login Button -->
+                            <div class="d-grid mb-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                                    Sign In
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- Divider -->
+                        <div class="divider my-4">
+                            <span class="divider-text text-muted">or</span>
+                        </div>
+                        
+
+                        <!-- Sign Up Link -->
+                        <div class="text-center">
+                            <p class="text-muted mb-2">Don't have an account?</p>
+                            <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg w-100">
+                                <i class="bi bi-person-plus me-2"></i>
+                                Create Account
+                            </a>
+                        </div>
+                        
+                        <!-- Demo Credentials -->
+                        <div class="demo-credentials mt-5 p-3 bg-light rounded-3">
+                            <h6 class="fw-bold text-center mb-3">
+                                <i class="bi bi-info-circle me-2"></i>Demo Credentials
+                            </h6>
+                            <p class="small text-muted text-center mb-3">For testing purposes:</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="demo-user">
+                                        <strong class="text-primary">Doctor:</strong><br>
+                                        <code class="bg-white px-2 py-1 rounded">doctor1</code><br>
+                                        <code class="bg-white px-2 py-1 rounded">password123</code>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="demo-user">
+                                        <strong class="text-success">Patient:</strong><br>
+                                        <code class="bg-white px-2 py-1 rounded">patient1</code><br>
+                                        <code class="bg-white px-2 py-1 rounded">password123</code>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -101,19 +151,6 @@
 
 {% block extra_scripts %}
 <script>
-document.getElementById('togglePassword').addEventListener('click', function() {
-    const passwordInput = document.getElementById('password');
-    const toggleIcon = this.querySelector('i');
-    
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        toggleIcon.classList.remove('bi-eye');
-        toggleIcon.classList.add('bi-eye-slash');
-    } else {
-        passwordInput.type = 'password';
-        toggleIcon.classList.remove('bi-eye-slash');
-        toggleIcon.classList.add('bi-eye');
-    }
-});
+// Password toggle functionality is handled by main.js UIEnhancements
 </script>
 {% endblock %}

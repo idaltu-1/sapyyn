@@ -6,15 +6,53 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
+            <!-- Provider Information Display -->
+            {% if provider_info %}
+            <div class="alert alert-info mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+                    <div>
+                        <h6 class="mb-1">Connecting to Healthcare Provider</h6>
+                        <p class="mb-0">
+                            <strong>{{ provider_info[4] }}</strong> - {{ provider_info[2].title() }}
+                            {% if provider_info[3] %}<br><small class="text-muted">{{ provider_info[3] }}</small>{% endif %}
+                            {% if provider_info[1] %}<br><small class="text-muted">{{ provider_info[1] }}</small>{% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% elif provider_code %}
+            <div class="alert alert-warning mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+                    <div>
+                        <h6 class="mb-1">Invalid Provider Code</h6>
+                        <p class="mb-0">The provider code "{{ provider_code }}" was not found. Please verify the code with your healthcare provider.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
             <div class="card shadow">
                 <div class="card-body p-5">
                     <div class="text-center mb-4">
                         <i class="bi bi-person-plus text-primary" style="font-size: 3rem;"></i>
                         <h2 class="fw-bold mt-2">Join Sapyyn</h2>
-                        <p class="text-muted">Create your patient referral account</p>
+                        <p class="text-muted">
+                            {% if provider_info %}
+                                Complete your registration to connect with {{ provider_info[4] }}
+                            {% else %}
+                                Create your patient referral account
+                            {% endif %}
+                        </p>
                     </div>
                     
                     <form method="POST" id="registerForm">
+                        <!-- Hidden field to preserve provider code -->
+                        {% if provider_code %}
+                        <input type="hidden" name="provider_code" value="{{ provider_code }}">
+                        {% endif %}
+                        
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="full_name" class="form-label">Full Name *</label>
@@ -55,11 +93,16 @@
                                 </span>
                                 <select class="form-select" id="role" name="role" required>
                                     <option value="">Select your role</option>
-                                    <option value="patient">Patient</option>
-                                    <option value="doctor">Doctor/Healthcare Provider</option>
-                                    <option value="admin">Administrator</option>
+                                    <option value="patient" {% if suggested_role == 'patient' %}selected{% endif %}>Patient</option>
+                                    <option value="doctor" {% if suggested_role == 'doctor' %}selected{% endif %}>Doctor/Healthcare Provider</option>
+                                    <option value="admin" {% if suggested_role == 'admin' %}selected{% endif %}>Administrator</option>
                                 </select>
                             </div>
+                            {% if provider_info and suggested_role == 'patient' %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle"></i> Patient role pre-selected for provider connection
+                            </div>
+                            {% endif %}
                         </div>
                         
                         <div class="mb-3">
@@ -107,7 +150,11 @@
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="bi bi-person-plus"></i>
-                                Create Account
+                                {% if provider_info %}
+                                    Create Account & Connect
+                                {% else %}
+                                    Create Account
+                                {% endif %}
                             </button>
                         </div>
                     </form>
@@ -116,7 +163,7 @@
                     
                     <div class="text-center">
                         <p class="mb-0">Already have an account?</p>
-                        <a href="{{ url_for('login') }}" class="btn btn-outline-primary">
+                        <a href="{{ url_for('login') }}{% if provider_code %}?provider_code={{ provider_code }}{% endif %}" class="btn btn-outline-primary">
                             <i class="bi bi-box-arrow-in-right"></i>
                             Login Instead
                         </a>
