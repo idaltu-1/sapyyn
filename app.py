@@ -2330,6 +2330,61 @@ def page_not_found(e):
     """Render custom 404 page"""
     return render_template('404.html'), 404
 
+def create_demo_users_if_needed():
+    """Create demo users if they don't exist"""
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Check if demo users already exist
+    cursor.execute('SELECT COUNT(*) FROM users WHERE username IN (?, ?, ?)', 
+                   ('doctor1', 'patient1', 'admin1'))
+    existing_count = cursor.fetchone()[0]
+    
+    if existing_count == 0:
+        # Demo users don't exist, create them
+        demo_users = [
+            {
+                'username': 'doctor1',
+                'email': 'doctor@sapyyn.com',
+                'password': 'password123',
+                'full_name': 'Dr. Sarah Johnson',
+                'role': 'doctor'
+            },
+            {
+                'username': 'patient1',
+                'email': 'patient@sapyyn.com',
+                'password': 'password123',
+                'full_name': 'John Smith',
+                'role': 'patient'
+            },
+            {
+                'username': 'admin1',
+                'email': 'admin@sapyyn.com',
+                'password': 'password123',
+                'full_name': 'Admin User',
+                'role': 'admin'
+            }
+        ]
+        
+        for user in demo_users:
+            try:
+                password_hash = generate_password_hash(user['password'])
+                cursor.execute('''
+                    INSERT OR IGNORE INTO users (username, email, password_hash, full_name, role)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (user['username'], user['email'], password_hash, user['full_name'], user['role']))
+                print(f"Created demo user: {user['username']} ({user['role']})")
+            except Exception as e:
+                print(f"Error creating demo user {user['username']}: {e}")
+        
+        conn.commit()
+        print("Demo users created successfully!")
+    else:
+        print("Demo users already exist.")
+    
+    conn.close()
+
 if __name__ == '__main__':
     init_db()
+    create_demo_users_if_needed()
     app.run(debug=True, host='0.0.0.0', port=5000)
