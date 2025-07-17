@@ -462,11 +462,28 @@ def register():
             provider_code = None
     
     if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        full_name = request.form['full_name']
-        role = request.form.get('role', 'patient')
+        signup_type = request.form.get('signup_type')
+        
+        if signup_type in ['inline', 'cta']:
+            # Handle inline/CTA signup - simplified process
+            email = request.form['email']
+            full_name = request.form.get('full_name', email.split('@')[0])
+            username = email
+            password = request.form.get('password', 'temp_password_' + str(uuid.uuid4())[:8])
+            role = request.form.get('role', 'dentist')  # Default to dentist for inline signups
+            
+            # Generate a more user-friendly password
+            if password.startswith('temp_password_'):
+                # Create a memorable password from email
+                password = email.split('@')[0] + '123!'
+            
+        else:
+            # Handle full registration form
+            username = request.form['username']
+            email = request.form['email']
+            password = request.form['password']
+            full_name = request.form['full_name']
+            role = request.form.get('role', 'patient')
         
         password_hash = generate_password_hash(password)
         
@@ -492,14 +509,51 @@ def register():
                       'Initial consultation', 'pending', 
                       f'Patient registered using provider code {provider_code}'))
             
+            # For inline signups, automatically start free trial
+            if signup_type in ['inline', 'cta']:
+                # Get trial plan
+                cursor.execute('SELECT id FROM subscription_plans WHERE plan_name = ?', ('Free Trial',))
+                trial_plan = cursor.fetchone()
+                if trial_plan:
+                    trial_end = datetime.now() + timedelta(days=14)
+                    cursor.execute('''
+                        INSERT INTO user_subscriptions 
+                        (user_id, plan_id, subscription_status, trial_end_date, end_date, auto_renew)
+                        VALUES (?, ?, 'trial', ?, ?, TRUE)
+                    ''', (user_id, trial_plan[0], trial_end, trial_end))
+                
+                # Generate provider code
+                provider_code_new = create_provider_code(
+                    user_id, 
+                    role,
+                    'Professional Practice',
+                    'General'
+                )
+            
             conn.commit()
             conn.close()
             
-            if provider_code and provider_info:
-                flash(f'Registration successful! You have been connected to {provider_info[2]} {provider_info[4]} at {provider_info[1]}. Please login.', 'success')
+            if signup_type in ['inline', 'cta']:
+                # For inline signups, automatically log them in and redirect to onboarding
+                session['user_id'] = user_id
+                session['username'] = username
+                session['full_name'] = full_name
+                session['role'] = role
+                
+                success_message = f'🎉 Welcome to Sapyyn! Your 14-day free trial has started.'
+                if 'provider_code_new' in locals():
+                    success_message += f' Your provider code is: {provider_code_new}'
+                
+                flash(success_message, 'success')
+                return redirect(url_for('dashboard'))
             else:
-                flash('Registration successful! Please login.', 'success')
-            return redirect(url_for('login'))
+                # For full registration, show success and redirect to login
+                if provider_code and provider_info:
+                    flash(f'Registration successful! You have been connected to {provider_info[2]} {provider_info[4]} at {provider_info[1]}. Please login.', 'success')
+                else:
+                    flash('Registration successful! Please login.', 'success')
+                return redirect(url_for('login'))
+                
         except sqlite3.IntegrityError:
             flash('Username or email already exists', 'error')
     
