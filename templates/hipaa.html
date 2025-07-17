@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}HIPAA Compliance - Sapyyn Patient Referral System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <h1 class="text-center mb-5">
+                <i class="bi bi-shield-check text-success me-3"></i>
+                HIPAA Compliance
+            </h1>
+            
+            <div class="alert alert-success" role="alert">
+                <h4 class="alert-heading">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    Fully HIPAA Compliant
+                </h4>
+                <p>Sapyyn is designed from the ground up to meet all HIPAA requirements for protecting patient health information.</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                <i class="bi bi-lock-fill text-primary me-2"></i>
+                                Data Encryption
+                            </h4>
+                            <p class="card-text">
+                                All patient data is encrypted both in transit and at rest using industry-standard 
+                                AES-256 encryption protocols.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                <i class="bi bi-person-check text-success me-2"></i>
+                                Access Controls
+                            </h4>
+                            <p class="card-text">
+                                Strict role-based access controls ensure only authorized personnel can access 
+                                patient information.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                <i class="bi bi-journal-text text-warning me-2"></i>
+                                Audit Trails
+                            </h4>
+                            <p class="card-text">
+                                Comprehensive audit logging tracks all access to patient data for compliance 
+                                and security monitoring.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                <i class="bi bi-shield-exclamation text-danger me-2"></i>
+                                Breach Prevention
+                            </h4>
+                            <p class="card-text">
+                                Advanced security measures and regular security assessments prevent 
+                                unauthorized access and data breaches.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-5">
+                <div class="card-body">
+                    <h3 class="card-title">Our HIPAA Compliance Features</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Business Associate Agreements (BAA)</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i>End-to-end encryption</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Secure user authentication</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Regular security training</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Data backup and recovery</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Incident response procedures</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Regular compliance audits</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Secure disposal of PHI</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-5">
+                <p class="lead">Questions about our HIPAA compliance?</p>
+                <a href="{{ url_for('contact') }}" class="btn btn-primary">
+                    <i class="bi bi-envelope"></i> Contact Our Compliance Team
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - Sapyyn Patient Referral System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="text-center mb-5">Contact Us</h1>
+            
+            <div class="row mb-5">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                <i class="bi bi-envelope-fill text-primary me-2"></i>
+                                Email Support
+                            </h4>
+                            <p class="card-text">Get in touch with our support team for any questions or assistance.</p>
+                            <a href="mailto:contact@sapyyn.com" class="btn btn-outline-primary">
+                                contact@sapyyn.com
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                <i class="bi bi-headset text-success me-2"></i>
+                                Customer Support
+                            </h4>
+                            <p class="card-text">Our dedicated support team is here to help you succeed.</p>
+                            <p class="text-muted">Available Monday - Friday, 9 AM - 6 PM EST</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Send us a Message</h3>
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="subject" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

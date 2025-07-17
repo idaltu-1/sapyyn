@@ -1873,6 +1873,7 @@ def handle_subscription_cancellation(subscription):
     conn.close()
 
 
+
 # ============================================================================
 # STATIC PAGE ROUTES & NAVIGATION LINKS
 # ============================================================================
@@ -2003,12 +2004,14 @@ def original_page():
     """Serve the original static index.html page for comparison"""
     return send_from_directory('.', 'index.html')
 
+
 @app.route('/referrals')
 def referrals():
     """Referrals page - redirect to dashboard for logged in users"""
     if 'user_id' in session:
         return redirect(url_for('dashboard'))
     return redirect(url_for('login'))
+
 
 @app.route('/surgicalInstruction')
 def surgical_instruction():
@@ -2033,6 +2036,7 @@ def how_to_guides():
 @app.route('/loyaltyrewards')
 def loyalty_rewards():
     """Loyalty rewards page - redirect to rewards dashboard"""
+
     return redirect(url_for('rewards_dashboard'))
 
 @app.route('/hippa')
@@ -2056,6 +2060,7 @@ def connect_providers():
     if 'user_id' in session:
         user_role = session.get('role', 'patient')
         if user_role == 'dentist':
+
             return redirect(url_for('dentist_portal'))
         elif user_role == 'specialist':
             return redirect(url_for('specialist_portal'))
@@ -2069,6 +2074,7 @@ def send_patient_documents():
     if 'user_id' in session:
         return redirect(url_for('upload_file'))
     return redirect(url_for('login'))
+
 
 @app.route('/api/feedback', methods=['POST'])
 def submit_feedback():
@@ -2329,6 +2335,7 @@ def export_feedback():
 def page_not_found(e):
     """Render custom 404 page"""
     return render_template('404.html'), 404
+
 
 def create_demo_users_if_needed():
     """Create demo users if they don't exist"""
