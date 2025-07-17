@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 import json
 import stripe
 
-app = Flask(__name__, static_folder=None)
+app = Flask(__name__)
 app.secret_key = 'sapyyn-patient-referral-system-2025'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
@@ -1878,6 +1878,49 @@ def handle_subscription_cancellation(subscription):
 # ============================================================================
 # STATIC PAGE ROUTES & NAVIGATION LINKS
 # ============================================================================
+
+# Authentication check for static files
+@app.before_request
+def check_static_auth():
+    """Check authentication for protected static HTML files before processing request"""
+    if request.endpoint == 'static' and request.path.startswith('/static/') and request.path.endswith('.html'):
+        filename = request.path[8:]  # Remove '/static/' prefix
+        
+        # Remove .html extension for comparison with existing lists
+        base_filename = filename
+        if base_filename.endswith('.html'):
+            base_filename = base_filename[:-5]
+        
+        # Define protected page categories (reuse from serve_static_page)
+        admin_pages = [
+            'admin', 'admin-1', 'admin-2', 'admin-3', 'admin-4', 'admin-users', 
+            'admin-referrals', 'sapyyn-admin-panel', 'corrected_admin_html',
+            'importDentists', 'importPatients', 'importSpecialist', 'users', 'roles'
+        ]
+        
+        portal_pages = [
+            'Dashboard', 'Patient Referral', 'Patient Referrral Admin portal',
+            'Patient Referrral Admin', 'Referral History', 'Track Referral',
+            'Medical Updates', 'portal-1', 'portal-referrals', 'portal-signup',
+            'portal_integrations', 'portal_messaging', 'portal_settings',
+            'patient', 'dentist', 'specialist', 'sapyyn-portal',
+            'sapyyn_unified_portal', 'sapyyn_unified_portal (1)', 'sapyyn_unified_portal (2)',
+            'updated_portal_rewards', 'appointments', 'forms', 'referrals',
+            'referrals_page', 'referrals_page (1)', 'rewards', 'redeem list'
+        ]
+        
+        # Check if this is a protected admin page
+        if base_filename in admin_pages:
+            if 'user_id' not in session or session.get('role') not in ['admin', 'dentist_admin', 'specialist_admin']:
+                flash('Access denied. Administrator privileges required.', 'error')
+                return redirect(url_for('login'))
+        
+        # Check if this is a protected portal page
+        elif base_filename in portal_pages:
+            if 'user_id' not in session:
+                flash('Please log in to access portal pages.', 'error')
+                return redirect(url_for('login'))
+
 
 @app.route('/static/<path:filename>')
 def serve_static_with_auth_check(filename):
