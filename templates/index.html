@@ -1,5 +1,38 @@
 {% extends "base.html" %}
 
+{% block title %}Sapyyn - Secure Patient Referral System | HIPAA Compliant Healthcare{% endblock %}
+
+{% block description %}Transform your patient referrals with Sapyyn's secure, HIPAA-compliant platform. Streamline document management, track referrals with QR codes, and connect providers seamlessly.{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Sapyyn Patient Referral System",
+    "description": "Secure, HIPAA-compliant patient referral management platform for healthcare providers",
+    "url": "{{ request.url }}",
+    "mainEntity": {
+        "@type": "SoftwareApplication",
+        "name": "Sapyyn",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "HIPAA Compliant Document Management",
+            "QR Code Patient Tracking", 
+            "Secure Provider Communication",
+            "Real-time Referral Status Updates"
+        ]
+    }
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <!-- Hero Section with Inline Email Signup -->
 <div class="bg-primary text-white py-5" id="hero">
@@ -48,7 +81,6 @@
                         </div>
                     </div>
                 </div>
-                
                 <!-- Secondary CTAs -->
                 <div class="d-grid d-md-flex gap-2">
                     <a href="#" class="btn btn-outline-light btn-lg" data-bs-toggle="modal" data-bs-target="#demoModal">
