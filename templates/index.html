@@ -46,12 +46,14 @@
                             Trusted by 1000+ Dental Practices & Specialists
                         </span>
                     </div>
+
                     <h1 class="hero-title display-3 fw-bold mb-4 text-white">
                         <span class="text-gradient">Transforming Dental Referrals</span>
                         <br>– Seamless, Paperless, and Patient-Centered
                     </h1>
                     <p class="hero-subtitle lead mb-4 text-white-75">
                         Connect general dentists, specialists, and patients on one secure network to ensure no referral slips through the cracks
+
                     </p>
                     
                     {% if not session.user_id %}
@@ -92,11 +94,11 @@
                     </div>
                     <!-- Secondary CTAs with Better Styling -->
                     <div class="hero-actions d-flex flex-wrap gap-3 align-items-center">
-                        <a href="#" class="btn btn-outline-light btn-lg px-4" data-bs-toggle="modal" data-bs-target="#demoModal">
+                        <a href="#" class="btn btn-outline-primary btn-lg px-4" data-bs-toggle="modal" data-bs-target="#demoModal">
                             <i class="bi bi-play-circle me-2"></i>Watch Demo
                         </a>
-                        <a href="{{ url_for('login') }}" class="btn btn-link text-white text-decoration-none fw-medium">
-                            Already have an account? <u class="text-warning">Sign in</u>
+                        <a href="{{ url_for('login') }}" class="btn btn-link text-primary text-decoration-none fw-medium">
+                            Already have an account? <u class="text-primary">Sign in</u>
                         </a>
                     </div>
                     {% else %}
@@ -555,109 +557,24 @@
     </div>
 </div>
 
-<!-- Pricing Preview Section -->
+<!-- Simplified Pricing Section - Focus on CTA -->
 <div class="bg-light py-5">
     <div class="container">
-        <div class="row text-center mb-5">
-            <div class="col">
-                <h2 class="fw-bold">Simple, Transparent Pricing</h2>
-                <p class="lead text-muted">Choose the perfect plan for your practice with our 14-day free trial</p>
-            </div>
-        </div>
-        
-        <div class="row g-4 justify-content-center">
-            <!-- Starter Plan -->
-            <div class="col-lg-3 col-md-6">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-header bg-white text-center border-0 py-4">
-                        <h4 class="fw-bold">Starter</h4>
-                        <div class="pricing-amount">
-                            <span class="currency">$</span>
-                            <span class="amount">49.99</span>
-                            <span class="period">/month</span>
-                        </div>
-                        <p class="text-muted small">Perfect for individual practitioners</p>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-unstyled">
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Up to 50 referrals/month</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>6-digit provider code</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>QR code generation</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>5 GB storage</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Email support</li>
-                        </ul>
-                    </div>
-                    <div class="card-footer bg-transparent text-center border-0 pb-4">
-                        <a href="{{ url_for('get_started_page') }}" class="btn btn-outline-primary w-100">Get Started</a>
-                    </div>
+        <div class="row text-center">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="fw-bold mb-3">Ready to Get Started?</h2>
+                <p class="lead text-muted mb-4">Join thousands of healthcare professionals who trust Sapyyn for their referral management</p>
+                <div class="d-flex flex-column flex-md-row gap-3 justify-content-center mb-4">
+                    <a href="{{ url_for('start_free_trial') }}" class="btn btn-primary btn-lg px-4">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Start Free 14-Day Trial
+                    </a>
+                    <a href="{{ url_for('pricing') }}" class="btn btn-outline-primary btn-lg px-4">
+                        <i class="bi bi-currency-dollar me-2"></i>View Pricing Plans
+                    </a>
                 </div>
-            </div>
-
-            <!-- Professional Plan (Most Popular) -->
-            <div class="col-lg-3 col-md-6">
-                <div class="card h-100 border-0 shadow-lg border-primary position-relative">
-                    <div class="badge bg-primary position-absolute top-0 start-50 translate-middle">Most Popular</div>
-                    <div class="card-header bg-primary text-white text-center border-0 py-4">
-                        <h4 class="fw-bold">Professional</h4>
-                        <div class="pricing-amount">
-                            <span class="currency">$</span>
-                            <span class="amount">99.99</span>
-                            <span class="period">/month</span>
-                        </div>
-                        <p class="opacity-75 small">For growing practices</p>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-unstyled">
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Up to 200 referrals/month</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Multiple provider codes</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Advanced analytics</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>25 GB storage</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Priority support</li>
-                        </ul>
-                    </div>
-                    <div class="card-footer bg-transparent text-center border-0 pb-4">
-                        <a href="{{ url_for('subscribe', plan_name='professional') }}" class="btn btn-primary w-100">Start Free Trial</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Enterprise Plan -->
-            <div class="col-lg-3 col-md-6">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-header bg-dark text-white text-center border-0 py-4">
-                        <h4 class="fw-bold">Enterprise</h4>
-                        <div class="pricing-amount">
-                            <span class="currency">$</span>
-                            <span class="amount">499</span>
-                            <span class="period">/month</span>
-                        </div>
-                        <p class="opacity-75 small">For large practices & hospitals</p>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-unstyled">
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Unlimited referrals</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Custom integrations</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Dedicated support</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>100 GB storage</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>24/7 phone support</li>
-                        </ul>
-                    </div>
-                    <div class="card-footer bg-transparent text-center border-0 pb-4">
-                        <a href="{{ url_for('subscribe', plan_name='enterprise') }}" class="btn btn-dark w-100">Contact Sales</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row mt-5">
-            <div class="col text-center">
-                <p class="text-muted mb-3">
-                    <i class="bi bi-gift me-2"></i>
-                    <strong>14-Day Free Trial</strong> - No credit card required. Cancel anytime.
+                <p class="small text-muted">
+                    <i class="bi bi-shield-check text-success me-1"></i><strong>14-Day Free Trial</strong> - No credit card required. Cancel anytime.
                 </p>
-                <a href="{{ url_for('pricing') }}" class="btn btn-outline-primary">
-                    View Complete Pricing Details
-                </a>
             </div>
         </div>
     </div>
