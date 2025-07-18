@@ -1,56 +1,106 @@
 {% extends 'base.html' %}
 {% block title %}Admin Portal{% endblock %}
 {% block content %}
+<!-- Portal-level header -->
+<header class="portal-header">
+    <nav class="portal-nav">
+        <a class="portal-logo" href="{{ url_for('dashboard') }}">
+            <img src="{{ url_for('static', filename='images/sapyyn-logo.png') }}" alt="Logo">
+            <span>Sapyyn Portal</span>
+        </a>
+        <ul class="portal-menu">
+            <li><a href="{{ url_for('dashboard') }}" class="{% if active == 'dashboard' %}active{% endif %}">Dashboard</a></li>
+            <li><a href="{{ url_for('portal_appointments') }}" class="{% if active == 'appointments' %}active{% endif %}">Appointments</a></li>
+            <li><a href="{{ url_for('view_documents') }}" class="{% if active == 'documents' %}active{% endif %}">Documents</a></li>
+            <li><a href="{{ url_for('messages_portal') }}" class="{% if active == 'messages' %}active{% endif %}">Messages</a></li>
+            <li><a href="{{ url_for('my_referrals') }}" class="{% if active == 'referrals' %}active{% endif %}">Referrals</a></li>
+        </ul>
+        <div class="user-controls">
+            <button class="notification-btn">
+                <i class="bi bi-bell"></i>
+                {% if unread_notifications %}<span class="notification-dot"></span>{% endif %}
+            </button>
+            <div class="user-profile dropdown">
+                <span class="user-avatar">{{ session.full_name[0] if session.full_name else 'U' }}</span>
+                <span>{{ session.full_name }}</span>
+                <div class="dropdown-menu">
+                    <a href="{{ url_for('profile') }}">Profile</a>
+                    <a href="{{ url_for('settings') }}">Settings</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
 <div class="container mt-5">
-  <h1 class="mb-4">Admin Portal</h1>
-  <div class="card mb-4">
-    <div class="card-body">
-      <h3>Welcome, {{ current_user.name if current_user else 'Admin' }}!</h3>
-      <p>Manage users, referrals, analytics, and system settings from this dashboard.</p>
-    </div>
+  <!-- Heading -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">Admin Portal</h1>
+    <span class="badge bg-primary bg-opacity-15 text-primary px-3 py-2">Welcome, {{ session.full_name }}</span>
   </div>
+  <!-- Quick Actions Grid -->
+  <div class="quick-actions-grid">
+    <a href="{{ url_for('new_referral') }}" class="quick-action-card text-center">
+        <i class="bi bi-person-plus"></i>
+        <h6>New Referral</h6>
+    </a>
+    <a href="{{ url_for('upload_file') }}" class="quick-action-card text-center">
+        <i class="bi bi-upload"></i>
+        <h6>Upload Document</h6>
+    </a>
+    <a href="{{ url_for('messages_portal') }}" class="quick-action-card text-center">
+        <i class="bi bi-chat-dots"></i>
+        <h6>Messages</h6>
+    </a>
+    <a href="{{ url_for('portal_appointments') }}" class="quick-action-card text-center">
+        <i class="bi bi-calendar-check"></i>
+        <h6>Appointments</h6>
+    </a>
+  </div>
+  <!-- Existing Admin Cards -->
   <div class="row">
     <div class="col-md-6 mb-4">
-      <div class="card">
-        <div class="card-header">User Management</div>
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light border-0"><strong>User Management</strong></div>
         <div class="card-body">
-          <p>View and manage all users in the system.</p>
+          <p class="mb-3">View and manage all users in the system.</p>
           <a href="/admin/users" class="btn btn-primary">Manage Users</a>
         </div>
       </div>
     </div>
     <div class="col-md-6 mb-4">
-      <div class="card">
-        <div class="card-header">Referrals</div>
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light border-0"><strong>Referrals</strong></div>
         <div class="card-body">
-          <p>Monitor and manage all patient referrals.</p>
+          <p class="mb-3">Monitor and manage all patient referrals.</p>
           <a href="/admin/referrals" class="btn btn-primary">View Referrals</a>
         </div>
       </div>
     </div>
     <div class="col-md-6 mb-4">
-      <div class="card">
-        <div class="card-header">Analytics</div>
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light border-0"><strong>Analytics</strong></div>
         <div class="card-body">
-          <p>View system analytics and reports.</p>
+          <p class="mb-3">View system analytics and reports.</p>
           <a href="/admin/analytics" class="btn btn-secondary">View Analytics</a>
         </div>
       </div>
     </div>
     <div class="col-md-6 mb-4">
-      <div class="card">
-        <div class="card-header">Messages</div>
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light border-0"><strong>Messages</strong></div>
         <div class="card-body">
-          <p>View and manage system messages and communications.</p>
+          <p class="mb-3">View and manage system messages and communications.</p>
           <a href="{{ url_for('messages_portal') }}" class="btn btn-primary">View Messages</a>
         </div>
       </div>
     </div>
     <div class="col-md-6 mb-4">
-      <div class="card">
-        <div class="card-header">Settings</div>
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light border-0"><strong>Settings</strong></div>
         <div class="card-body">
-          <p>Configure system settings and preferences.</p>
+          <p class="mb-3">Configure system settings and preferences.</p>
           <a href="/admin/settings" class="btn btn-success">System Settings</a>
         </div>
       </div>
