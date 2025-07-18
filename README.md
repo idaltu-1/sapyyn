@@ -188,6 +188,86 @@ The application uses SQLite by default. The database schema includes:
 - **Referrals** table for patient referrals
 - **Documents** table for file management
 
+### NoCodeBackend.com Integration
+
+Sapyyn supports integration with [NoCodeBackend.com](https://nocodebackend.com) for external database management. This integration allows you to sync patient referrals and data with a cloud database.
+
+#### Setup Instructions
+
+1. **Create a NoCodeBackend account** at [nocodebackend.com](https://nocodebackend.com)
+
+2. **Set up your database instance** with the name `35557_sapyynreferral_db`
+
+3. **Get your secret key** from the NoCodeBackend dashboard
+
+4. **Configure environment variables** by creating a `.env` file in the project root:
+   ```bash
+   # Copy the example configuration
+   cp .env.example .env
+   ```
+
+5. **Update the `.env` file** with your NoCodeBackend credentials:
+   ```bash
+   # NoCodeBackend.com Database Integration
+   NOCODEBACKEND_SECRET_KEY=your_actual_secret_key_here
+   NOCODEBACKEND_API_ENDPOINT=https://api.nocodebackend.com/api-docs/?Instance=35557_sapyynreferral_db
+   NOCODEBACKEND_ENABLED=true
+   ```
+
+6. **Alternatively, set the secret key as a repository secret:**
+   - Go to your GitHub repository settings
+   - Navigate to "Secrets and variables" → "Actions"
+   - Add a new repository secret named `NOCODEBACKEND_SECRET_KEY`
+   - Set the value to your actual secret key
+
+#### Available API Endpoints
+
+Once configured, the following endpoints are available:
+
+- `GET /api/nocodebackend/test` - Test connection to NoCodeBackend
+- `POST /api/nocodebackend/sync-referral/<referral_id>` - Sync specific referral to NoCodeBackend
+- `POST /api/nocodebackend/create-patient` - Create patient record in NoCodeBackend
+- `GET /api/nocodebackend/patients` - Retrieve patients from NoCodeBackend
+
+#### Testing the Integration
+
+Run the integration test to verify your setup:
+
+```bash
+# Set environment variables and run test
+export NOCODEBACKEND_SECRET_KEY="your_secret_key"
+export NOCODEBACKEND_ENABLED="true"
+python test_nocodebackend_integration.py
+```
+
+#### Example Usage
+
+```python
+# Example: Sync a referral to NoCodeBackend
+import requests
+
+response = requests.post('http://localhost:5000/api/nocodebackend/sync-referral/REF-001')
+print(response.json())
+
+# Example: Create a patient in NoCodeBackend
+patient_data = {
+    "patient_name": "John Doe",
+    "email": "john.doe@example.com",
+    "phone": "+1234567890"
+}
+
+response = requests.post('http://localhost:5000/api/nocodebackend/create-patient', 
+                        json=patient_data)
+print(response.json())
+```
+
+#### Security Notes
+
+- Never commit your secret key to version control
+- Use environment variables or repository secrets for production
+- The secret key provides full access to your NoCodeBackend database
+- Consider using different keys for development and production environments
+
 ## 🚀 Deployment
 
 ### Production Deployment

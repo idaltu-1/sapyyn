@@ -17,6 +17,7 @@ import hashlib
 from datetime import datetime, timedelta
 import json
 import stripe
+from nocodebackend_client import NoCodeBackendClient, get_client
 
 app = Flask(__name__)
 app.secret_key = 'sapyyn-patient-referral-system-2025'
@@ -33,6 +34,13 @@ ANALYTICS_CONFIG = {
     'HOTJAR_SITE_ID': os.environ.get('HOTJAR_SITE_ID', '3842847'),
     'ENABLE_ANALYTICS': os.environ.get('ENABLE_ANALYTICS', 'true').lower() == 'true',
     'ENVIRONMENT': os.environ.get('FLASK_ENV', 'development')
+}
+
+# NoCodeBackend configuration
+NOCODEBACKEND_CONFIG = {
+    'SECRET_KEY': os.environ.get('NOCODEBACKEND_SECRET_KEY'),
+    'API_ENDPOINT': os.environ.get('NOCODEBACKEND_API_ENDPOINT', 'https://api.nocodebackend.com/api-docs/?Instance=35557_sapyynreferral_db'),
+    'ENABLED': os.environ.get('NOCODEBACKEND_ENABLED', 'false').lower() == 'true'
 }
 
 # Configuration
@@ -5982,6 +5990,152 @@ def track_promotion_event(promotion_id):
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+# NoCodeBackend Integration API Endpoints
+@app.route('/api/nocodebackend/test', methods=['GET'])
+def test_nocodebackend_connection():
+    """Test connection to NoCodeBackend database"""
+    if not NOCODEBACKEND_CONFIG.get('ENABLED', False):
+        return jsonify({'error': 'NoCodeBackend integration is disabled'}), 400
+    
+    if not NOCODEBACKEND_CONFIG.get('SECRET_KEY'):
+        return jsonify({'error': 'NoCodeBackend secret key not configured'}), 400
+    
+    try:
+        client = get_client()
+        result = client.test_connection()
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': f'Connection failed: {str(e)}'}), 500
+
+
+@app.route('/api/nocodebackend/sync-referral/<referral_id>', methods=['POST'])
+def sync_referral_to_nocodebackend(referral_id):
+    """Sync a specific referral to NoCodeBackend database"""
+    if not NOCODEBACKEND_CONFIG.get('ENABLED', False):
+        return jsonify({'error': 'NoCodeBackend integration is disabled'}), 400
+    
+    if not NOCODEBACKEND_CONFIG.get('SECRET_KEY'):
+        return jsonify({'error': 'NoCodeBackend secret key not configured'}), 400
+    
+    try:
+        # Get referral from local database
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT r.*, u.username, u.email, u.full_name
+            FROM referrals r
+            JOIN users u ON r.user_id = u.id
+            WHERE r.referral_id = ?
+        ''', (referral_id,))
+        
+        referral = cursor.fetchone()
+        conn.close()
+        
+        if not referral:
+            return jsonify({'error': 'Referral not found'}), 404
+        
+        # Convert to dictionary for easier handling
+        referral_data = {
+            'id': referral[0],
+            'user_id': referral[1],
+            'referral_id': referral[2],
+            'patient_name': referral[3],
+            'referring_doctor': referral[4],
+            'target_doctor': referral[5],
+            'medical_condition': referral[6],
+            'urgency_level': referral[7],
+            'status': referral[8],
+            'notes': referral[9],
+            'qr_code': referral[10],
+            'created_at': referral[11],
+            'updated_at': referral[12],
+            'case_status': referral[13] if len(referral) > 13 else None,
+            'consultation_date': referral[14] if len(referral) > 14 else None,
+            'case_accepted_date': referral[15] if len(referral) > 15 else None,
+            'user_username': referral[16] if len(referral) > 16 else None,
+            'user_email': referral[17] if len(referral) > 17 else None,
+            'user_full_name': referral[18] if len(referral) > 18 else None
+        }
+        
+        # Sync to NoCodeBackend
+        client = get_client()
+        result = client.create_record('referrals', referral_data)
+        
+        return jsonify({
+            'success': True,
+            'local_referral_id': referral_id,
+            'nocodebackend_result': result
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Sync failed: {str(e)}'}), 500
+
+
+@app.route('/api/nocodebackend/create-patient', methods=['POST'])
+def create_patient_in_nocodebackend():
+    """Create a patient record in NoCodeBackend database"""
+    if not NOCODEBACKEND_CONFIG.get('ENABLED', False):
+        return jsonify({'error': 'NoCodeBackend integration is disabled'}), 400
+    
+    if not NOCODEBACKEND_CONFIG.get('SECRET_KEY'):
+        return jsonify({'error': 'NoCodeBackend secret key not configured'}), 400
+    
+    data = request.get_json() or {}
+    
+    if not data.get('patient_name'):
+        return jsonify({'error': 'patient_name is required'}), 400
+    
+    try:
+        # Prepare patient data
+        patient_data = {
+            'patient_name': data.get('patient_name'),
+            'email': data.get('email', ''),
+            'phone': data.get('phone', ''),
+            'date_of_birth': data.get('date_of_birth', ''),
+            'medical_history': data.get('medical_history', ''),
+            'emergency_contact': data.get('emergency_contact', ''),
+            'created_at': datetime.now().isoformat()
+        }
+        
+        # Create in NoCodeBackend
+        client = get_client()
+        result = client.create_record('patients', patient_data)
+        
+        return jsonify({
+            'success': True,
+            'patient_data': patient_data,
+            'nocodebackend_result': result
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Patient creation failed: {str(e)}'}), 500
+
+
+@app.route('/api/nocodebackend/patients', methods=['GET'])
+def get_patients_from_nocodebackend():
+    """Retrieve patients from NoCodeBackend database"""
+    if not NOCODEBACKEND_CONFIG.get('ENABLED', False):
+        return jsonify({'error': 'NoCodeBackend integration is disabled'}), 400
+    
+    if not NOCODEBACKEND_CONFIG.get('SECRET_KEY'):
+        return jsonify({'error': 'NoCodeBackend secret key not configured'}), 400
+    
+    try:
+        client = get_client()
+        limit = request.args.get('limit', 100, type=int)
+        patients = client.get_records('patients', limit=limit)
+        
+        return jsonify({
+            'success': True,
+            'patients': patients,
+            'count': len(patients)
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to retrieve patients: {str(e)}'}), 500
 
 
 if __name__ == '__main__':
