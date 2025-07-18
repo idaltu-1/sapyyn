@@ -3238,6 +3238,16 @@ def appointments():
         return redirect(url_for('login'))
     return redirect(url_for('serve_static_page', filename='appointments'))
 
+@app.route('/find-provider')
+def find_provider():
+    """Find provider page - search our network"""
+    return render_template('find_provider.html')
+
+@app.route('/portal')
+def portal():
+    """Main portal page with all key functionalities"""
+    return send_from_directory('.', 'sapyyn_portal.html')
+
 @app.route('/portal-dashboard')
 def portal_dashboard():
     """Portal dashboard route based on user role"""
