@@ -701,6 +701,54 @@
     </div>
 </div>
 
+<!-- Newsletter Signup Section -->
+<section id="newsletter-signup" class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <h3 class="fw-bold mb-3">Subscribe for Updates</h3>
+                <p class="text-muted mb-4">Stay informed about the latest features, security updates, and best practices for patient referral management.</p>
+                <form id="newsletter-form" class="row g-2 justify-content-center">
+                    <div class="col-auto flex-fill" style="max-width: 300px;">
+                        <input type="email" class="form-control" id="newsletter-email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-envelope me-1"></i>Subscribe
+                        </button>
+                    </div>
+                </form>
+                <p class="small text-muted mt-2 mb-0">
+                    <i class="bi bi-shield-check me-1"></i>We respect your privacy. Unsubscribe anytime.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call-to-Action Banner -->
+<section id="cta-banner" class="py-5" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);">
+    <div class="container">
+        <div class="row justify-content-center text-center text-white">
+            <div class="col-lg-8">
+                <h2 class="display-5 fw-bold mb-3">Ready to modernize your referrals?</h2>
+                <p class="lead mb-4">Get started with Sapyyn and connect your practice today. Join thousands of healthcare providers who trust our secure, HIPAA-compliant platform.</p>
+                <div class="d-grid d-md-flex gap-3 justify-content-center">
+                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg px-4">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Create Your Free Account
+                    </a>
+                    <a href="{{ url_for('contact') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-telephone me-2"></i>Contact Sales
+                    </a>
+                </div>
+                <p class="small mt-3 mb-0 opacity-75">
+                    <i class="bi bi-shield-check me-1"></i>14-day free trial • No credit card required • HIPAA compliant
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Subscription Required Modal -->
 <div class="modal fade" id="subscriptionModal" tabindex="-1" aria-labelledby="subscriptionModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -1329,6 +1377,88 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+});
+</script>
+
+<script>
+// Newsletter signup form handling
+document.addEventListener('DOMContentLoaded', function() {
+    const newsletterForm = document.getElementById('newsletter-form');
+    const emailInput = document.getElementById('newsletter-email');
+    
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            if (!email) {
+                showMessage('Please enter your email address.', 'warning');
+                return;
+            }
+            
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage('Please enter a valid email address.', 'warning');
+                return;
+            }
+            
+            // Simulate newsletter subscription
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Subscribing...';
+            submitBtn.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                emailInput.value = '';
+                submitBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Subscribed!';
+                submitBtn.classList.remove('btn-primary');
+                submitBtn.classList.add('btn-success');
+                
+                showMessage('Thank you for subscribing! You\'ll receive updates about Sapyyn features and best practices.', 'success');
+                
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('btn-success');
+                    submitBtn.classList.add('btn-primary');
+                }, 3000);
+            }, 1500);
+        });
+    }
+    
+    function showMessage(message, type) {
+        // Create alert if it doesn't exist
+        let alertContainer = document.querySelector('.newsletter-alert');
+        if (!alertContainer) {
+            alertContainer = document.createElement('div');
+            alertContainer.className = 'newsletter-alert mt-3';
+            newsletterForm.parentNode.appendChild(alertContainer);
+        }
+        
+        const alertClass = type === 'success' ? 'alert-success' : 
+                          type === 'warning' ? 'alert-warning' : 'alert-info';
+        
+        alertContainer.innerHTML = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            const alert = alertContainer.querySelector('.alert');
+            if (alert) {
+                alert.classList.remove('show');
+                setTimeout(() => {
+                    alertContainer.innerHTML = '';
+                }, 150);
+            }
+        }, 5000);
+    }
 });
 </script>
 
