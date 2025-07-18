@@ -82,6 +82,47 @@ def init_db():
         )
     ''')
     
+    # Add case acceptance tracking columns to referrals if they don't exist
+    try:
+        cursor.execute('ALTER TABLE referrals ADD COLUMN case_status TEXT DEFAULT "pending"')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+    
+    try:
+        cursor.execute('ALTER TABLE referrals ADD COLUMN consultation_date TIMESTAMP')
+    except sqlite3.OperationalError:
+        pass
+    
+    try:
+        cursor.execute('ALTER TABLE referrals ADD COLUMN case_accepted_date TIMESTAMP')
+    except sqlite3.OperationalError:
+        pass
+    
+    try:
+        cursor.execute('ALTER TABLE referrals ADD COLUMN treatment_start_date TIMESTAMP')
+    except sqlite3.OperationalError:
+        pass
+    
+    try:
+        cursor.execute('ALTER TABLE referrals ADD COLUMN treatment_complete_date TIMESTAMP')
+    except sqlite3.OperationalError:
+        pass
+    
+    try:
+        cursor.execute('ALTER TABLE referrals ADD COLUMN rejection_reason TEXT')
+    except sqlite3.OperationalError:
+        pass
+    
+    try:
+        cursor.execute('ALTER TABLE referrals ADD COLUMN estimated_value DECIMAL(10,2)')
+    except sqlite3.OperationalError:
+        pass
+    
+    try:
+        cursor.execute('ALTER TABLE referrals ADD COLUMN actual_value DECIMAL(10,2)')
+    except sqlite3.OperationalError:
+        pass
+    
     # Documents table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS documents (
@@ -378,6 +419,62 @@ def init_db():
     except sqlite3.OperationalError:
         # Column already exists, skip
         pass
+
+    # Referring Doctor Profiles table for relationship management
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS referring_doctors (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT,
+            phone TEXT,
+            practice_name TEXT,
+            specialty TEXT,
+            address TEXT,
+            city TEXT,
+            state TEXT,
+            zip_code TEXT,
+            referral_count INTEGER DEFAULT 0,
+            conversion_rate DECIMAL(5,2) DEFAULT 0.0,
+            avg_case_value DECIMAL(10,2) DEFAULT 0.0,
+            relationship_score INTEGER DEFAULT 0,
+            last_referral_date TIMESTAMP,
+            communication_preference TEXT DEFAULT 'email',
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    # Case Conversion Tracking table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS case_conversions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            referral_id TEXT NOT NULL,
+            stage TEXT NOT NULL,
+            stage_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            notes TEXT,
+            assigned_to TEXT,
+            response_time_hours INTEGER,
+            created_by INTEGER,
+            FOREIGN KEY (created_by) REFERENCES users (id)
+        )
+    ''')
+    
+    # Team Productivity Metrics table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS team_metrics (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            date DATE DEFAULT CURRENT_DATE,
+            referrals_processed INTEGER DEFAULT 0,
+            consultations_completed INTEGER DEFAULT 0,
+            cases_accepted INTEGER DEFAULT 0,
+            avg_response_time_hours DECIMAL(10,2) DEFAULT 0.0,
+            revenue_generated DECIMAL(10,2) DEFAULT 0.0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
 
     conn.commit()
     conn.close()
@@ -967,12 +1064,13 @@ def check_subscription():
 
 @app.route('/api/provider-code/validate', methods=['POST'])
 def validate_provider_code():
-    """Validate a 6-digit provider code"""
+    """Validate a 6-character provider code (alphanumeric or numeric)"""
     data = request.get_json()
-    provider_code = data.get('provider_code')
+    provider_code = data.get('provider_code', '').upper().strip()
     
-    if not provider_code or len(provider_code) != 6 or not provider_code.isdigit():
-        return jsonify({'valid': False, 'message': 'Invalid provider code format'})
+    # Validate format: exactly 6 characters, alphanumeric
+    if not provider_code or len(provider_code) != 6 or not provider_code.isalnum():
+        return jsonify({'valid': False, 'message': 'Provider code must be exactly 6 alphanumeric characters'})
     
     conn = sqlite3.connect('sapyyn.db')
     cursor = conn.cursor()
@@ -991,6 +1089,7 @@ def validate_provider_code():
         return jsonify({
             'valid': True,
             'provider': {
+                'id': provider[0],
                 'name': provider[4],
                 'practice': provider[1],
                 'type': provider[2],
@@ -998,7 +1097,7 @@ def validate_provider_code():
             }
         })
     
-    return jsonify({'valid': False, 'message': 'Provider code not found'})
+    return jsonify({'valid': False, 'message': 'Provider code not found or inactive'})
 
 def check_subscription_required(f):
     """Decorator to check if user has required subscription for referral features"""
@@ -1245,6 +1344,284 @@ def track_referral(referral_id):
 def track_consultation(consultation_id):
     """Track consultation request page"""
     return track_referral(consultation_id)  # Same functionality for now
+
+# Case Acceptance Management Routes
+@app.route('/api/case/update-status', methods=['POST'])
+def update_case_status():
+    """Update case acceptance status and track conversion pipeline"""
+    try:
+        data = request.get_json()
+        referral_id = data.get('referral_id')
+        new_status = data.get('status')  # consultation_scheduled, case_accepted, case_rejected, treatment_started, treatment_completed
+        notes = data.get('notes', '')
+        estimated_value = data.get('estimated_value')
+        actual_value = data.get('actual_value')
+        rejection_reason = data.get('rejection_reason')
+        
+        if not referral_id or not new_status:
+            return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+        
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        # Update referral with new case status
+        update_fields = ['case_status = ?', 'updated_at = ?']
+        update_values = [new_status, datetime.now()]
+        
+        # Set appropriate timestamp based on status
+        if new_status == 'consultation_scheduled':
+            update_fields.append('consultation_date = ?')
+            update_values.append(datetime.now())
+        elif new_status == 'case_accepted':
+            update_fields.append('case_accepted_date = ?')
+            update_values.append(datetime.now())
+        elif new_status == 'treatment_started':
+            update_fields.append('treatment_start_date = ?')
+            update_values.append(datetime.now())
+        elif new_status == 'treatment_completed':
+            update_fields.append('treatment_complete_date = ?')
+            update_values.append(datetime.now())
+        
+        if estimated_value:
+            update_fields.append('estimated_value = ?')
+            update_values.append(float(estimated_value))
+            
+        if actual_value:
+            update_fields.append('actual_value = ?')
+            update_values.append(float(actual_value))
+            
+        if rejection_reason:
+            update_fields.append('rejection_reason = ?')
+            update_values.append(rejection_reason)
+        
+        update_values.append(referral_id)
+        
+        cursor.execute(f'''
+            UPDATE referrals 
+            SET {', '.join(update_fields)}
+            WHERE referral_id = ?
+        ''', update_values)
+        
+        # Track conversion stage
+        cursor.execute('''
+            INSERT INTO case_conversions (referral_id, stage, notes, created_by)
+            VALUES (?, ?, ?, ?)
+        ''', (referral_id, new_status, notes, session.get('user_id')))
+        
+        # Update referring doctor stats if case is accepted or rejected
+        if new_status in ['case_accepted', 'case_rejected']:
+            update_referring_doctor_stats(cursor, referral_id, new_status == 'case_accepted', actual_value or estimated_value)
+        
+        # Update team metrics
+        if session.get('user_id'):
+            update_team_metrics(cursor, session['user_id'], new_status)
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Case status updated to {new_status.replace("_", " ").title()}',
+            'status': new_status
+        })
+        
+    except Exception as e:
+        app.logger.error(f'Error updating case status: {str(e)}')
+        return jsonify({'success': False, 'message': 'Internal server error'}), 500
+
+@app.route('/api/conversion-analytics')
+def get_conversion_analytics():
+    """Get conversion pipeline analytics for dashboard"""
+    try:
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        # Get conversion funnel data
+        cursor.execute('''
+            SELECT 
+                case_status,
+                COUNT(*) as count,
+                AVG(CASE WHEN estimated_value IS NOT NULL THEN estimated_value ELSE 0 END) as avg_estimated_value,
+                AVG(CASE WHEN actual_value IS NOT NULL THEN actual_value ELSE 0 END) as avg_actual_value
+            FROM referrals 
+            WHERE created_at >= date('now', '-30 days')
+            GROUP BY case_status
+        ''')
+        
+        conversion_data = {}
+        for row in cursor.fetchall():
+            conversion_data[row[0] or 'pending'] = {
+                'count': row[1],
+                'avg_estimated_value': round(row[2] or 0, 2),
+                'avg_actual_value': round(row[3] or 0, 2)
+            }
+        
+        # Get referring doctor performance
+        cursor.execute('''
+            SELECT 
+                rd.name,
+                rd.referral_count,
+                rd.conversion_rate,
+                rd.avg_case_value,
+                rd.last_referral_date
+            FROM referring_doctors rd
+            ORDER BY rd.conversion_rate DESC
+            LIMIT 10
+        ''')
+        
+        top_referring_doctors = []
+        for row in cursor.fetchall():
+            top_referring_doctors.append({
+                'name': row[0],
+                'referral_count': row[1],
+                'conversion_rate': row[2],
+                'avg_case_value': row[3],
+                'last_referral_date': row[4]
+            })
+        
+        # Get team productivity
+        cursor.execute('''
+            SELECT 
+                u.full_name,
+                tm.referrals_processed,
+                tm.cases_accepted,
+                tm.avg_response_time_hours,
+                tm.revenue_generated
+            FROM team_metrics tm
+            JOIN users u ON tm.user_id = u.id
+            WHERE tm.date >= date('now', '-7 days')
+            ORDER BY tm.revenue_generated DESC
+        ''')
+        
+        team_performance = []
+        for row in cursor.fetchall():
+            team_performance.append({
+                'name': row[0],
+                'referrals_processed': row[1],
+                'cases_accepted': row[2],
+                'avg_response_time': row[3],
+                'revenue_generated': row[4]
+            })
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'conversion_funnel': conversion_data,
+            'top_referring_doctors': top_referring_doctors,
+            'team_performance': team_performance
+        })
+        
+    except Exception as e:
+        app.logger.error(f'Error getting conversion analytics: {str(e)}')
+        return jsonify({'success': False, 'message': 'Internal server error'}), 500
+
+def update_referring_doctor_stats(cursor, referral_id, case_accepted, case_value=None):
+    """Update referring doctor statistics based on case outcome"""
+    try:
+        # Get referring doctor name from referral
+        cursor.execute('SELECT referring_doctor FROM referrals WHERE referral_id = ?', (referral_id,))
+        result = cursor.fetchone()
+        if not result or not result[0]:
+            return
+        
+        referring_doctor_name = result[0]
+        
+        # Check if referring doctor exists in our system
+        cursor.execute('SELECT id, referral_count, conversion_rate, avg_case_value FROM referring_doctors WHERE name = ?', 
+                      (referring_doctor_name,))
+        doctor_record = cursor.fetchone()
+        
+        if doctor_record:
+            # Update existing doctor record
+            doctor_id, current_count, current_rate, current_avg = doctor_record
+            new_count = current_count + 1
+            
+            if case_accepted:
+                new_conversion_rate = ((current_rate * current_count) + 100) / new_count
+                if case_value:
+                    new_avg_value = ((current_avg * current_count) + case_value) / new_count
+                else:
+                    new_avg_value = current_avg
+            else:
+                new_conversion_rate = (current_rate * current_count) / new_count
+                new_avg_value = current_avg
+            
+            cursor.execute('''
+                UPDATE referring_doctors 
+                SET referral_count = ?, conversion_rate = ?, avg_case_value = ?, 
+                    last_referral_date = ?, updated_at = ?
+                WHERE id = ?
+            ''', (new_count, round(new_conversion_rate, 2), round(new_avg_value, 2), 
+                  datetime.now(), datetime.now(), doctor_id))
+        else:
+            # Create new doctor record
+            initial_rate = 100 if case_accepted else 0
+            initial_value = case_value if case_accepted and case_value else 0
+            
+            cursor.execute('''
+                INSERT INTO referring_doctors 
+                (name, referral_count, conversion_rate, avg_case_value, last_referral_date)
+                VALUES (?, 1, ?, ?, ?)
+            ''', (referring_doctor_name, initial_rate, initial_value, datetime.now()))
+    
+    except Exception as e:
+        app.logger.error(f'Error updating referring doctor stats: {str(e)}')
+
+def update_team_metrics(cursor, user_id, status):
+    """Update team productivity metrics"""
+    try:
+        today = datetime.now().date()
+        
+        # Check if record exists for today
+        cursor.execute('SELECT id FROM team_metrics WHERE user_id = ? AND date = ?', (user_id, today))
+        existing_record = cursor.fetchone()
+        
+        if existing_record:
+            # Update existing record
+            if status in ['consultation_scheduled', 'case_accepted', 'case_rejected']:
+                cursor.execute('''
+                    UPDATE team_metrics 
+                    SET referrals_processed = referrals_processed + 1
+                    WHERE user_id = ? AND date = ?
+                ''', (user_id, today))
+            
+            if status == 'consultation_scheduled':
+                cursor.execute('''
+                    UPDATE team_metrics 
+                    SET consultations_completed = consultations_completed + 1
+                    WHERE user_id = ? AND date = ?
+                ''', (user_id, today))
+            
+            if status == 'case_accepted':
+                cursor.execute('''
+                    UPDATE team_metrics 
+                    SET cases_accepted = cases_accepted + 1
+                    WHERE user_id = ? AND date = ?
+                ''', (user_id, today))
+        else:
+            # Create new record
+            referrals_processed = 1 if status in ['consultation_scheduled', 'case_accepted', 'case_rejected'] else 0
+            consultations_completed = 1 if status == 'consultation_scheduled' else 0
+            cases_accepted = 1 if status == 'case_accepted' else 0
+            
+            cursor.execute('''
+                INSERT INTO team_metrics 
+                (user_id, date, referrals_processed, consultations_completed, cases_accepted)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (user_id, today, referrals_processed, consultations_completed, cases_accepted))
+    
+    except Exception as e:
+        app.logger.error(f'Error updating team metrics: {str(e)}')
+
+@app.route('/conversion-dashboard')
+def conversion_dashboard():
+    """Dental specialist conversion dashboard"""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    return render_template('conversion_dashboard.html', 
+                         analytics_config=ANALYTICS_CONFIG)
 
 def log_compliance_action(user_id, action_type, entity_type, entity_id, action_details, request):
     """Log compliance actions for audit trail"""
@@ -2283,6 +2660,90 @@ def generate_new_provider_code():
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': f'Failed to generate provider code: {str(e)}'}), 500
+
+@app.route('/api/quick-referral', methods=['POST'])
+def create_quick_referral():
+    """Create a quick referral using provider code from popup form"""
+    try:
+        data = request.get_json()
+        provider_code = data.get('provider_code', '').upper().strip()
+        patient_name = data.get('patient_name', '').strip()
+        patient_phone = data.get('patient_phone', '').strip()
+        medical_condition = data.get('medical_condition', '').strip()
+        urgency_level = data.get('urgency_level', 'normal')
+        notes = data.get('notes', '').strip()
+        
+        # Validation
+        if not provider_code or not patient_name:
+            return jsonify({'success': False, 'message': 'Provider code and patient name are required'}), 400
+        
+        if len(provider_code) != 6 or not provider_code.isalnum():
+            return jsonify({'success': False, 'message': 'Provider code must be exactly 6 alphanumeric characters'}), 400
+        
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        # Find provider by code
+        cursor.execute('''
+            SELECT pc.user_id, pc.practice_name, u.full_name, pc.provider_type, pc.specialization
+            FROM provider_codes pc
+            JOIN users u ON pc.user_id = u.id
+            WHERE pc.provider_code = ? AND pc.is_active = TRUE
+        ''', (provider_code,))
+        
+        provider = cursor.fetchone()
+        
+        if not provider:
+            conn.close()
+            return jsonify({'success': False, 'message': 'Provider code not found or inactive'}), 404
+        
+        # Verify provider is a dentist or specialist
+        if provider[3] not in ['dentist', 'dentist_admin', 'specialist', 'specialist_admin']:
+            conn.close()
+            return jsonify({'success': False, 'message': 'Provider code is not valid for referrals'}), 400
+        
+        # Generate referral ID and QR code
+        referral_id = str(uuid.uuid4())[:8].upper()
+        qr_data = f"Quick Referral\nID: {referral_id}\nPatient: {patient_name}\nProvider: {provider[2]}"
+        qr_code = generate_qr_code(qr_data)
+        
+        # Compile notes
+        compiled_notes = f"Quick referral via provider code {provider_code}"
+        if patient_phone:
+            compiled_notes += f"\nPatient phone: {patient_phone}"
+        if notes:
+            compiled_notes += f"\nAdditional notes: {notes}"
+        
+        # Create referral
+        cursor.execute('''
+            INSERT INTO referrals (
+                user_id, referral_id, patient_name, referring_doctor, target_doctor, 
+                medical_condition, urgency_level, status, notes, qr_code, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            provider[0], referral_id, patient_name, 'Quick Referral', provider[2], 
+            medical_condition or 'General consultation', urgency_level, 'pending', 
+            compiled_notes, qr_code, datetime.now()
+        ))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'referral_id': referral_id,
+            'provider': {
+                'name': provider[2],
+                'practice': provider[1],
+                'type': provider[3],
+                'specialty': provider[4]
+            },
+            'message': f'Quick referral created successfully to {provider[2]} at {provider[1]}'
+        })
+        
+    except Exception as e:
+        app.logger.error(f'Error creating quick referral: {str(e)}')
+        return jsonify({'success': False, 'message': 'Internal server error'}), 500
 
 @app.route('/api/referral/by-code', methods=['POST'])
 def create_referral_by_code():
