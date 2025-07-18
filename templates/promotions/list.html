@@ -133,20 +133,20 @@
                                     <div class="stats">
                                         <div class="stat-item">
                                             <div class="stat-label">Impressions</div>
-                                            <div class="stat-value">{{ promotion[11] or 0 }}</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">Clicks</div>
                                             <div class="stat-value">{{ promotion[12] or 0 }}</div>
                                         </div>
                                         <div class="stat-item">
-                                            <div class="stat-label">CTR</div>
-                                            <div class="stat-value">{{ "%.2f"|format(promotion[13] or 0) }}%</div>
+                                            <div class="stat-label">Clicks</div>
+                                            <div class="stat-value">{{ promotion[13] or 0 }}</div>
                                         </div>
-                                        {% if promotion[10] %}
+                                        <div class="stat-item">
+                                            <div class="stat-label">CTR</div>
+                                            <div class="stat-value">{{ "%.2f"|format(promotion[14] or 0) }}%</div>
+                                        </div>
+                                        {% if promotion[11] %}
                                         <div class="stat-item">
                                             <div class="stat-label">Budget</div>
-                                            <div class="stat-value">${{ "%.2f"|format(promotion[10]) }}</div>
+                                            <div class="stat-value">${{ "%.2f"|format(promotion[11]|float) }}</div>
                                         </div>
                                         {% endif %}
                                     </div>
