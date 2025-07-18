@@ -619,6 +619,50 @@ def init_db():
         )
     ''')
 
+    # ---------------------------------------------------------------------------
+    # Promotions table for campaign management
+    #
+    # Create a table to store promotional campaigns that dental practices can run
+    # to attract referrals. Includes campaign details, image uploads, date ranges,
+    # status controls, and real-time tracking of impressions and clicks.
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS promotions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            description TEXT,
+            image_path TEXT,
+            image_filename TEXT,
+            start_date DATE NOT NULL,
+            end_date DATE NOT NULL,
+            is_active BOOLEAN DEFAULT TRUE,
+            status TEXT DEFAULT 'draft',
+            target_audience TEXT,
+            budget DECIMAL(10,2),
+            impressions INTEGER DEFAULT 0,
+            clicks INTEGER DEFAULT 0,
+            click_through_rate DECIMAL(5,4) DEFAULT 0.0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+
+    # Promotion Stats table for real-time tracking
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS promotion_stats (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            promotion_id INTEGER NOT NULL,
+            event_type TEXT NOT NULL,
+            event_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            ip_address TEXT,
+            user_agent TEXT,
+            referrer TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (promotion_id) REFERENCES promotions (id)
+        )
+    ''')
+
     # -----------------------------------------------------------------------
     # Seed a default super administrator account if one does not already exist.
     # This ensures the system has at least one user with full privileges after
@@ -5102,6 +5146,7 @@ def portal_appointments():
 
 @app.route('/portal/appointments/<int:appointment_id>/update', methods=['POST'])
 @require_roles(['dentist', 'specialist', 'dentist_admin', 'specialist_admin', 'admin'])
+
 def update_appointment_portal(appointment_id: int):
     """Update an existing appointment's status or notes.
 
@@ -5154,6 +5199,7 @@ def update_appointment_portal(appointment_id: int):
 
 @app.route('/portal/appointments/<int:appointment_id>/delete', methods=['POST'])
 @require_roles(['patient', 'admin', 'dentist_admin', 'specialist_admin'])
+
 def delete_appointment_portal(appointment_id: int):
     """Delete (cancel) an appointment.
 
@@ -5283,6 +5329,442 @@ def my_referrals():
     referrals = cursor.fetchall()
     conn.close()
     return render_template('my_referrals.html', referrals=referrals)
+
+
+# ============================================================================
+# PROMOTIONS MANAGEMENT ROUTES
+# ============================================================================
+
+def require_promotion_access(f):
+    """Decorator to check if user has access to promotions management"""
+    from functools import wraps
+    
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('login'))
+        
+        # Allow dentists, specialists, and admins to manage promotions
+        user_role = session.get('role')
+        if user_role not in ['dentist', 'specialist', 'dentist_admin', 'specialist_admin', 'admin']:
+            flash('Access denied. Promotions management requires provider privileges.', 'error')
+            return redirect(url_for('dashboard'))
+        
+        return f(*args, **kwargs)
+    return decorated_function
+
+def allowed_promotion_file(filename):
+    """Check if uploaded file is valid for promotions (PNG/JPG only)"""
+    if '.' not in filename:
+        return False
+    ext = filename.rsplit('.', 1)[1].lower()
+    return ext in ['png', 'jpg', 'jpeg']
+
+def validate_file_size(file_stream):
+    """Check if file size is within 500KB limit"""
+    file_stream.seek(0, 2)  # Seek to end
+    size = file_stream.tell()
+    file_stream.seek(0)  # Reset to beginning
+    return size <= 500 * 1024  # 500KB
+
+@app.route('/promotions')
+@require_promotion_access
+def promotions_list():
+    """Display list of promotions for current user"""
+    user_id = session.get('user_id')
+    user_role = session.get('role')
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Admins can see all promotions, others see only their own
+    if user_role in ['admin', 'dentist_admin', 'specialist_admin']:
+        cursor.execute('''
+            SELECT p.*, u.full_name as creator_name
+            FROM promotions p
+            JOIN users u ON p.user_id = u.id
+            ORDER BY p.created_at DESC
+        ''')
+    else:
+        cursor.execute('''
+            SELECT p.*, u.full_name as creator_name
+            FROM promotions p
+            JOIN users u ON p.user_id = u.id
+            WHERE p.user_id = ?
+            ORDER BY p.created_at DESC
+        ''', (user_id,))
+    
+    promotions = cursor.fetchall()
+    conn.close()
+    
+    return render_template('promotions/list.html', promotions=promotions)
+
+@app.route('/promotions/create', methods=['GET', 'POST'])
+@require_promotion_access
+def promotions_create():
+    """Create a new promotion"""
+    if request.method == 'POST':
+        title = request.form.get('title')
+        description = request.form.get('description')
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+        target_audience = request.form.get('target_audience')
+        budget = request.form.get('budget')
+        is_active = 'is_active' in request.form
+        
+        # Validate required fields
+        if not title or not start_date or not end_date:
+            flash('Title, start date, and end date are required.', 'error')
+            return render_template('promotions/create.html')
+        
+        # Handle file upload
+        image_path = None
+        image_filename = None
+        if 'image' in request.files and request.files['image'].filename != '':
+            file = request.files['image']
+            
+            if not allowed_promotion_file(file.filename):
+                flash('Only PNG and JPG images are allowed.', 'error')
+                return render_template('promotions/create.html')
+            
+            if not validate_file_size(file):
+                flash('Image file must be 500KB or smaller.', 'error')
+                return render_template('promotions/create.html')
+            
+            # Save file
+            filename = secure_filename(file.filename)
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            unique_filename = f"promo_{timestamp}_{filename}"
+            file_path = os.path.join('static/uploads/promotions', unique_filename)
+            file.save(file_path)
+            image_path = file_path
+            image_filename = filename
+        
+        try:
+            conn = sqlite3.connect('sapyyn.db')
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                INSERT INTO promotions (
+                    user_id, title, description, image_path, image_filename, 
+                    start_date, end_date, is_active, target_audience, budget, status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                session['user_id'], title, description, image_path, image_filename,
+                start_date, end_date, is_active, target_audience, 
+                float(budget) if budget else 0.0, 'active' if is_active else 'draft'
+            ))
+            
+            conn.commit()
+            conn.close()
+            
+            flash('Promotion created successfully!', 'success')
+            return redirect(url_for('promotions_list'))
+            
+        except Exception as e:
+            flash(f'Error creating promotion: {str(e)}', 'error')
+            return render_template('promotions/create.html')
+    
+    return render_template('promotions/create.html')
+
+@app.route('/promotions/<int:promotion_id>/edit', methods=['GET', 'POST'])
+@require_promotion_access
+def promotions_edit(promotion_id):
+    """Edit an existing promotion"""
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Get promotion details
+    cursor.execute('SELECT * FROM promotions WHERE id = ?', (promotion_id,))
+    promotion = cursor.fetchone()
+    
+    if not promotion:
+        conn.close()
+        flash('Promotion not found.', 'error')
+        return redirect(url_for('promotions_list'))
+    
+    # Check ownership (unless admin)
+    user_role = session.get('role')
+    if user_role not in ['admin', 'dentist_admin', 'specialist_admin'] and promotion[1] != session['user_id']:
+        conn.close()
+        flash('You can only edit your own promotions.', 'error')
+        return redirect(url_for('promotions_list'))
+    
+    if request.method == 'POST':
+        title = request.form.get('title')
+        description = request.form.get('description')
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+        target_audience = request.form.get('target_audience')
+        budget = request.form.get('budget')
+        is_active = 'is_active' in request.form
+        
+        # Validate required fields
+        if not title or not start_date or not end_date:
+            flash('Title, start date, and end date are required.', 'error')
+            return render_template('promotions/edit.html', promotion=promotion)
+        
+        # Handle new file upload
+        image_path = promotion[4]  # Keep existing image path
+        image_filename = promotion[5]  # Keep existing filename
+        
+        if 'image' in request.files and request.files['image'].filename != '':
+            file = request.files['image']
+            
+            if not allowed_promotion_file(file.filename):
+                flash('Only PNG and JPG images are allowed.', 'error')
+                return render_template('promotions/edit.html', promotion=promotion)
+            
+            if not validate_file_size(file):
+                flash('Image file must be 500KB or smaller.', 'error')
+                return render_template('promotions/edit.html', promotion=promotion)
+            
+            # Delete old file if it exists
+            if image_path and os.path.exists(image_path):
+                try:
+                    os.remove(image_path)
+                except:
+                    pass
+            
+            # Save new file
+            filename = secure_filename(file.filename)
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            unique_filename = f"promo_{timestamp}_{filename}"
+            file_path = os.path.join('static/uploads/promotions', unique_filename)
+            file.save(file_path)
+            image_path = file_path
+            image_filename = filename
+        
+        try:
+            cursor.execute('''
+                UPDATE promotions SET
+                    title = ?, description = ?, image_path = ?, image_filename = ?,
+                    start_date = ?, end_date = ?, is_active = ?, target_audience = ?,
+                    budget = ?, status = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            ''', (
+                title, description, image_path, image_filename,
+                start_date, end_date, is_active, target_audience,
+                float(budget) if budget else 0.0, 'active' if is_active else 'draft',
+                promotion_id
+            ))
+            
+            conn.commit()
+            conn.close()
+            
+            flash('Promotion updated successfully!', 'success')
+            return redirect(url_for('promotions_list'))
+            
+        except Exception as e:
+            conn.close()
+            flash(f'Error updating promotion: {str(e)}', 'error')
+            return render_template('promotions/edit.html', promotion=promotion)
+    
+    conn.close()
+    return render_template('promotions/edit.html', promotion=promotion)
+
+@app.route('/promotions/<int:promotion_id>/delete', methods=['POST'])
+@require_promotion_access
+def promotions_delete(promotion_id):
+    """Delete a promotion"""
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Get promotion details for ownership check and file cleanup
+    cursor.execute('SELECT user_id, image_path FROM promotions WHERE id = ?', (promotion_id,))
+    promotion = cursor.fetchone()
+    
+    if not promotion:
+        conn.close()
+        flash('Promotion not found.', 'error')
+        return redirect(url_for('promotions_list'))
+    
+    # Check ownership (unless admin)
+    user_role = session.get('role')
+    if user_role not in ['admin', 'dentist_admin', 'specialist_admin'] and promotion[0] != session['user_id']:
+        conn.close()
+        flash('You can only delete your own promotions.', 'error')
+        return redirect(url_for('promotions_list'))
+    
+    try:
+        # Delete associated stats
+        cursor.execute('DELETE FROM promotion_stats WHERE promotion_id = ?', (promotion_id,))
+        
+        # Delete promotion
+        cursor.execute('DELETE FROM promotions WHERE id = ?', (promotion_id,))
+        
+        # Delete image file if it exists
+        if promotion[1] and os.path.exists(promotion[1]):
+            try:
+                os.remove(promotion[1])
+            except:
+                pass
+        
+        conn.commit()
+        conn.close()
+        
+        flash('Promotion deleted successfully!', 'success')
+        
+    except Exception as e:
+        conn.close()
+        flash(f'Error deleting promotion: {str(e)}', 'error')
+    
+    return redirect(url_for('promotions_list'))
+
+@app.route('/promotions/<int:promotion_id>/toggle', methods=['POST'])
+@require_promotion_access
+def promotions_toggle(promotion_id):
+    """Toggle promotion active/paused status"""
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Get promotion details for ownership check
+    cursor.execute('SELECT user_id, is_active FROM promotions WHERE id = ?', (promotion_id,))
+    promotion = cursor.fetchone()
+    
+    if not promotion:
+        conn.close()
+        return jsonify({'success': False, 'message': 'Promotion not found'}), 404
+    
+    # Check ownership (unless admin)
+    user_role = session.get('role')
+    if user_role not in ['admin', 'dentist_admin', 'specialist_admin'] and promotion[0] != session['user_id']:
+        conn.close()
+        return jsonify({'success': False, 'message': 'Access denied'}), 403
+    
+    try:
+        new_status = not promotion[1]  # Toggle the current status
+        status_text = 'active' if new_status else 'paused'
+        
+        cursor.execute('''
+            UPDATE promotions SET 
+                is_active = ?, 
+                status = ?, 
+                updated_at = CURRENT_TIMESTAMP 
+            WHERE id = ?
+        ''', (new_status, status_text, promotion_id))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True, 
+            'message': f'Promotion {"activated" if new_status else "paused"}',
+            'is_active': new_status
+        })
+        
+    except Exception as e:
+        conn.close()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/promotions/<int:promotion_id>/stats')
+@require_promotion_access
+def promotions_stats(promotion_id):
+    """Get real-time stats for a promotion"""
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Get promotion details for ownership check
+    cursor.execute('SELECT user_id, title FROM promotions WHERE id = ?', (promotion_id,))
+    promotion = cursor.fetchone()
+    
+    if not promotion:
+        conn.close()
+        return jsonify({'error': 'Promotion not found'}), 404
+    
+    # Check ownership (unless admin)
+    user_role = session.get('role')
+    if user_role not in ['admin', 'dentist_admin', 'specialist_admin'] and promotion[0] != session['user_id']:
+        conn.close()
+        return jsonify({'error': 'Access denied'}), 403
+    
+    try:
+        # Get impression and click counts
+        cursor.execute('SELECT COUNT(*) FROM promotion_stats WHERE promotion_id = ? AND event_type = "impression"', (promotion_id,))
+        impressions = cursor.fetchone()[0]
+        
+        cursor.execute('SELECT COUNT(*) FROM promotion_stats WHERE promotion_id = ? AND event_type = "click"', (promotion_id,))
+        clicks = cursor.fetchone()[0]
+        
+        # Calculate CTR
+        ctr = (clicks / impressions * 100) if impressions > 0 else 0
+        
+        # Get hourly stats for the last 24 hours
+        cursor.execute('''
+            SELECT 
+                strftime('%H', event_timestamp) as hour,
+                event_type,
+                COUNT(*) as count
+            FROM promotion_stats 
+            WHERE promotion_id = ? 
+                AND event_timestamp >= datetime('now', '-24 hours')
+            GROUP BY hour, event_type
+            ORDER BY hour
+        ''', (promotion_id,))
+        hourly_stats = cursor.fetchall()
+        
+        # Update promotion stats
+        cursor.execute('''
+            UPDATE promotions SET 
+                impressions = ?, 
+                clicks = ?, 
+                click_through_rate = ? 
+            WHERE id = ?
+        ''', (impressions, clicks, ctr, promotion_id))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'impressions': impressions,
+            'clicks': clicks,
+            'ctr': round(ctr, 2),
+            'hourly_stats': hourly_stats
+        })
+        
+    except Exception as e:
+        conn.close()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/promotions/<int:promotion_id>/track', methods=['POST'])
+def track_promotion_event(promotion_id):
+    """Track promotion impression or click events"""
+    data = request.get_json() or {}
+    event_type = data.get('event_type', 'impression')
+    
+    if event_type not in ['impression', 'click']:
+        return jsonify({'error': 'Invalid event type'}), 400
+    
+    try:
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        # Verify promotion exists and is active
+        cursor.execute('SELECT is_active FROM promotions WHERE id = ?', (promotion_id,))
+        promotion = cursor.fetchone()
+        
+        if not promotion or not promotion[0]:
+            conn.close()
+            return jsonify({'error': 'Promotion not found or inactive'}), 404
+        
+        # Record the event
+        ip_address = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', ''))
+        user_agent = request.headers.get('User-Agent', '')
+        referrer = request.headers.get('Referer', '')
+        
+        cursor.execute('''
+            INSERT INTO promotion_stats (
+                promotion_id, event_type, ip_address, user_agent, referrer
+            ) VALUES (?, ?, ?, ?, ?)
+        ''', (promotion_id, event_type, ip_address, user_agent, referrer))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':
