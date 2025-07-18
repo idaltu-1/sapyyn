@@ -38,10 +38,84 @@ ANALYTICS_CONFIG = {
 UPLOAD_FOLDER = 'patient-referral'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'xls', 'xlsx'}
 
+# Domain-based access control configuration
+ALLOWED_DOMAINS = {
+    'healthcare.org',
+    'medical.com', 
+    'dental.org',
+    'clinic.net',
+    'hospital.org',
+    'dentistry.edu',
+    'orthodontics.com',
+    'periodontics.org',
+    'oralsurgery.net',
+    'endodontics.com',
+    'sapyyn.com',  # Allow for demo users
+    'gmail.com',  # Allow for demo/testing
+    'example.com'  # Allow for demo/testing
+}
+
+# Password complexity requirements
+PASSWORD_MIN_LENGTH = 8
+PASSWORD_REQUIREMENTS = {
+    'min_length': PASSWORD_MIN_LENGTH,
+    'require_uppercase': True,
+    'require_lowercase': True,
+    'require_digit': True,
+    'require_special': True
+}
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Ensure upload folder exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Domain and password validation functions
+def is_email_domain_allowed(email):
+    """Check if the email domain is in the allowed domains list"""
+    if not email or '@' not in email:
+        return False
+    domain = email.split('@')[1].lower()
+    return domain in ALLOWED_DOMAINS
+
+def validate_password_complexity(password):
+    """Validate password meets complexity requirements"""
+    if not password:
+        return False, "Password is required"
+    
+    if len(password) < PASSWORD_REQUIREMENTS['min_length']:
+        return False, f"Password must be at least {PASSWORD_REQUIREMENTS['min_length']} characters long"
+    
+    if PASSWORD_REQUIREMENTS['require_uppercase'] and not any(c.isupper() for c in password):
+        return False, "Password must contain at least one uppercase letter"
+    
+    if PASSWORD_REQUIREMENTS['require_lowercase'] and not any(c.islower() for c in password):
+        return False, "Password must contain at least one lowercase letter"
+    
+    if PASSWORD_REQUIREMENTS['require_digit'] and not any(c.isdigit() for c in password):
+        return False, "Password must contain at least one digit"
+    
+    if PASSWORD_REQUIREMENTS['require_special'] and not any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in password):
+        return False, "Password must contain at least one special character"
+    
+    return True, "Password meets complexity requirements"
+
+def get_user_by_username_or_email(username):
+    """Get user by username or email"""
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Try to find by username first, then by email
+    cursor.execute('SELECT id, username, password_hash, full_name, role, email FROM users WHERE username = ?', (username,))
+    user = cursor.fetchone()
+    
+    if not user and '@' in username:
+        # If username looks like an email, try searching by email
+        cursor.execute('SELECT id, username, password_hash, full_name, role, email FROM users WHERE email = ?', (username,))
+        user = cursor.fetchone()
+    
+    conn.close()
+    return user
 
 # Database initialization
 def init_db():
@@ -662,23 +736,34 @@ def complete_onboarding():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    """User login"""
+    """User login with domain-based restrictions"""
     provider_code = request.args.get('provider_code')
     
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         
-        conn = sqlite3.connect('sapyyn.db')
-        cursor = conn.cursor()
-        cursor.execute('SELECT id, username, password_hash, full_name, role FROM users WHERE username = ?', (username,))
-        user = cursor.fetchone()
+        # Get user information (try both username and email)
+        user = get_user_by_username_or_email(username)
         
         if user and check_password_hash(user[2], password):
+            # Check domain restrictions for email-based logins
+            user_email = user[5] if len(user) > 5 else None
+            
+            # If user has an email, check domain restrictions
+            if user_email and not is_email_domain_allowed(user_email):
+                flash('Access denied: Your email domain is not authorized for this portal. Please contact your administrator.', 'error')
+                return render_template('login.html', provider_code=provider_code)
+            
+            # Successful login - set session
             session['user_id'] = user[0]
             session['username'] = user[1]
             session['full_name'] = user[3]
             session['role'] = user[4]
+            session['email'] = user_email
+            
+            conn = sqlite3.connect('sapyyn.db')
+            cursor = conn.cursor()
             
             # Handle provider code after login
             if provider_code:
@@ -715,7 +800,6 @@ def login():
             return redirect(url_for('dashboard'))
         else:
             flash('Invalid username or password', 'error')
-            conn.close()
     
     return render_template('login.html', provider_code=provider_code)
 
@@ -766,6 +850,24 @@ def register():
             password = request.form['password']
             full_name = request.form['full_name']
             role = request.form.get('role', 'patient')
+        
+        # Domain validation
+        if not is_email_domain_allowed(email):
+            flash('Registration denied: Your email domain is not authorized for this portal. Please use an authorized email domain or contact your administrator.', 'error')
+            return render_template('register.html', 
+                                 provider_code=provider_code, 
+                                 provider_info=provider_info, 
+                                 suggested_role=suggested_role)
+        
+        # Password complexity validation (skip for auto-generated passwords)
+        if not password.startswith('temp_password_') and signup_type not in ['inline', 'cta']:
+            is_valid, message = validate_password_complexity(password)
+            if not is_valid:
+                flash(f'Password validation failed: {message}', 'error')
+                return render_template('register.html', 
+                                     provider_code=provider_code, 
+                                     provider_info=provider_info, 
+                                     suggested_role=suggested_role)
         
         password_hash = generate_password_hash(password)
         
