@@ -265,18 +265,20 @@
                         <div class="bg-warning bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
                             <i class="bi bi-lightning-charge-fill text-warning fs-2"></i>
                         </div>
-                        <h5 class="fw-bold mb-3">Quick Access with 6-Digit Code</h5>
-                        <p class="text-muted mb-4">Already have a provider code? Access your referral instantly</p>
+                        <h5 class="fw-bold mb-3">Quick Access with 6-Character Code</h5>
+                        <p class="text-muted mb-4">Already have a provider code? Access your referral instantly with the 6-character alphanumeric code</p>
                         
                         <form id="quickReferralForm" class="row g-3 justify-content-center">
                             <div class="col-md-6">
-                                <label for="homeProviderCode" class="form-label">Enter 6-Digit Provider Code</label>
+                                <label for="homeProviderCode" class="form-label">Enter 6-Character Provider Code</label>
                                 <input type="text" class="form-control form-control-lg text-center fs-3 fw-bold" 
-                                       id="homeProviderCode" placeholder="000000" maxlength="6" pattern="[0-9]{6}">
+                                       id="homeProviderCode" placeholder="ABC123" maxlength="6" 
+                                       pattern="[A-Za-z0-9]{6}" style="text-transform: uppercase;">
+                                <div class="form-text">Enter the 6-character alphanumeric code provided by your dentist</div>
                             </div>
                             <div class="col-md-6 d-flex align-items-end">
                                 <button type="submit" class="btn btn-warning btn-lg w-100">
-                                    <i class="bi bi-search me-2"></i>Access Now
+                                    <i class="bi bi-search me-2"></i>Connect Now
                                 </button>
                             </div>
                         </form>
@@ -852,6 +854,76 @@
         </div>
     </div>
 </div>
+
+<!-- Quick Referral Modal -->
+<div class="modal fade" id="quickReferralModal" tabindex="-1" aria-labelledby="quickReferralModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="quickReferralModalLabel">
+                    <i class="bi bi-lightning-charge-fill me-2"></i>Quick Referral
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Provider Information Display -->
+                <div id="providerInfo" class="alert alert-info mb-4" style="display: none;">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-person-badge fs-3 me-3"></i>
+                        <div>
+                            <h6 class="mb-1">Referring to:</h6>
+                            <div id="providerDetails"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Referral Form -->
+                <form id="referralForm">
+                    <input type="hidden" id="modalProviderCode" name="provider_code">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="patientName" class="form-label">Patient Name *</label>
+                            <input type="text" class="form-control" id="patientName" name="patient_name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="patientPhone" class="form-label">Patient Phone</label>
+                            <input type="tel" class="form-control" id="patientPhone" name="patient_phone">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="medicalCondition" class="form-label">Medical Condition / Reason for Referral</label>
+                        <input type="text" class="form-control" id="medicalCondition" name="medical_condition" 
+                               placeholder="e.g., Routine cleaning, Orthodontic consultation, Emergency treatment">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="urgencyLevel" class="form-label">Urgency Level</label>
+                        <select class="form-select" id="urgencyLevel" name="urgency_level">
+                            <option value="normal">Normal</option>
+                            <option value="urgent">Urgent</option>
+                            <option value="emergency">Emergency</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Additional Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                  placeholder="Any additional information about the patient or referral"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submitReferralBtn">
+                    <i class="bi bi-send me-2"></i>Create Referral
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_scripts %}
@@ -1339,11 +1411,11 @@ document.addEventListener('DOMContentLoaded', function() {
         quickReferralForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const providerCode = providerCodeInput.value.trim();
+            const providerCode = providerCodeInput.value.trim().toUpperCase();
             
-            // Validate 6-digit code
-            if (providerCode.length !== 6 || isNaN(providerCode)) {
-                alert('Please enter a valid 6-digit provider code');
+            // Validate 6-character alphanumeric code
+            if (providerCode.length !== 6 || !/^[A-Z0-9]{6}$/.test(providerCode)) {
+                alert('Please enter a valid 6-character provider code (letters and numbers only)');
                 providerCodeInput.focus();
                 return;
             }
@@ -1365,18 +1437,13 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.valid) {
-                    {% if session.user_id %}
-                    // Redirect to appropriate portal with provider code
-                    window.location.href = '/portal/patient?provider_code=' + providerCode;
-                    {% else %}
-                    // Redirect to registration with provider code
-                    window.location.href = '/register?provider_code=' + providerCode + '&role=patient';
-                    {% endif %}
+                    // Show the referral modal with provider information
+                    showReferralModal(providerCode, data.provider);
                 } else {
                     alert('Invalid provider code. Please check the code and try again.');
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
                 }
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
             })
             .catch(error => {
                 console.error('Error validating provider code:', error);
@@ -1386,21 +1453,128 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        // Format input as user types
+        // Format input as user types (alphanumeric, uppercase)
         providerCodeInput.addEventListener('input', function(e) {
-            // Only allow numbers
-            this.value = this.value.replace(/[^0-9]/g, '');
+            // Only allow alphanumeric characters and convert to uppercase
+            this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
             
             // Add visual feedback for valid length
             if (this.value.length === 6) {
                 this.classList.add('is-valid');
                 this.classList.remove('is-invalid');
-            } else if (this.value.length > 0) {
-                this.classList.add('is-invalid');
-                this.classList.remove('is-valid');
             } else {
-                this.classList.remove('is-valid', 'is-invalid');
+                this.classList.remove('is-valid');
+                if (this.value.length > 0) {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                }
             }
+        });
+    }
+    
+    // Function to show referral modal with provider information
+    function showReferralModal(providerCode, provider) {
+        // Set provider code in hidden field
+        document.getElementById('modalProviderCode').value = providerCode;
+        
+        // Display provider information
+        const providerInfo = document.getElementById('providerInfo');
+        const providerDetails = document.getElementById('providerDetails');
+        
+        providerDetails.innerHTML = `
+            <strong>${provider.name}</strong><br>
+            <small class="text-muted">${provider.practice} • ${provider.type} • ${provider.specialty}</small>
+        `;
+        
+        providerInfo.style.display = 'block';
+        
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('quickReferralModal'));
+        modal.show();
+    }
+    
+    // Handle referral form submission
+    const submitReferralBtn = document.getElementById('submitReferralBtn');
+    if (submitReferralBtn) {
+        submitReferralBtn.addEventListener('click', function() {
+            const form = document.getElementById('referralForm');
+            const formData = new FormData(form);
+            
+            // Convert to JSON
+            const data = {
+                provider_code: formData.get('provider_code'),
+                patient_name: formData.get('patient_name'),
+                patient_phone: formData.get('patient_phone'),
+                medical_condition: formData.get('medical_condition'),
+                urgency_level: formData.get('urgency_level'),
+                notes: formData.get('notes')
+            };
+            
+            // Validate required fields
+            if (!data.patient_name) {
+                alert('Patient name is required');
+                document.getElementById('patientName').focus();
+                return;
+            }
+            
+            // Show loading state
+            const originalText = submitReferralBtn.innerHTML;
+            submitReferralBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Creating...';
+            submitReferralBtn.disabled = true;
+            
+            // Submit referral
+            fetch('/api/quick-referral', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close modal and show success message
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('quickReferralModal'));
+                    modal.hide();
+                    
+                    // Show success alert
+                    const successAlert = document.createElement('div');
+                    successAlert.className = 'alert alert-success alert-dismissible fade show';
+                    successAlert.innerHTML = `
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <strong>Referral Created Successfully!</strong><br>
+                        ${data.message}<br>
+                        <small>Referral ID: ${data.referral_id}</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    
+                    // Insert at top of page
+                    document.body.insertBefore(successAlert, document.body.firstChild);
+                    
+                    // Clear form
+                    form.reset();
+                    document.getElementById('providerInfo').style.display = 'none';
+                    
+                    // Auto-hide alert after 5 seconds
+                    setTimeout(() => {
+                        if (successAlert.parentNode) {
+                            successAlert.remove();
+                        }
+                    }, 5000);
+                } else {
+                    alert('Error creating referral: ' + data.message);
+                }
+                
+                submitReferralBtn.innerHTML = originalText;
+                submitReferralBtn.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error creating referral:', error);
+                alert('Error creating referral. Please try again.');
+                submitReferralBtn.innerHTML = originalText;
+                submitReferralBtn.disabled = false;
+            });
         });
     }
     

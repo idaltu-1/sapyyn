@@ -1064,12 +1064,13 @@ def check_subscription():
 
 @app.route('/api/provider-code/validate', methods=['POST'])
 def validate_provider_code():
-    """Validate a 6-digit provider code"""
+    """Validate a 6-character provider code (alphanumeric or numeric)"""
     data = request.get_json()
-    provider_code = data.get('provider_code')
+    provider_code = data.get('provider_code', '').upper().strip()
     
-    if not provider_code or len(provider_code) != 6 or not provider_code.isdigit():
-        return jsonify({'valid': False, 'message': 'Invalid provider code format'})
+    # Validate format: exactly 6 characters, alphanumeric
+    if not provider_code or len(provider_code) != 6 or not provider_code.isalnum():
+        return jsonify({'valid': False, 'message': 'Provider code must be exactly 6 alphanumeric characters'})
     
     conn = sqlite3.connect('sapyyn.db')
     cursor = conn.cursor()
@@ -1088,6 +1089,7 @@ def validate_provider_code():
         return jsonify({
             'valid': True,
             'provider': {
+                'id': provider[0],
                 'name': provider[4],
                 'practice': provider[1],
                 'type': provider[2],
@@ -1095,7 +1097,7 @@ def validate_provider_code():
             }
         })
     
-    return jsonify({'valid': False, 'message': 'Provider code not found'})
+    return jsonify({'valid': False, 'message': 'Provider code not found or inactive'})
 
 def check_subscription_required(f):
     """Decorator to check if user has required subscription for referral features"""
@@ -2658,6 +2660,90 @@ def generate_new_provider_code():
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': f'Failed to generate provider code: {str(e)}'}), 500
+
+@app.route('/api/quick-referral', methods=['POST'])
+def create_quick_referral():
+    """Create a quick referral using provider code from popup form"""
+    try:
+        data = request.get_json()
+        provider_code = data.get('provider_code', '').upper().strip()
+        patient_name = data.get('patient_name', '').strip()
+        patient_phone = data.get('patient_phone', '').strip()
+        medical_condition = data.get('medical_condition', '').strip()
+        urgency_level = data.get('urgency_level', 'normal')
+        notes = data.get('notes', '').strip()
+        
+        # Validation
+        if not provider_code or not patient_name:
+            return jsonify({'success': False, 'message': 'Provider code and patient name are required'}), 400
+        
+        if len(provider_code) != 6 or not provider_code.isalnum():
+            return jsonify({'success': False, 'message': 'Provider code must be exactly 6 alphanumeric characters'}), 400
+        
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        # Find provider by code
+        cursor.execute('''
+            SELECT pc.user_id, pc.practice_name, u.full_name, pc.provider_type, pc.specialization
+            FROM provider_codes pc
+            JOIN users u ON pc.user_id = u.id
+            WHERE pc.provider_code = ? AND pc.is_active = TRUE
+        ''', (provider_code,))
+        
+        provider = cursor.fetchone()
+        
+        if not provider:
+            conn.close()
+            return jsonify({'success': False, 'message': 'Provider code not found or inactive'}), 404
+        
+        # Verify provider is a dentist or specialist
+        if provider[3] not in ['dentist', 'dentist_admin', 'specialist', 'specialist_admin']:
+            conn.close()
+            return jsonify({'success': False, 'message': 'Provider code is not valid for referrals'}), 400
+        
+        # Generate referral ID and QR code
+        referral_id = str(uuid.uuid4())[:8].upper()
+        qr_data = f"Quick Referral\nID: {referral_id}\nPatient: {patient_name}\nProvider: {provider[2]}"
+        qr_code = generate_qr_code(qr_data)
+        
+        # Compile notes
+        compiled_notes = f"Quick referral via provider code {provider_code}"
+        if patient_phone:
+            compiled_notes += f"\nPatient phone: {patient_phone}"
+        if notes:
+            compiled_notes += f"\nAdditional notes: {notes}"
+        
+        # Create referral
+        cursor.execute('''
+            INSERT INTO referrals (
+                user_id, referral_id, patient_name, referring_doctor, target_doctor, 
+                medical_condition, urgency_level, status, notes, qr_code, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            provider[0], referral_id, patient_name, 'Quick Referral', provider[2], 
+            medical_condition or 'General consultation', urgency_level, 'pending', 
+            compiled_notes, qr_code, datetime.now()
+        ))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'referral_id': referral_id,
+            'provider': {
+                'name': provider[2],
+                'practice': provider[1],
+                'type': provider[3],
+                'specialty': provider[4]
+            },
+            'message': f'Quick referral created successfully to {provider[2]} at {provider[1]}'
+        })
+        
+    except Exception as e:
+        app.logger.error(f'Error creating quick referral: {str(e)}')
+        return jsonify({'success': False, 'message': 'Internal server error'}), 500
 
 @app.route('/api/referral/by-code', methods=['POST'])
 def create_referral_by_code():
