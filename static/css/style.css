@@ -61,6 +61,46 @@ body {
     font-weight: 700;
     font-size: 1.5rem;
     font-family: var(--font-heading);
+    transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+    transform: translateY(-1px);
+    color: var(--sapyyn-warning-light) !important;
+}
+
+.navbar-logo {
+    height: 40px;
+    width: auto;
+    transition: all 0.3s ease;
+    filter: brightness(1.1);
+}
+
+.navbar-brand:hover .navbar-logo {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+}
+
+/* Enhanced Navbar Styling */
+.navbar {
+    background: linear-gradient(135deg, var(--sapyyn-primary) 0%, var(--sapyyn-primary-dark) 100%) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-lg);
+    padding: 0.75rem 0;
+}
+
+.navbar.sticky-top {
+    transition: all 0.3s ease;
+}
+
+.navbar-brand span {
+    background: linear-gradient(45deg, #ffffff, #f1f5f9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+    letter-spacing: -0.02em;
 }
 
 /* Enhanced Hero Section */
@@ -69,6 +109,109 @@ body {
     min-height: 100vh;
     position: relative;
     overflow: hidden;
+}
+
+/* Add subtle pattern overlay for texture */
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 60px 60px, 40px 40px;
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* Enhanced CTA card styling */
+.cta-card {
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 
+        0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+        0 10px 10px -5px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.cta-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Enhanced button styling */
+.btn-primary {
+    background: linear-gradient(135deg, var(--sapyyn-primary) 0%, var(--sapyyn-primary-dark) 100%);
+    border: none;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px 0 rgba(30, 64, 175, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--sapyyn-primary-dark) 0%, var(--dental-blue) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px 0 rgba(30, 64, 175, 0.4);
+}
+
+/* Trust indicators styling */
+.trust-indicators {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.trust-indicators i {
+    font-size: 0.875rem;
+}
+
+/* Enhanced hero badge */
+.hero-badge .badge {
+    background: linear-gradient(135deg, var(--sapyyn-warning) 0%, var(--sapyyn-warning-light) 100%) !important;
+    color: var(--sapyyn-dark) !important;
+    font-weight: 700;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive hero title */
+.hero-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    font-family: var(--font-heading);
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Hero content improvements */
+.hero-subtitle {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 90%;
+}
+
+.text-white-75 {
+    color: rgba(255, 255, 255, 0.75) !important;
 }
 
 .hero-bg-pattern {
