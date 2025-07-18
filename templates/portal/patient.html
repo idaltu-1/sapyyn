@@ -19,12 +19,13 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <p class="mb-3">Have a 6-digit provider code from your dentist or specialist? Enter it below for instant referral.</p>
+                    <p class="mb-3">Have a 6-character provider code from your dentist or specialist? Enter it below for instant referral.</p>
                     <form id="codeReferralForm" class="row g-3">
                         <div class="col-md-6">
-                            <label for="providerCode" class="form-label">6-Digit Provider Code</label>
-                            <input type="text" class="form-control form-control-lg text-center" id="providerCode" 
-                                   placeholder="000000" maxlength="6" pattern="[0-9]{6}" required>
+                            <label for="providerCode" class="form-label">6-Character Provider Code</label>
+                            <input type="text" class="form-control form-control-lg text-center text-uppercase" id="providerCode" 
+                                   placeholder="ABC123" maxlength="6" pattern="[A-Z0-9]{6}" style="letter-spacing: 0.2em;" required>
+                            <div class="form-text">Enter 6-character alphanumeric code (letters and numbers)</div>
                         </div>
                         <div class="col-md-6">
                             <label for="patientName" class="form-label">Your Name</label>
