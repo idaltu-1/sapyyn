@@ -640,6 +640,77 @@ def init_db():
             'admin'
         ))
 
+    # Referral campaigns table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS referral_campaigns (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            description TEXT,
+            start_date TIMESTAMP,
+            end_date TIMESTAMP,
+            advocate_role TEXT,
+            reward_type TEXT,
+            reward_value DECIMAL(10,2),
+            reward_trigger TEXT,
+            max_referrals_per_advocate INTEGER,
+            fraud_threshold DECIMAL(5,2),
+            is_active BOOLEAN DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Referral codes table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS referral_codes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            campaign_id INTEGER NOT NULL,
+            advocate_id INTEGER NOT NULL,
+            code TEXT UNIQUE NOT NULL,
+            link_slug TEXT UNIQUE,
+            qr_svg TEXT,
+            usage_count INTEGER DEFAULT 0,
+            reward_status TEXT DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (campaign_id) REFERENCES referral_campaigns (id),
+            FOREIGN KEY (advocate_id) REFERENCES users (id)
+        )
+    ''')
+
+    # Referral events table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS referral_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            code_id INTEGER NOT NULL,
+            referred_patient_id INTEGER,
+            status TEXT NOT NULL CHECK (status IN ('SIGNED_UP', 'CONVERTED', 'REWARDED')),
+            ip_addr TEXT,
+            user_agent TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (code_id) REFERENCES referral_codes (id),
+            FOREIGN KEY (referred_patient_id) REFERENCES users (id)
+        )
+    ''')
+
+    # Rewards table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS rewards (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            advocate_id INTEGER NOT NULL,
+            campaign_id INTEGER NOT NULL,
+            event_id INTEGER,
+            reward_type TEXT NOT NULL CHECK (reward_type IN ('GIFT_CARD', 'CREDIT', 'SWAG')),
+            amount DECIMAL(10,2),
+            issued_at TIMESTAMP,
+            fulfilled_at TIMESTAMP,
+            status TEXT DEFAULT 'pending',
+            FOREIGN KEY (advocate_id) REFERENCES users (id),
+            FOREIGN KEY (campaign_id) REFERENCES referral_campaigns (id),
+            FOREIGN KEY (event_id) REFERENCES referral_events (id)
+        )
+    ''')
+
     conn.commit()
     conn.close()
 
@@ -5031,7 +5102,7 @@ def portal_appointments():
 
 @app.route('/portal/appointments/<int:appointment_id>/update', methods=['POST'])
 @require_roles(['dentist', 'specialist', 'dentist_admin', 'specialist_admin', 'admin'])
-def update_appointment(appointment_id: int):
+def update_appointment_portal(appointment_id: int):
     """Update an existing appointment's status or notes.
 
     Providers and administrators can update the status and notes of an
@@ -5083,7 +5154,7 @@ def update_appointment(appointment_id: int):
 
 @app.route('/portal/appointments/<int:appointment_id>/delete', methods=['POST'])
 @require_roles(['patient', 'admin', 'dentist_admin', 'specialist_admin'])
-def delete_appointment(appointment_id: int):
+def delete_appointment_portal(appointment_id: int):
     """Delete (cancel) an appointment.
 
     Patients can cancel their own appointments; administrators can delete any
