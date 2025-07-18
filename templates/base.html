@@ -188,7 +188,7 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ url_for('portal_dashboard') }}"><i class="bi bi-speedometer2"></i> Portal Dashboard</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('referral_history') }}"><i class="bi bi-clock-history"></i> Referral History</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('track_referral') }}"><i class="bi bi-search"></i> Track Referral</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="promptForReferralId()"><i class="bi bi-search"></i> Track Referral</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('appointments') }}"><i class="bi bi-calendar-check"></i> Appointments</a></li>
                             {% if session.role in ['admin', 'dentist_admin', 'specialist_admin'] %}
                             <li><hr class="dropdown-divider"></li>
@@ -445,6 +445,16 @@
     <script src="{{ url_for('static', filename='js/feedback.js') }}"></script>
     
     <!-- Custom JS -->
+    <!-- Custom scripts for base functionality -->
+    <script>
+        function promptForReferralId() {
+            const referralId = prompt('Enter the Referral ID to track:');
+            if (referralId) {
+                window.location.href = '/referral/track/' + referralId;
+            }
+        }
+    </script>
+    
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     
     {% block extra_scripts %}{% endblock %}
