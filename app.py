@@ -5031,7 +5031,7 @@ def portal_appointments():
 
 @app.route('/portal/appointments/<int:appointment_id>/update', methods=['POST'])
 @require_roles(['dentist', 'specialist', 'dentist_admin', 'specialist_admin', 'admin'])
-def update_appointment(appointment_id: int):
+def update_appointment_status(appointment_id: int):
     """Update an existing appointment's status or notes.
 
     Providers and administrators can update the status and notes of an
@@ -5083,7 +5083,7 @@ def update_appointment(appointment_id: int):
 
 @app.route('/portal/appointments/<int:appointment_id>/delete', methods=['POST'])
 @require_roles(['patient', 'admin', 'dentist_admin', 'specialist_admin'])
-def delete_appointment(appointment_id: int):
+def cancel_appointment(appointment_id: int):
     """Delete (cancel) an appointment.
 
     Patients can cancel their own appointments; administrators can delete any
