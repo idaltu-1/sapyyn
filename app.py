@@ -5978,10 +5978,26 @@ def track_promotion_event(promotion_id):
         conn.commit()
         conn.close()
         
-        return jsonify({'success': True})
-        
+  
+except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/nocodebackend/referrals', methods=['POST'])
+def nocodebackend_referrals():
+    """
+    Example endpoint to create a referral record using NoCodeBackendClient.
+    """
+    from nocodebackend_client import NoCodeBackendClient
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+    try:
+        client = NoCodeBackendClient()
+        result = client.create_referral(data)
+        return jsonify(result), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 
 if __name__ == '__main__':
