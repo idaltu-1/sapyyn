@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapyyn Portal - {% if session.role == 'admin' %}Super Admin{% elif session.role == 'dentist_admin' %}Dental Admin{% elif session.role == 'specialist_admin' %}Specialist Admin{% elif session.role == 'dentist' %}Dentist{% elif session.role == 'specialist' %}Specialist{% else %}Patient{% endif %} Dashboard</title>
+    <meta name="description" content="Access your referrals, appointments, and medical records securely">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #0A2463;
+            --secondary: #3E92CC;
+            --accent: #D8315B;
+            --success: #28A745;
+            --warning: #FFC107;
+            --info: #17A2B8;
+            --light: #F8F9FA;
+            --dark: #1E1B18;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            
+            /* Role-specific colors */
+            {% if session.role == 'admin' %}
+            --role-primary: #6F2C91;
+            --role-secondary: #9B59B6;
+            {% elif session.role == 'dentist_admin' %}
+            --role-primary: #E74C3C;
+            --role-secondary: #EC7063;
+            {% elif session.role == 'specialist_admin' %}
+            --role-primary: #F39C12;
+            --role-secondary: #F7DC6F;
+            {% elif session.role == 'dentist' %}
+            --role-primary: #2ECC71;
+            --role-secondary: #58D68D;
+            {% elif session.role == 'specialist' %}
+            --role-primary: #3498DB;
+            --role-secondary: #5DADE2;
+            {% else %}
+            --role-primary: #0A2463;
+            --role-secondary: #3E92CC;
+            {% endif %}
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+        
+        /* Role Badge */
+        .role-badge {
+            background: linear-gradient(135deg, var(--role-primary), var(--role-secondary));
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        
+        /* Portal Header */
+        .portal-header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .portal-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .portal-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--role-primary);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .portal-logo img {
+            height: 40px;
+        }
+        
+        .portal-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .portal-menu a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .portal-menu a:hover {
+            color: var(--role-secondary);
+        }
+        
+        .portal-menu a.active {
+            color: var(--role-primary);
+        }
+        
+        .portal-menu a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1.5rem;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--role-primary);
+        }
+        
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .notification-btn {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--gray);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .notification-btn:hover {
+            color: var(--role-primary);
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .user-profile:hover {
+            background: var(--light);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--role-primary), var(--role-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Dashboard Container */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Welcome Section */
+        .welcome-section {
+            background: linear-gradient(135deg, var(--role-primary), var(--role-secondary));
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .welcome-content h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome-content p {
+            opacity: 0.9;
+            font-size: 1.125rem;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .action-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--dark);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-color: var(--role-secondary);
+        }
+        
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--role-primary), var(--role-secondary));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .action-card h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .action-card p {
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+        
+        /* Main Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        /* Role-specific sections */
+        .admin-section {
+            display: {% if session.role == 'admin' %}block{% else %}none{% endif %};
+        }
+        
+        .dentist-admin-section {
+            display: {% if session.role == 'dentist_admin' %}block{% else %}none{% endif %};
+        }
+        
+        .specialist-admin-section {
+            display: {% if session.role == 'specialist_admin' %}block{% else %}none{% endif %};
+        }
+        
+        .dentist-section {
+            display: {% if session.role == 'dentist' %}block{% else %}none{% endif %};
+        }
+        
+        .specialist-section {
+            display: {% if session.role == 'specialist' %}block{% else %}none{% endif %};
+        }
+        
+        .patient-section {
+            display: {% if session.role == 'patient' %}block{% else %}none{% endif %};
+        }
+        
+        /* Card styling */
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .view-all-btn {
+            color: var(--role-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .view-all-btn:hover {
+            color: var(--role-primary);
+        }
+        
+        /* List items */
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .list-item {
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .list-item:hover {
+            border-color: var(--role-secondary);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        .item-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .item-info p {
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+        }
+        
+        .status-pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-scheduled {
+            background: rgba(23, 162, 184, 0.1);
+            color: var(--info);
+        }
+        
+        /* Mobile Responsive */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--role-primary);
+            cursor: pointer;
+        }
+        
+        @media (max-width: 968px) {
+            .portal-menu {
+                display: none;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .portal-nav {
+                padding: 1rem;
+            }
+            
+            .dashboard-container {
+                padding: 1rem;
+            }
+            
+            .welcome-content h1 {
+                font-size: 1.5rem;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Portal Header -->
+    <header class="portal-header">
+        <nav class="portal-nav">
+            <a href="/portal" class="portal-logo">
+                <img src="/logo.svg" alt="Sapyyn">
+                <span>Portal</span>
+                <span class="role-badge">
+                    {% if session.role == 'admin' %}Super Admin
+                    {% elif session.role == 'dentist_admin' %}Dental Admin
+                    {% elif session.role == 'specialist_admin' %}Specialist Admin
+                    {% elif session.role == 'dentist' %}Dentist
+                    {% elif session.role == 'specialist' %}Specialist
+                    {% else %}Patient
+                    {% endif %}
+                </span>
+            </a>
+            
+            <ul class="portal-menu">
+                <li><a href="/portal/dashboard" class="active">Dashboard</a></li>
+                {% if session.role in ['dentist', 'specialist', 'dentist_admin', 'specialist_admin'] %}
+                <li><a href="/portal/referrals">Referrals</a></li>
+                <li><a href="/portal/patients">Patients</a></li>
+                {% elif session.role == 'patient' %}
+                <li><a href="/portal/referrals">My Referrals</a></li>
+                <li><a href="/portal/appointments">Appointments</a></li>
+                {% endif %}
+                {% if session.role == 'admin' %}
+                <li><a href="/portal/administration">Administration</a></li>
+                <li><a href="/portal/analytics">Analytics</a></li>
+                {% endif %}
+                <li><a href="/portal/documents">Documents</a></li>
+                <li><a href="/portal/messages">Messages</a></li>
+            </ul>
+            
+            <div class="user-controls">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-dot"></span>
+                </button>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        {% if session.full_name %}
+                            {{ session.full_name.split()[0][0] }}{% if session.full_name.split()|length > 1 %}{{ session.full_name.split()[1][0] }}{% endif %}
+                        {% else %}
+                            {{ session.username[0]|upper }}
+                        {% endif %}
+                    </div>
+                    <div class="user-info">
+                        <div style="font-weight: 600; font-size: 0.875rem;">
+                            {% if session.full_name %}{{ session.full_name }}
+                            {% else %}{{ session.username }}
+                            {% endif %}
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--gray);">
+                            {% if session.role == 'admin' %}Super Administrator
+                            {% elif session.role == 'dentist_admin' %}Dental Administrator
+                            {% elif session.role == 'specialist_admin' %}Specialist Administrator
+                            {% elif session.role == 'dentist' %}Dentist
+                            {% elif session.role == 'specialist' %}Specialist
+                            {% else %}Patient #{{ session.user_id }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="font-size: 0.75rem; color: var(--gray);"></i>
+                </div>
+            </div>
+            
+            <button class="mobile-menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Dashboard Content -->
+    <main class="dashboard-container">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <div class="welcome-content">
+                <h1>Welcome back, {% if session.full_name %}{{ session.full_name.split()[0] }}{% else %}{{ session.username }}{% endif %}!</h1>
+                <p>
+                    {% if session.role == 'admin' %}
+                        System overview: Monitor all platform activities
+                    {% elif session.role == 'dentist_admin' %}
+                        Practice overview: Manage your dental practice
+                    {% elif session.role == 'specialist_admin' %}
+                        Specialist practice overview: Manage referrals and appointments
+                    {% elif session.role == 'dentist' %}
+                        You have access to patient referrals and practice management
+                    {% elif session.role == 'specialist' %}
+                        You have new referrals waiting for review
+                    {% else %}
+                        You have 2 upcoming appointments and 1 pending referral
+                    {% endif %}
+                </p>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions">
+            {% if session.role == 'admin' %}
+                <!-- Super Admin Actions -->
+                <a href="/admin/users" class="action-card">
+                    <div class="action-icon"><i class="fas fa-users"></i></div>
+                    <h3>Manage Users</h3>
+                    <p>View and manage all users</p>
+                </a>
+                <a href="/admin/analytics" class="action-card">
+                    <div class="action-icon"><i class="fas fa-chart-bar"></i></div>
+                    <h3>Analytics</h3>
+                    <p>Platform performance metrics</p>
+                </a>
+                <a href="/admin/settings" class="action-card">
+                    <div class="action-icon"><i class="fas fa-cog"></i></div>
+                    <h3>System Settings</h3>
+                    <p>Configure platform settings</p>
+                </a>
+                <a href="/admin/reports" class="action-card">
+                    <div class="action-icon"><i class="fas fa-file-alt"></i></div>
+                    <h3>Reports</h3>
+                    <p>Generate system reports</p>
+                </a>
+            {% elif session.role in ['dentist_admin', 'specialist_admin'] %}
+                <!-- Admin Actions -->
+                <a href="/portal/practice-management" class="action-card">
+                    <div class="action-icon"><i class="fas fa-building"></i></div>
+                    <h3>Practice Management</h3>
+                    <p>Manage practice settings</p>
+                </a>
+                <a href="/portal/staff" class="action-card">
+                    <div class="action-icon"><i class="fas fa-user-md"></i></div>
+                    <h3>Staff Management</h3>
+                    <p>Manage practice staff</p>
+                </a>
+                <a href="/portal/reports" class="action-card">
+                    <div class="action-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Practice Reports</h3>
+                    <p>View practice analytics</p>
+                </a>
+                <a href="/referral/new" class="action-card">
+                    <div class="action-icon"><i class="fas fa-plus"></i></div>
+                    <h3>New Referral</h3>
+                    <p>Create patient referral</p>
+                </a>
+            {% elif session.role in ['dentist', 'specialist'] %}
+                <!-- Provider Actions -->
+                <a href="/referral/new" class="action-card">
+                    <div class="action-icon"><i class="fas fa-plus"></i></div>
+                    <h3>New Referral</h3>
+                    <p>{% if session.role == 'dentist' %}Refer to specialist{% else %}Refer to another specialist{% endif %}</p>
+                </a>
+                <a href="/portal/patients" class="action-card">
+                    <div class="action-icon"><i class="fas fa-users"></i></div>
+                    <h3>Patient Management</h3>
+                    <p>View and manage patients</p>
+                </a>
+                <a href="/portal/appointments" class="action-card">
+                    <div class="action-icon"><i class="fas fa-calendar"></i></div>
+                    <h3>Appointments</h3>
+                    <p>Manage your schedule</p>
+                </a>
+                <a href="/upload" class="action-card">
+                    <div class="action-icon"><i class="fas fa-upload"></i></div>
+                    <h3>Upload Document</h3>
+                    <p>Share medical records</p>
+                </a>
+            {% else %}
+                <!-- Patient Actions -->
+                <a href="/portal/new-referral" class="action-card">
+                    <div class="action-icon"><i class="fas fa-plus"></i></div>
+                    <h3>New Referral</h3>
+                    <p>Request a specialist referral</p>
+                </a>
+                <a href="/portal/find-provider" class="action-card">
+                    <div class="action-icon"><i class="fas fa-search"></i></div>
+                    <h3>Find Provider</h3>
+                    <p>Search our network</p>
+                </a>
+                <a href="/portal/upload-document" class="action-card">
+                    <div class="action-icon"><i class="fas fa-upload"></i></div>
+                    <h3>Upload Document</h3>
+                    <p>Share medical records</p>
+                </a>
+                <a href="/portal/schedule" class="action-card">
+                    <div class="action-icon"><i class="fas fa-calendar-plus"></i></div>
+                    <h3>Schedule Visit</h3>
+                    <p>Book an appointment</p>
+                </a>
+            {% endif %}
+        </section>
+
+        <!-- Main Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Left Column - Main Content -->
+            <div>
+                {% if session.role == 'admin' %}
+                    <!-- Super Admin Content -->
+                    <section class="card admin-section">
+                        <div class="card-header">
+                            <h2 class="card-title">System Overview</h2>
+                            <a href="/admin/dashboard" class="view-all-btn">View Detailed →</a>
+                        </div>
+                        <div class="item-list">
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>Total Users</h4>
+                                    <p>Active platform users</p>
+                                </div>
+                                <span class="status-badge status-active">1,234</span>
+                            </div>
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>Monthly Referrals</h4>
+                                    <p>Referrals processed this month</p>
+                                </div>
+                                <span class="status-badge status-active">456</span>
+                            </div>
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>System Health</h4>
+                                    <p>All services operational</p>
+                                </div>
+                                <span class="status-badge status-active">Healthy</span>
+                            </div>
+                        </div>
+                    </section>
+                {% elif session.role in ['dentist_admin', 'specialist_admin'] %}
+                    <!-- Admin Content -->
+                    <section class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Practice Overview</h2>
+                            <a href="/portal/practice" class="view-all-btn">View All →</a>
+                        </div>
+                        <div class="item-list">
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>Active Staff</h4>
+                                    <p>Currently working staff members</p>
+                                </div>
+                                <span class="status-badge status-active">12</span>
+                            </div>
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>Monthly Revenue</h4>
+                                    <p>Revenue for current month</p>
+                                </div>
+                                <span class="status-badge status-active">$45,670</span>
+                            </div>
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>Pending Referrals</h4>
+                                    <p>Referrals awaiting review</p>
+                                </div>
+                                <span class="status-badge status-pending">8</span>
+                            </div>
+                        </div>
+                    </section>
+                {% elif session.role in ['dentist', 'specialist'] %}
+                    <!-- Provider Content -->
+                    <section class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">{% if session.role == 'dentist' %}Recent Referrals Sent{% else %}Recent Referrals Received{% endif %}</h2>
+                            <a href="/portal/referrals" class="view-all-btn">View All →</a>
+                        </div>
+                        <div class="item-list">
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>{% if session.role == 'dentist' %}Orthodontic Consultation{% else %}Complex Root Canal{% endif %}</h4>
+                                    <p>{% if session.role == 'dentist' %}To Dr. Sarah Miller • Sent Dec 10, 2024{% else %}From Dr. Johnson • Received Dec 10, 2024{% endif %}</p>
+                                </div>
+                                <span class="status-badge status-active">Active</span>
+                            </div>
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>{% if session.role == 'dentist' %}Periodontal Treatment{% else %}Surgical Extraction{% endif %}</h4>
+                                    <p>{% if session.role == 'dentist' %}To Dr. Michael Chen • Sent Dec 5, 2024{% else %}From Dr. Smith • Received Dec 5, 2024{% endif %}</p>
+                                </div>
+                                <span class="status-badge status-scheduled">Scheduled</span>
+                            </div>
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>{% if session.role == 'dentist' %}Implant Consultation{% else %}TMJ Evaluation{% endif %}</h4>
+                                    <p>{% if session.role == 'dentist' %}To Dr. James Wilson • Sent Nov 28, 2024{% else %}From Dr. Brown • Received Nov 28, 2024{% endif %}</p>
+                                </div>
+                                <span class="status-badge status-pending">Pending</span>
+                            </div>
+                        </div>
+                    </section>
+                {% else %}
+                    <!-- Patient Content -->
+                    <section class="card patient-section">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Referrals</h2>
+                            <a href="/portal/referrals" class="view-all-btn">View All →</a>
+                        </div>
+                        <div class="item-list">
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>Orthodontic Consultation</h4>
+                                    <p>Dr. Sarah Miller • Requested Dec 10, 2024</p>
+                                </div>
+                                <span class="status-badge status-active">Active</span>
+                            </div>
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>Root Canal Treatment</h4>
+                                    <p>Dr. Michael Chen • Requested Dec 5, 2024</p>
+                                </div>
+                                <span class="status-badge status-scheduled">Scheduled</span>
+                            </div>
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>Periodontal Evaluation</h4>
+                                    <p>Dr. James Wilson • Requested Nov 28, 2024</p>
+                                </div>
+                                <span class="status-badge status-pending">Pending</span>
+                            </div>
+                        </div>
+                    </section>
+                {% endif %}
+            </div>
+
+            <!-- Right Column - Sidebar Content -->
+            <div>
+                {% if session.role == 'admin' %}
+                    <!-- Admin Sidebar -->
+                    <section class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Admin Actions</h2>
+                        </div>
+                        <div class="item-list">
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>User Created</h4>
+                                    <p>New dentist account: Dr. Smith</p>
+                                </div>
+                            </div>
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>System Update</h4>
+                                    <p>Platform updated to v2.1.0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                {% elif session.role in ['patient'] %}
+                    <!-- Patient Sidebar -->
+                    <section class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Upcoming Appointments</h2>
+                        </div>
+                        <div class="item-list">
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>Dec 18, 2024</h4>
+                                    <p>Dr. Sarah Miller<br>Orthodontic Consultation<br>2:30 PM</p>
+                                </div>
+                            </div>
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>Dec 22, 2024</h4>
+                                    <p>Dr. Michael Chen<br>Root Canal - Session 1<br>10:00 AM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                {% else %}
+                    <!-- Provider Sidebar -->
+                    <section class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Today's Schedule</h2>
+                        </div>
+                        <div class="item-list">
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>9:00 AM</h4>
+                                    <p>Patient: Sarah Johnson<br>Consultation</p>
+                                </div>
+                            </div>
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>11:30 AM</h4>
+                                    <p>Patient: Mike Davis<br>Follow-up</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                {% endif %}
+
+                <!-- Messages Widget (for all roles) -->
+                <section class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Recent Messages</h2>
+                        <a href="/portal/messages" class="view-all-btn">View All →</a>
+                    </div>
+                    <div class="item-list">
+                        <div class="list-item">
+                            <div class="item-info">
+                                <h4>
+                                    {% if session.role == 'admin' %}System Notification
+                                    {% elif session.role in ['dentist_admin', 'specialist_admin'] %}Practice Update
+                                    {% elif session.role in ['dentist', 'specialist'] %}Patient Message
+                                    {% else %}Dr. Sarah Miller
+                                    {% endif %}
+                                </h4>
+                                <p>
+                                    {% if session.role == 'admin' %}System maintenance scheduled for tonight
+                                    {% elif session.role in ['dentist_admin', 'specialist_admin'] %}Monthly reports are now available
+                                    {% elif session.role in ['dentist', 'specialist'] %}Thank you for the referral, patient scheduled
+                                    {% else %}Your orthodontic consultation has been confirmed for Dec 18 at 2:30 PM
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+            const menu = document.querySelector('.portal-menu');
+            menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+            menu.style.position = 'absolute';
+            menu.style.top = '100%';
+            menu.style.left = '0';
+            menu.style.right = '0';
+            menu.style.background = 'white';
+            menu.style.flexDirection = 'column';
+            menu.style.padding = '1rem';
+            menu.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+        });
+
+        // Notification animation
+        const notificationDot = document.querySelector('.notification-dot');
+        if (notificationDot) {
+            setInterval(() => {
+                notificationDot.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    notificationDot.style.transform = 'scale(1)';
+                }, 200);
+            }, 3000);
+        }
+
+        // Add hover effects to cards
+        document.querySelectorAll('.action-card, .list-item').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

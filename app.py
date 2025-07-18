@@ -2604,7 +2604,7 @@ def check_static_auth():
         portal_pages = [
             'Dashboard', 'Patient Referral', 'Patient Referrral Admin portal',
             'Patient Referrral Admin', 'Referral History', 'Track Referral',
-            'Medical Updates', 'portal-1', 'portal-referrals', 'portal-signup',
+            'Medical Updates', 'portal-referrals', 'portal-signup',
             'portal_integrations', 'portal_messaging', 'portal_settings',
             'patient', 'dentist', 'specialist', 'sapyyn-portal',
             'sapyyn_unified_portal', 'sapyyn_unified_portal (1)', 'sapyyn_unified_portal (2)',
@@ -2648,7 +2648,7 @@ def serve_static_with_auth_check(filename):
         portal_pages = [
             'Dashboard', 'Patient Referral', 'Patient Referrral Admin portal',
             'Patient Referrral Admin', 'Referral History', 'Track Referral',
-            'Medical Updates', 'portal-1', 'portal-referrals', 'portal-signup',
+            'Medical Updates', 'portal-referrals', 'portal-signup',
             'portal_integrations', 'portal_messaging', 'portal_settings',
             'patient', 'dentist', 'specialist', 'sapyyn-portal',
             'sapyyn_unified_portal', 'sapyyn_unified_portal (1)', 'sapyyn_unified_portal (2)',
@@ -2695,7 +2695,7 @@ def serve_static_page(filename):
     portal_pages = [
         'Dashboard', 'Patient Referral', 'Patient Referrral Admin portal',
         'Patient Referrral Admin', 'Referral History', 'Track Referral',
-        'Medical Updates', 'portal-1', 'portal-referrals', 'portal-signup',
+        'Medical Updates', 'portal-referrals', 'portal-signup',
         'portal_integrations', 'portal_messaging', 'portal_settings',
         'patient', 'dentist', 'specialist', 'sapyyn-portal',
         'sapyyn_unified_portal', 'sapyyn_unified_portal (1)', 'sapyyn_unified_portal (2)',
@@ -2817,6 +2817,33 @@ def surgical_instruction():
 def case_studies():
     """Case studies page"""
     return render_template('case_studies.html')
+
+@app.route('/portal-1.html')
+def portal_1():
+    """Role-based portal-1 page with user-specific content"""
+    if 'user_id' not in session:
+        flash('Please log in to access the portal.', 'error')
+        return redirect(url_for('login'))
+    
+    # Get user information from database for more complete session data
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT id, username, full_name, role FROM users WHERE id = ?', (session['user_id'],))
+    user = cursor.fetchone()
+    conn.close()
+    
+    if not user:
+        flash('User not found. Please log in again.', 'error')
+        session.clear()
+        return redirect(url_for('login'))
+    
+    # Update session with complete user data
+    session['username'] = user[1]
+    session['full_name'] = user[2]
+    session['role'] = user[3]
+    
+    # Render role-specific portal-1 template
+    return render_template('portal-1.html')
 
 @app.route('/tutorials')
 def tutorials():
