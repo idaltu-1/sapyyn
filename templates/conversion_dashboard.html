@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+
+{% block title %}Conversion Dashboard - Sapyyn{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="bi bi-graph-up text-primary"></i>
+                        Case Conversion Dashboard
+                    </h1>
+                    <p class="text-muted">Track referral conversions and optimize case acceptance</p>
+                </div>
+                <div>
+                    <button class="btn btn-outline-primary" onclick="refreshDashboard()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conversion Funnel -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-funnel"></i>
+                        Conversion Pipeline (Last 30 Days)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="conversionFunnel" class="row">
+                        <!-- Funnel stages will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <i class="bi bi-clock-history text-warning fs-1 mb-2"></i>
+                    <h5>Pending Consultations</h5>
+                    <h3 id="pendingConsultations" class="text-warning">-</h3>
+                    <button class="btn btn-outline-warning btn-sm" onclick="showPendingReferrals()">
+                        View All
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <i class="bi bi-check-circle text-success fs-1 mb-2"></i>
+                    <h5>Cases Accepted Today</h5>
+                    <h3 id="casesAcceptedToday" class="text-success">-</h3>
+                    <button class="btn btn-outline-success btn-sm" onclick="showAcceptedCases()">
+                        View Details
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <i class="bi bi-currency-dollar text-info fs-1 mb-2"></i>
+                    <h5>Revenue This Month</h5>
+                    <h3 id="monthlyRevenue" class="text-info">-</h3>
+                    <button class="btn btn-outline-info btn-sm" onclick="showRevenueDetails()">
+                        Breakdown
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Referring Doctors Performance -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-people"></i>
+                        Top Referring Doctors
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="referringDoctorsTable">
+                        <!-- Table will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-trophy"></i>
+                        Team Performance (This Week)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="teamPerformanceTable">
+                        <!-- Table will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Case Management Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-gear"></i>
+                        Quick Case Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Update Case Status</h6>
+                            <form id="caseUpdateForm">
+                                <div class="mb-3">
+                                    <label for="referralId" class="form-label">Referral ID</label>
+                                    <input type="text" class="form-control" id="referralId" placeholder="Enter referral ID">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="caseStatus" class="form-label">New Status</label>
+                                    <select class="form-select" id="caseStatus">
+                                        <option value="">Select status...</option>
+                                        <option value="consultation_scheduled">Consultation Scheduled</option>
+                                        <option value="case_accepted">Case Accepted</option>
+                                        <option value="case_rejected">Case Rejected</option>
+                                        <option value="treatment_started">Treatment Started</option>
+                                        <option value="treatment_completed">Treatment Completed</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3" id="estimatedValueDiv" style="display: none;">
+                                    <label for="estimatedValue" class="form-label">Estimated Value ($)</label>
+                                    <input type="number" class="form-control" id="estimatedValue" step="0.01">
+                                </div>
+                                <div class="mb-3" id="rejectionReasonDiv" style="display: none;">
+                                    <label for="rejectionReason" class="form-label">Rejection Reason</label>
+                                    <textarea class="form-control" id="rejectionReason" rows="2"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="caseNotes" class="form-label">Notes</label>
+                                    <textarea class="form-control" id="caseNotes" rows="2"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg"></i>
+                                    Update Status
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Key Metrics</h6>
+                            <div class="list-group">
+                                <div class="list-group-item d-flex justify-content-between">
+                                    <span>Conversion Rate (30 days)</span>
+                                    <strong id="conversionRate">-</strong>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between">
+                                    <span>Average Case Value</span>
+                                    <strong id="avgCaseValue">-</strong>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between">
+                                    <span>Average Response Time</span>
+                                    <strong id="avgResponseTime">-</strong>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between">
+                                    <span>Active Referrals</span>
+                                    <strong id="activeReferrals">-</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals for detailed views -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailModalTitle">Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailModalBody">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadConversionAnalytics();
+    
+    // Setup case status change handler
+    document.getElementById('caseStatus').addEventListener('change', function() {
+        const status = this.value;
+        const estimatedValueDiv = document.getElementById('estimatedValueDiv');
+        const rejectionReasonDiv = document.getElementById('rejectionReasonDiv');
+        
+        if (status === 'case_accepted') {
+            estimatedValueDiv.style.display = 'block';
+            rejectionReasonDiv.style.display = 'none';
+        } else if (status === 'case_rejected') {
+            estimatedValueDiv.style.display = 'none';
+            rejectionReasonDiv.style.display = 'block';
+        } else {
+            estimatedValueDiv.style.display = 'none';
+            rejectionReasonDiv.style.display = 'none';
+        }
+    });
+    
+    // Setup case update form
+    document.getElementById('caseUpdateForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        updateCaseStatus();
+    });
+});
+
+function loadConversionAnalytics() {
+    fetch('/api/conversion-analytics')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayConversionFunnel(data.conversion_funnel);
+                displayReferringDoctors(data.top_referring_doctors);
+                displayTeamPerformance(data.team_performance);
+                updateQuickStats(data);
+            } else {
+                console.error('Error loading analytics:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
+function displayConversionFunnel(funnelData) {
+    const stages = [
+        { key: 'pending', name: 'Referrals Received', color: 'primary' },
+        { key: 'consultation_scheduled', name: 'Consultations Scheduled', color: 'info' },
+        { key: 'case_accepted', name: 'Cases Accepted', color: 'success' },
+        { key: 'treatment_started', name: 'Treatments Started', color: 'warning' },
+        { key: 'treatment_completed', name: 'Treatments Completed', color: 'dark' }
+    ];
+    
+    const funnelHtml = stages.map(stage => {
+        const data = funnelData[stage.key] || { count: 0, avg_estimated_value: 0 };
+        return `
+            <div class="col-md-2 text-center mb-3">
+                <div class="card border-${stage.color}">
+                    <div class="card-body">
+                        <h4 class="text-${stage.color}">${data.count}</h4>
+                        <p class="small">${stage.name}</p>
+                        ${data.avg_estimated_value > 0 ? `<small class="text-muted">Avg: $${data.avg_estimated_value}</small>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    document.getElementById('conversionFunnel').innerHTML = funnelHtml;
+}
+
+function displayReferringDoctors(doctors) {
+    const tableHtml = `
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Doctor</th>
+                        <th>Referrals</th>
+                        <th>Conversion</th>
+                        <th>Avg Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${doctors.map(doctor => `
+                        <tr>
+                            <td>${doctor.name}</td>
+                            <td>${doctor.referral_count}</td>
+                            <td>${doctor.conversion_rate}%</td>
+                            <td>$${doctor.avg_case_value}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+    document.getElementById('referringDoctorsTable').innerHTML = tableHtml;
+}
+
+function displayTeamPerformance(team) {
+    const tableHtml = `
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Team Member</th>
+                        <th>Processed</th>
+                        <th>Accepted</th>
+                        <th>Response Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${team.map(member => `
+                        <tr>
+                            <td>${member.name}</td>
+                            <td>${member.referrals_processed}</td>
+                            <td>${member.cases_accepted}</td>
+                            <td>${member.avg_response_time}h</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+    document.getElementById('teamPerformanceTable').innerHTML = tableHtml;
+}
+
+function updateQuickStats(data) {
+    // Update quick stats based on conversion data
+    const funnelData = data.conversion_funnel;
+    document.getElementById('pendingConsultations').textContent = funnelData.pending?.count || 0;
+    document.getElementById('casesAcceptedToday').textContent = funnelData.case_accepted?.count || 0;
+    
+    // Calculate total revenue
+    const totalRevenue = Object.values(funnelData).reduce((sum, stage) => 
+        sum + (stage.avg_actual_value * stage.count), 0);
+    document.getElementById('monthlyRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
+}
+
+function updateCaseStatus() {
+    const referralId = document.getElementById('referralId').value;
+    const status = document.getElementById('caseStatus').value;
+    const notes = document.getElementById('caseNotes').value;
+    const estimatedValue = document.getElementById('estimatedValue').value;
+    const rejectionReason = document.getElementById('rejectionReason').value;
+    
+    if (!referralId || !status) {
+        alert('Please fill in required fields');
+        return;
+    }
+    
+    const data = {
+        referral_id: referralId,
+        status: status,
+        notes: notes
+    };
+    
+    if (estimatedValue) data.estimated_value = estimatedValue;
+    if (rejectionReason) data.rejection_reason = rejectionReason;
+    
+    fetch('/api/case/update-status', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Case status updated successfully!');
+            document.getElementById('caseUpdateForm').reset();
+            document.getElementById('estimatedValueDiv').style.display = 'none';
+            document.getElementById('rejectionReasonDiv').style.display = 'none';
+            loadConversionAnalytics(); // Refresh the dashboard
+        } else {
+            alert('Error updating case status: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating case status');
+    });
+}
+
+function refreshDashboard() {
+    loadConversionAnalytics();
+}
+
+function showPendingReferrals() {
+    // Implementation for showing pending referrals modal
+    window.location.href = '/dashboard?filter=pending';
+}
+
+function showAcceptedCases() {
+    // Implementation for showing accepted cases modal
+    window.location.href = '/dashboard?filter=accepted';
+}
+
+function showRevenueDetails() {
+    // Implementation for showing revenue breakdown modal
+    alert('Revenue breakdown feature coming soon!');
+}
+</script>
+{% endblock %}
