@@ -1149,6 +1149,11 @@ def login():
     
     return render_template('login.html', provider_code=provider_code)
 
+@app.route('/signup')
+def signup():
+    """Redirect signup to register page for compatibility"""
+    return redirect(url_for('register'))
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     """User registration"""
