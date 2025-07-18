@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Sapyyn - Secure Patient Referral System | HIPAA Compliant Healthcare{% endblock %}
+{% block title %}Sapyyn - Transforming Dental Referrals | Secure Network for Dentists & Specialists{% endblock %}
 
-{% block description %}Transform your patient referrals with Sapyyn's secure, HIPAA-compliant platform. Streamline document management, track referrals with QR codes, and connect providers seamlessly.{% endblock %}
+{% block description %}Transforming dental referrals with Sapyyn's secure, HIPAA-compliant platform. Connect general dentists, specialists, and patients seamlessly. No referral slips through the cracks.{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
@@ -10,7 +10,7 @@
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "Sapyyn Patient Referral System",
-    "description": "Secure, HIPAA-compliant patient referral management platform for healthcare providers",
+    "description": "Secure, HIPAA-compliant dental referral network connecting general dentists, specialists, and patients",
     "url": "{{ request.url }}",
     "mainEntity": {
         "@type": "SoftwareApplication",
@@ -43,16 +43,15 @@
                     <div class="hero-badge mb-3">
                         <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
                             <i class="bi bi-star-fill me-1"></i>
-                            Trusted by 1000+ Healthcare Providers
+                            Trusted by 1000+ Dental Practices & Specialists
                         </span>
                     </div>
                     <h1 class="hero-title display-3 fw-bold mb-4 text-white">
-                        <span class="text-gradient">Streamline Patient Referrals</span>
-                        <br>in Seconds
+                        <span class="text-gradient">Transforming Dental Referrals</span>
+                        <br>Seamless, Paperless, and Patient-Centered
                     </h1>
                     <p class="hero-subtitle lead mb-4 text-white-75">
-                        Transform your practice with our secure, HIPAA-compliant platform. 
-                        Manage referrals, track progress, and improve patient outcomes with ease.
+                        Connect general dentists, specialists, and patients on one secure network to ensure no referral slips through the cracks. Faster referrals, better care coordination.
                     </p>
                     
                     {% if not session.user_id %}
@@ -62,7 +61,7 @@
                             <h5 class="fw-bold text-primary mb-2">
                                 <i class="bi bi-rocket-takeoff me-2"></i>Start Your Free 14-Day Trial
                             </h5>
-                            <p class="text-muted small mb-0">Join thousands of healthcare professionals already using Sapyyn</p>
+                            <p class="text-muted small mb-0">Join thousands of dental professionals already using Sapyyn</p>
                         </div>
                         <form id="inlineSignupForm" class="signup-form" method="post" action="{{ url_for('register') }}">
                             <div class="input-group input-group-lg mb-3">
@@ -73,7 +72,7 @@
                                        class="form-control border-start-0 ps-0" 
                                        name="email" 
                                        id="heroEmail" 
-                                       placeholder="Enter your work email" 
+                                       placeholder="Enter your dental practice email" 
                                        required>
                                 <button type="submit" class="btn btn-primary btn-lg px-4">
                                     <i class="bi bi-arrow-right me-1"></i>Get Started
@@ -236,9 +235,9 @@
                         <div class="bg-success bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
                             <i class="bi bi-chat-dots-fill text-success fs-1"></i>
                         </div>
-                        <h4 class="fw-bold mb-3 text-success">Request Consultation</h4>
+                        <h4 class="fw-bold mb-3 text-success">Request Dental Consultation</h4>
                         <p class="text-muted mb-4">
-                            Connect with specialists for case discussions, second opinions, and collaborative treatment planning.
+                            Connect with dental specialists for case discussions, second opinions, and collaborative treatment planning. Build your professional network.
                         </p>
                         <div class="mb-3">
                             <span class="badge bg-success text-white mb-2">Expert Guidance</span>
@@ -302,8 +301,8 @@
         <div class="row text-center mb-5">
             <div class="col">
 
-                <h2 class="fw-bold">Solve Your Biggest Referral Challenges</h2>
-                <p class="lead text-muted">Transform how you manage patient referrals with solutions that address real healthcare pain points</p>
+                <h2 class="fw-bold">Connect, Collaborate, and Transform Dental Care</h2>
+                <p class="lead text-muted">Build stronger professional networks and deliver better patient outcomes through seamless collaboration between general dentists and specialists</p>
             </div>
         </div>
         
@@ -315,9 +314,9 @@
                         <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
                             <i class="bi bi-bell-fill text-primary fs-1"></i>
                         </div>
-                        <h4 class="fw-bold mb-3">Never Lose Track of a Referral</h4>
+                        <h4 class="fw-bold mb-3">Keep Everyone Connected & Informed</h4>
                         <p class="text-muted mb-3">
-                            Real-time status updates keep your team and patients informed throughout the entire referral process.
+                            Real-time communication between dentists, specialists, and patients. Never lose track of a referral with automated updates and secure messaging.
                         </p>
                         <div class="benefit-highlight">
                             <i class="bi bi-check-circle-fill text-success me-2"></i>
@@ -334,9 +333,9 @@
                         <div class="bg-success bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
                             <i class="bi bi-arrow-left-right text-success fs-1"></i>
                         </div>
-                        <h4 class="fw-bold mb-3">Seamless Referral Transfers</h4>
+                        <h4 class="fw-bold mb-3">Seamless Dental Specialist Connections</h4>
                         <p class="text-muted mb-3">
-                            Eliminate paperwork delays and reduce patient wait times with instant digital referral transfers.
+                            Instantly connect patients with the right dental specialists. Build your professional network and ensure no referral falls through the cracks.
                         </p>
                         <div class="benefit-highlight">
                             <i class="bi bi-check-circle-fill text-success me-2"></i>
@@ -353,13 +352,13 @@
                         <div class="bg-info bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
                             <i class="bi bi-chat-dots-fill text-info fs-1"></i>
                         </div>
-                        <h4 class="fw-bold mb-3">Provider-to-Provider Collaboration Chat</h4>
+                        <h4 class="fw-bold mb-3">Dental Professional Network & Communication</h4>
                         <p class="text-muted mb-3">
-                            Connect directly with specialists to discuss cases and ensure optimal patient outcomes.
+                            Build lasting relationships with dental specialists. Real-time case discussions, consultation requests, and collaborative treatment planning – all in one secure platform.
                         </p>
                         <div class="benefit-highlight">
                             <i class="bi bi-check-circle-fill text-success me-2"></i>
-                            <small class="text-muted">HIPAA-compliant messaging built right in</small>
+                            <small class="text-muted">Direct specialist connections + HIPAA messaging</small>
                         </div>
                     </div>
                 </div>
