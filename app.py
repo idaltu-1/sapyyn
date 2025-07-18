@@ -2834,7 +2834,7 @@ def loyalty_rewards():
 
     return redirect(url_for('rewards_dashboard'))
 
-@app.route('/hippa')
+@app.route('/hipaa')
 def hipaa():
     """HIPAA compliance page"""
     return render_template('hipaa.html')
