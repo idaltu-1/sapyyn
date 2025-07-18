@@ -123,6 +123,17 @@ def init_db():
     except sqlite3.OperationalError:
         pass
     
+    # Add patient_id and dentist_id columns for new referrals module
+    try:
+        cursor.execute('ALTER TABLE referrals ADD COLUMN patient_id INTEGER')
+    except sqlite3.OperationalError:
+        pass
+    
+    try:
+        cursor.execute('ALTER TABLE referrals ADD COLUMN dentist_id INTEGER')
+    except sqlite3.OperationalError:
+        pass
+    
     # Documents table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS documents (
@@ -4034,6 +4045,351 @@ def create_demo_users_if_needed():
     conn.commit()
     
     conn.close()
+
+# ============================================================================
+# NEW REFERRALS MODULE API ENDPOINTS
+# ============================================================================
+
+@app.route('/api/referrals', methods=['GET'])
+def get_referrals_list():
+    """Get list of referrals with filtering and permissions"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    try:
+        user_id = session['user_id']
+        user_role = session.get('role', 'patient')
+        status_filter = request.args.get('status', 'all')  # all, pending, completed
+        
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        # Build query based on user role and permissions
+        if user_role == 'admin':
+            # Admin sees all referrals
+            base_query = '''
+                SELECT r.*, 
+                       p.full_name as patient_name_user,
+                       d.full_name as dentist_name_user
+                FROM referrals r
+                LEFT JOIN users p ON r.patient_id = p.id
+                LEFT JOIN users d ON r.dentist_id = d.id
+            '''
+            query_params = []
+        elif user_role in ['dentist', 'dentist_admin', 'specialist', 'specialist_admin']:
+            # Dentists see referrals they initiated
+            base_query = '''
+                SELECT r.*,
+                       p.full_name as patient_name_user,
+                       d.full_name as dentist_name_user
+                FROM referrals r
+                LEFT JOIN users p ON r.patient_id = p.id
+                LEFT JOIN users d ON r.dentist_id = d.id
+                WHERE r.dentist_id = ? OR r.user_id = ?
+            '''
+            query_params = [user_id, user_id]
+        else:
+            # Patients see their own referrals
+            base_query = '''
+                SELECT r.*,
+                       p.full_name as patient_name_user,
+                       d.full_name as dentist_name_user
+                FROM referrals r
+                LEFT JOIN users p ON r.patient_id = p.id
+                LEFT JOIN users d ON r.dentist_id = d.id
+                WHERE r.patient_id = ? OR r.user_id = ?
+            '''
+            query_params = [user_id, user_id]
+        
+        # Add status filter
+        if status_filter != 'all':
+            if status_filter == 'pending':
+                base_query += ' AND (r.status = "pending" OR r.status = "emergency_pending" OR r.status = "consultation_pending")'
+            elif status_filter == 'completed':
+                base_query += ' AND (r.status = "completed" OR r.status = "treatment_completed")'
+            else:
+                base_query += ' AND r.status = ?'
+                query_params.append(status_filter)
+        
+        base_query += ' ORDER BY r.created_at DESC'
+        
+        cursor.execute(base_query, query_params)
+        referrals = cursor.fetchall()
+        
+        # Convert to list of dictionaries
+        columns = [description[0] for description in cursor.description]
+        referrals_list = []
+        for referral in referrals:
+            referral_dict = dict(zip(columns, referral))
+            referrals_list.append(referral_dict)
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'referrals': referrals_list,
+            'count': len(referrals_list),
+            'filter': status_filter
+        })
+        
+    except Exception as e:
+        app.logger.error(f'Error getting referrals list: {str(e)}')
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
+
+@app.route('/api/referrals/<int:referral_id>', methods=['GET'])
+def get_referral_detail(referral_id):
+    """Get detailed information for a specific referral"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    try:
+        user_id = session['user_id']
+        user_role = session.get('role', 'patient')
+        
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        # Get referral with permission check
+        if user_role == 'admin':
+            # Admin can see any referral
+            cursor.execute('''
+                SELECT r.*,
+                       p.full_name as patient_name_user,
+                       d.full_name as dentist_name_user
+                FROM referrals r
+                LEFT JOIN users p ON r.patient_id = p.id
+                LEFT JOIN users d ON r.dentist_id = d.id
+                WHERE r.id = ?
+            ''', (referral_id,))
+        elif user_role in ['dentist', 'dentist_admin', 'specialist', 'specialist_admin']:
+            # Dentists can see referrals they initiated
+            cursor.execute('''
+                SELECT r.*,
+                       p.full_name as patient_name_user,
+                       d.full_name as dentist_name_user
+                FROM referrals r
+                LEFT JOIN users p ON r.patient_id = p.id
+                LEFT JOIN users d ON r.dentist_id = d.id
+                WHERE r.id = ? AND (r.dentist_id = ? OR r.user_id = ?)
+            ''', (referral_id, user_id, user_id))
+        else:
+            # Patients can see their own referrals
+            cursor.execute('''
+                SELECT r.*,
+                       p.full_name as patient_name_user,
+                       d.full_name as dentist_name_user
+                FROM referrals r
+                LEFT JOIN users p ON r.patient_id = p.id
+                LEFT JOIN users d ON r.dentist_id = d.id
+                WHERE r.id = ? AND (r.patient_id = ? OR r.user_id = ?)
+            ''', (referral_id, user_id, user_id))
+        
+        referral = cursor.fetchone()
+        
+        if not referral:
+            conn.close()
+            return jsonify({'success': False, 'error': 'Referral not found or access denied'}), 404
+        
+        # Convert to dictionary
+        columns = [description[0] for description in cursor.description]
+        referral_dict = dict(zip(columns, referral))
+        
+        # Get related documents
+        cursor.execute('''
+            SELECT id, file_type, file_name, file_size, upload_date
+            FROM documents
+            WHERE referral_id = ?
+            ORDER BY upload_date DESC
+        ''', (referral_id,))
+        documents = cursor.fetchall()
+        
+        # Convert documents to list of dictionaries
+        doc_columns = [description[0] for description in cursor.description]
+        documents_list = [dict(zip(doc_columns, doc)) for doc in documents]
+        
+        referral_dict['documents'] = documents_list
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'referral': referral_dict
+        })
+        
+    except Exception as e:
+        app.logger.error(f'Error getting referral detail: {str(e)}')
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
+
+@app.route('/api/referrals', methods=['POST'])
+def create_referral():
+    """Create a new referral"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    try:
+        data = request.get_json()
+        user_id = session['user_id']
+        user_role = session.get('role', 'patient')
+        
+        # Extract required fields
+        patient_id = data.get('patient_id')
+        dentist_id = data.get('dentist_id')
+        notes = data.get('notes', '')
+        status = data.get('status', 'pending')
+        
+        # Additional fields for compatibility with existing system
+        patient_name = data.get('patient_name', '')
+        referring_doctor = data.get('referring_doctor', session.get('full_name', ''))
+        target_doctor = data.get('target_doctor', '')
+        medical_condition = data.get('medical_condition', '')
+        urgency_level = data.get('urgency_level', 'normal')
+        
+        # Validation
+        if not all([patient_id, dentist_id]):
+            return jsonify({'success': False, 'error': 'patient_id and dentist_id are required'}), 400
+        
+        # Permission check - only dentists/admin can create referrals
+        if user_role not in ['dentist', 'dentist_admin', 'specialist', 'specialist_admin', 'admin']:
+            return jsonify({'success': False, 'error': 'Insufficient permissions to create referrals'}), 403
+        
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        # Verify patient and dentist exist
+        cursor.execute('SELECT full_name FROM users WHERE id = ?', (patient_id,))
+        patient = cursor.fetchone()
+        if not patient:
+            conn.close()
+            return jsonify({'success': False, 'error': 'Patient not found'}), 404
+        
+        cursor.execute('SELECT full_name FROM users WHERE id = ?', (dentist_id,))
+        dentist = cursor.fetchone()
+        if not dentist:
+            conn.close()
+            return jsonify({'success': False, 'error': 'Dentist not found'}), 404
+        
+        # Generate referral ID and QR code
+        referral_id = str(uuid.uuid4())[:8].upper()
+        qr_data = f"Referral ID: {referral_id}\nPatient: {patient[0]}\nDentist: {dentist[0]}"
+        qr_code = generate_qr_code(qr_data)
+        
+        # Use patient/dentist names if not provided
+        if not patient_name:
+            patient_name = patient[0]
+        if not target_doctor:
+            target_doctor = dentist[0]
+        
+        # Create referral
+        cursor.execute('''
+            INSERT INTO referrals (
+                user_id, referral_id, patient_id, dentist_id, patient_name, 
+                referring_doctor, target_doctor, medical_condition, urgency_level,
+                status, notes, qr_code, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            user_id, referral_id, patient_id, dentist_id, patient_name,
+            referring_doctor, target_doctor, medical_condition, urgency_level,
+            status, notes, qr_code, datetime.now(), datetime.now()
+        ))
+        
+        new_referral_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'referral_id': new_referral_id,
+            'referral_uuid': referral_id,
+            'message': 'Referral created successfully'
+        })
+        
+    except Exception as e:
+        app.logger.error(f'Error creating referral: {str(e)}')
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
+
+@app.route('/api/referrals/<int:referral_id>', methods=['PATCH'])
+def update_referral_status():
+    """Update referral status (dentist or admin only)"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    try:
+        user_id = session['user_id']
+        user_role = session.get('role', 'patient')
+        
+        # Only dentists and admins can update status
+        if user_role not in ['dentist', 'dentist_admin', 'specialist', 'specialist_admin', 'admin']:
+            return jsonify({'success': False, 'error': 'Insufficient permissions to update referral status'}), 403
+        
+        data = request.get_json()
+        new_status = data.get('status')
+        notes = data.get('notes', '')
+        
+        if not new_status:
+            return jsonify({'success': False, 'error': 'Status is required'}), 400
+        
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        # Check if referral exists and user has permission to update it
+        if user_role == 'admin':
+            cursor.execute('SELECT id, status, dentist_id FROM referrals WHERE id = ?', (referral_id,))
+        else:
+            cursor.execute('''
+                SELECT id, status, dentist_id FROM referrals 
+                WHERE id = ? AND (dentist_id = ? OR user_id = ?)
+            ''', (referral_id, user_id, user_id))
+        
+        referral = cursor.fetchone()
+        
+        if not referral:
+            conn.close()
+            return jsonify({'success': False, 'error': 'Referral not found or access denied'}), 404
+        
+        old_status = referral[1]
+        
+        # Update referral status
+        update_fields = ['status = ?', 'updated_at = ?']
+        update_values = [new_status, datetime.now()]
+        
+        # Add notes to existing notes if provided
+        if notes:
+            cursor.execute('SELECT notes FROM referrals WHERE id = ?', (referral_id,))
+            existing_notes = cursor.fetchone()[0] or ''
+            new_notes = f"{existing_notes}\n\n[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Status updated to {new_status}: {notes}".strip()
+            update_fields.append('notes = ?')
+            update_values.append(new_notes)
+        
+        update_values.append(referral_id)
+        
+        cursor.execute(f'''
+            UPDATE referrals 
+            SET {', '.join(update_fields)}
+            WHERE id = ?
+        ''', update_values)
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Referral status updated from {old_status} to {new_status}',
+            'old_status': old_status,
+            'new_status': new_status
+        })
+        
+    except Exception as e:
+        app.logger.error(f'Error updating referral status: {str(e)}')
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
+
+@app.route('/my-referrals')
+def my_referrals_page():
+    """My Referrals page with filters"""
+    if 'user_id' not in session:
+        flash('Please log in to view your referrals.', 'error')
+        return redirect(url_for('login'))
+    
+    return render_template('my_referrals.html', user_role=session.get('role'))
 
 if __name__ == '__main__':
     init_db()
