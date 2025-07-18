@@ -4033,9 +4033,25 @@ def create_demo_users_if_needed():
     cursor.execute("UPDATE users SET role = 'dentist' WHERE role = 'doctor'")
     conn.commit()
     
-    conn.close()
 
-if __name__ == '__main__':
+    
+    
+    conn.close()
+@app.route('/my-referrals')
+def my_referrals():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    conn = sqlite3.connect('sapyyn.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM referrals WHERE patient_id = ?', (session['user_id'],))
+    referrals = cursor.fetchall()
+    conn.close()
+    return render_template('my_referrals.html', referrals=referrals)
+
+
+if if __name__ == '__main__':
+    
     init_db()
     create_demo_users_if_needed()
     app.run(debug=True, host='0.0.0.0', port=5000)
