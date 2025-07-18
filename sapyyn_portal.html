@@ -1,24 +1,339 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-    rel="stylesheet">
-  <title>Dashboard</title>
-  <script type="module" crossorigin src="/assets/index-867af749.js"></script>
-  <link rel="stylesheet" href="/assets/index-ffb7e56b.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapyyn Portal - Healthcare Referral Hub</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2C5AA0;
+            --secondary-color: #f6c75f;
+            --accent-color: #fcf8e8;
+            --text-dark: #2d3748;
+            --text-light: #718096;
+            --border-light: #e2e8f0;
+            --success-color: #38a169;
+            --danger-color: #e53e3e;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .portal-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .portal-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .portal-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .portal-logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        
+        .portal-title {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .portal-subtitle {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+        
+        .portal-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .portal-button {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 15px;
+            padding: 30px 25px;
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            min-height: 180px;
+        }
+        
+        .portal-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .portal-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(44, 90, 160, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .portal-button:hover::before {
+            left: 100%;
+        }
+        
+        .button-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+        
+        .portal-button:hover .button-icon {
+            transform: scale(1.1);
+        }
+        
+        .button-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+        
+        .button-description {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            line-height: 1.4;
+        }
+        
+        .portal-button.primary {
+            background: linear-gradient(135deg, var(--primary-color), #1e3a8a);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .portal-button.primary .button-icon,
+        .portal-button.primary .button-title,
+        .portal-button.primary .button-description {
+            color: white;
+        }
+        
+        .portal-button.primary:hover {
+            background: linear-gradient(135deg, #1e3a8a, var(--primary-color));
+            color: white;
+        }
+        
+        .user-info {
+            background: var(--accent-color);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .user-greeting {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin: 0;
+        }
+        
+        .quick-actions {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .quick-actions-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .quick-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-link {
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-link:hover {
+            background: #1e3a8a;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .portal-card {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .portal-title {
+                font-size: 2rem;
+            }
+            
+            .portal-buttons {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .portal-button {
+                padding: 25px 20px;
+                min-height: 160px;
+            }
+            
+            .button-icon {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
 </head>
-
 <body>
-  <div id="root"></div>
-  
-  <script src="https://chatbox.simplebase.co/projects/65fde462604c7e2eafcc9139/widget.js"></script>
+    <div class="portal-container">
+        <div class="portal-card">
+            <div class="portal-header">
+                <img src="/Sapyyn-logo.png" alt="Sapyyn Logo" class="portal-logo" onerror="this.style.display='none'">
+                <h1 class="portal-title">Sapyyn Portal</h1>
+                <p class="portal-subtitle">Your comprehensive healthcare referral platform</p>
+            </div>
+            
+            <div class="user-info">
+                <p class="user-greeting">
+                    <i class="bi bi-person-circle me-2"></i>
+                    Welcome to your healthcare portal hub
+                </p>
+            </div>
+            
+            <div class="portal-buttons">
+                <!-- New Referral Button -->
+                <a href="/referral/new" class="portal-button primary">
+                    <i class="bi bi-plus-circle-fill button-icon"></i>
+                    <div class="button-title">New Referral</div>
+                    <div class="button-description">Request a specialist referral</div>
+                </a>
+                
+                <!-- Find Provider Button -->
+                <a href="/find-provider" class="portal-button">
+                    <i class="bi bi-search button-icon"></i>
+                    <div class="button-title">Find Provider</div>
+                    <div class="button-description">Search our network</div>
+                </a>
+                
+                <!-- Upload Document Button -->
+                <a href="/upload" class="portal-button">
+                    <i class="bi bi-cloud-upload-fill button-icon"></i>
+                    <div class="button-title">Upload Document</div>
+                    <div class="button-description">Share medical records</div>
+                </a>
+                
+                <!-- Schedule Visit Button -->
+                <a href="/appointments" class="portal-button">
+                    <i class="bi bi-calendar-plus-fill button-icon"></i>
+                    <div class="button-title">Schedule Visit</div>
+                    <div class="button-description">Book an appointment</div>
+                </a>
+            </div>
+            
+            <div class="quick-actions">
+                <div class="quick-actions-title">Quick Access</div>
+                <div class="quick-links">
+                    <a href="/dashboard" class="quick-link">
+                        <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                    </a>
+                    <a href="/referrals" class="quick-link">
+                        <i class="bi bi-arrow-right-circle me-1"></i>My Referrals
+                    </a>
+                    <a href="/documents" class="quick-link">
+                        <i class="bi bi-file-earmark-text me-1"></i>Documents
+                    </a>
+                    <a href="/login" class="quick-link">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chatbox widget -->
+    <script src="https://chatbox.simplebase.co/projects/65fde462604c7e2eafcc9139/widget.js"></script>
+    
+    <script>
+        // Add smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Add loading effect for portal buttons
+        document.querySelectorAll('.portal-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                // Add a subtle loading effect
+                this.style.opacity = '0.7';
+                setTimeout(() => {
+                    this.style.opacity = '1';
+                }, 300);
+            });
+        });
+    </script>
 </body>
-
 </html>
