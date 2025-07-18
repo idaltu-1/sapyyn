@@ -496,6 +496,34 @@ def init_db():
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
     ''')
+    
+    # Appointments table for portal functionality
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS appointments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            appointment_id TEXT UNIQUE NOT NULL,
+            patient_id INTEGER,
+            provider_id INTEGER NOT NULL,
+            referral_id TEXT,
+            appointment_type TEXT DEFAULT 'consultation',
+            appointment_date TIMESTAMP NOT NULL,
+            duration_minutes INTEGER DEFAULT 60,
+            status TEXT DEFAULT 'scheduled',
+            notes TEXT,
+            patient_name TEXT,
+            patient_email TEXT,
+            patient_phone TEXT,
+            reason TEXT,
+            location TEXT,
+            virtual_meeting_link TEXT,
+            created_by INTEGER,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (patient_id) REFERENCES users (id),
+            FOREIGN KEY (provider_id) REFERENCES users (id),
+            FOREIGN KEY (created_by) REFERENCES users (id)
+        )
+    ''')
 
     conn.commit()
     conn.close()
@@ -2690,6 +2718,244 @@ def generate_new_provider_code():
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': f'Failed to generate provider code: {str(e)}'}), 500
+
+@app.route('/portal/appointments')
+def appointments_portal():
+    """Appointments portal for all user types"""
+    if 'user_id' not in session:
+        flash('Please log in to access appointments.', 'error')
+        return redirect(url_for('login'))
+    
+    user_role = session.get('role')
+    user_id = session.get('user_id')
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Get appointments based on user role
+    if user_role in ['dentist', 'dentist_admin', 'specialist', 'specialist_admin']:
+        # Providers see appointments with them
+        cursor.execute('''
+            SELECT a.id, a.appointment_id, a.appointment_date, a.appointment_type, 
+                   a.status, a.patient_name, a.patient_email, a.patient_phone, 
+                   a.reason, a.duration_minutes, a.notes, a.location, a.virtual_meeting_link,
+                   u.full_name as created_by_name
+            FROM appointments a
+            LEFT JOIN users u ON a.created_by = u.id
+            WHERE a.provider_id = ?
+            ORDER BY a.appointment_date DESC
+        ''', (user_id,))
+    elif user_role == 'patient':
+        # Patients see their own appointments
+        cursor.execute('''
+            SELECT a.id, a.appointment_id, a.appointment_date, a.appointment_type, 
+                   a.status, a.patient_name, a.patient_email, a.patient_phone, 
+                   a.reason, a.duration_minutes, a.notes, a.location, a.virtual_meeting_link,
+                   p.full_name as provider_name
+            FROM appointments a
+            LEFT JOIN users p ON a.provider_id = p.id
+            WHERE a.patient_id = ? OR a.patient_email = ?
+            ORDER BY a.appointment_date DESC
+        ''', (user_id, session.get('email')))
+    else:  # admin
+        # Admins see all appointments
+        cursor.execute('''
+            SELECT a.id, a.appointment_id, a.appointment_date, a.appointment_type, 
+                   a.status, a.patient_name, a.patient_email, a.patient_phone, 
+                   a.reason, a.duration_minutes, a.notes, a.location, a.virtual_meeting_link,
+                   p.full_name as provider_name, u.full_name as created_by_name
+            FROM appointments a
+            LEFT JOIN users p ON a.provider_id = p.id
+            LEFT JOIN users u ON a.created_by = u.id
+            ORDER BY a.appointment_date DESC
+        ''')
+    
+    appointments = cursor.fetchall()
+    
+    # Get available providers for new appointments (for patients and admins)
+    providers = []
+    if user_role in ['patient', 'admin']:
+        cursor.execute('''
+            SELECT id, full_name, role FROM users 
+            WHERE role IN ('dentist', 'dentist_admin', 'specialist', 'specialist_admin')
+            ORDER BY full_name
+        ''')
+        providers = cursor.fetchall()
+    
+    conn.close()
+    
+    return render_template('portal/appointments.html', 
+                         appointments=appointments, 
+                         providers=providers,
+                         user_role=user_role)
+
+@app.route('/api/appointments', methods=['POST'])
+def create_appointment():
+    """Create a new appointment"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    data = request.get_json()
+    
+    # Extract appointment data
+    provider_id = data.get('provider_id')
+    appointment_date = data.get('appointment_date')
+    appointment_type = data.get('appointment_type', 'consultation')
+    duration_minutes = data.get('duration_minutes', 60)
+    patient_name = data.get('patient_name')
+    patient_email = data.get('patient_email')
+    patient_phone = data.get('patient_phone')
+    reason = data.get('reason')
+    notes = data.get('notes')
+    location = data.get('location')
+    virtual_meeting_link = data.get('virtual_meeting_link')
+    
+    # Validation
+    if not all([provider_id, appointment_date, patient_name]):
+        return jsonify({'error': 'Provider, appointment date, and patient name are required'}), 400
+    
+    # Generate unique appointment ID
+    appointment_id = str(uuid.uuid4())[:12].upper()
+    
+    user_id = session.get('user_id')
+    user_role = session.get('role')
+    
+    # Set patient_id if user is a patient
+    patient_id = user_id if user_role == 'patient' else None
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute('''
+            INSERT INTO appointments (
+                appointment_id, patient_id, provider_id, appointment_date, 
+                appointment_type, duration_minutes, patient_name, patient_email, 
+                patient_phone, reason, notes, location, virtual_meeting_link, created_by
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            appointment_id, patient_id, provider_id, appointment_date,
+            appointment_type, duration_minutes, patient_name, patient_email,
+            patient_phone, reason, notes, location, virtual_meeting_link, user_id
+        ))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True, 
+            'appointment_id': appointment_id,
+            'message': 'Appointment created successfully'
+        })
+        
+    except Exception as e:
+        conn.close()
+        return jsonify({'error': f'Failed to create appointment: {str(e)}'}), 500
+
+@app.route('/api/appointments/<appointment_id>', methods=['PUT'])
+def update_appointment(appointment_id):
+    """Update an appointment"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    data = request.get_json()
+    user_id = session.get('user_id')
+    user_role = session.get('role')
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Check if user has permission to update this appointment
+    if user_role in ['dentist', 'dentist_admin', 'specialist', 'specialist_admin']:
+        # Providers can update their own appointments
+        cursor.execute('SELECT id FROM appointments WHERE appointment_id = ? AND provider_id = ?', 
+                      (appointment_id, user_id))
+    elif user_role == 'patient':
+        # Patients can update their own appointments
+        cursor.execute('SELECT id FROM appointments WHERE appointment_id = ? AND patient_id = ?', 
+                      (appointment_id, user_id))
+    else:  # admin
+        # Admins can update any appointment
+        cursor.execute('SELECT id FROM appointments WHERE appointment_id = ?', (appointment_id,))
+    
+    appointment = cursor.fetchone()
+    if not appointment:
+        conn.close()
+        return jsonify({'error': 'Appointment not found or access denied'}), 404
+    
+    # Update appointment
+    update_fields = []
+    update_values = []
+    
+    allowed_fields = ['appointment_date', 'appointment_type', 'duration_minutes', 
+                     'status', 'patient_name', 'patient_email', 'patient_phone', 
+                     'reason', 'notes', 'location', 'virtual_meeting_link']
+    
+    for field in allowed_fields:
+        if field in data:
+            update_fields.append(f"{field} = ?")
+            update_values.append(data[field])
+    
+    if update_fields:
+        update_fields.append("updated_at = CURRENT_TIMESTAMP")
+        update_values.append(appointment_id)
+        
+        query = f"UPDATE appointments SET {', '.join(update_fields)} WHERE appointment_id = ?"
+        
+        try:
+            cursor.execute(query, update_values)
+            conn.commit()
+            conn.close()
+            
+            return jsonify({'success': True, 'message': 'Appointment updated successfully'})
+            
+        except Exception as e:
+            conn.close()
+            return jsonify({'error': f'Failed to update appointment: {str(e)}'}), 500
+    
+    conn.close()
+    return jsonify({'error': 'No valid fields to update'}), 400
+
+@app.route('/api/appointments/<appointment_id>', methods=['DELETE'])
+def delete_appointment(appointment_id):
+    """Delete an appointment"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    user_id = session.get('user_id')
+    user_role = session.get('role')
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Check if user has permission to delete this appointment
+    if user_role in ['dentist', 'dentist_admin', 'specialist', 'specialist_admin']:
+        # Providers can delete their own appointments
+        cursor.execute('SELECT id FROM appointments WHERE appointment_id = ? AND provider_id = ?', 
+                      (appointment_id, user_id))
+    elif user_role == 'patient':
+        # Patients can delete their own appointments
+        cursor.execute('SELECT id FROM appointments WHERE appointment_id = ? AND patient_id = ?', 
+                      (appointment_id, user_id))
+    else:  # admin
+        # Admins can delete any appointment
+        cursor.execute('SELECT id FROM appointments WHERE appointment_id = ?', (appointment_id,))
+    
+    appointment = cursor.fetchone()
+    if not appointment:
+        conn.close()
+        return jsonify({'error': 'Appointment not found or access denied'}), 404
+    
+    try:
+        cursor.execute('DELETE FROM appointments WHERE appointment_id = ?', (appointment_id,))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True, 'message': 'Appointment deleted successfully'})
+        
+    except Exception as e:
+        conn.close()
+        return jsonify({'error': f'Failed to delete appointment: {str(e)}'}), 500
 
 @app.route('/api/quick-referral', methods=['POST'])
 def create_quick_referral():
