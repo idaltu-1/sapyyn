@@ -3044,6 +3044,73 @@ def get_user_contacts():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/referral/<referral_id>')
+def get_referral_detail(referral_id):
+    """Get detailed referral information"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Authentication required'}), 401
+    
+    try:
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        # Get referral details with access control
+        user_role = session.get('role', 'patient')
+        user_id = session['user_id']
+        
+        if user_role in ['dentist', 'dentist_admin']:
+            # Dentists can see their own referrals
+            cursor.execute('SELECT * FROM referrals WHERE referral_id = ? AND user_id = ?', 
+                         (referral_id, user_id))
+        elif user_role in ['specialist', 'specialist_admin']:
+            # Specialists can see referrals sent to them or created by them
+            user_full_name = session.get('full_name', '')
+            cursor.execute('''SELECT * FROM referrals 
+                            WHERE referral_id = ? AND (user_id = ? OR target_doctor = ?)''', 
+                         (referral_id, user_id, user_full_name))
+        else:
+            # Patients can see referrals related to them
+            patient_name = session.get('full_name', '')
+            cursor.execute('''SELECT * FROM referrals 
+                            WHERE referral_id = ? AND (patient_name LIKE ? OR user_id = ?)''', 
+                         (referral_id, f'%{patient_name}%', user_id))
+        
+        referral = cursor.fetchone()
+        conn.close()
+        
+        if not referral:
+            return jsonify({'success': False, 'error': 'Referral not found or access denied'}), 404
+        
+        # Convert to dictionary
+        referral_dict = {
+            'id': referral[0],
+            'user_id': referral[1],
+            'referral_id': referral[2],
+            'patient_name': referral[3],
+            'referring_doctor': referral[4],
+            'target_doctor': referral[5],
+            'medical_condition': referral[6],
+            'urgency_level': referral[7],
+            'status': referral[8],
+            'notes': referral[9],
+            'qr_code': referral[10],
+            'created_at': referral[11],
+            'updated_at': referral[12],
+            'case_status': referral[13] if len(referral) > 13 else None,
+            'consultation_date': referral[14] if len(referral) > 14 else None,
+            'case_accepted_date': referral[15] if len(referral) > 15 else None,
+            'treatment_start_date': referral[16] if len(referral) > 16 else None,
+            'treatment_complete_date': referral[17] if len(referral) > 17 else None,
+            'rejection_reason': referral[18] if len(referral) > 18 else None,
+            'estimated_value': referral[19] if len(referral) > 19 else None,
+            'actual_value': referral[20] if len(referral) > 20 else None
+        }
+        
+        return jsonify({'success': True, 'referral': referral_dict})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/referral/by-code', methods=['POST'])
 def create_referral_by_code():
     """Create referral using provider code"""
@@ -3572,10 +3639,108 @@ def original_page():
 
 @app.route('/referrals')
 def referrals():
-    """Referrals page - redirect to dashboard for logged in users"""
-    if 'user_id' in session:
-        return redirect(url_for('dashboard'))
-    return redirect(url_for('login'))
+    """My Referrals page with list and detail view"""
+    if 'user_id' not in session:
+        flash('Please log in to view your referrals.', 'error')
+        return redirect(url_for('login'))
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Get filter parameters
+    status_filter = request.args.get('status', 'all')
+    search_query = request.args.get('search', '')
+    sort_by = request.args.get('sort', 'created_at')
+    sort_order = request.args.get('order', 'desc')
+    
+    # Build base query - get referrals based on user role
+    user_role = session.get('role', 'patient')
+    
+    if user_role in ['dentist', 'dentist_admin']:
+        # Dentists see referrals they created
+        base_query = '''
+            SELECT r.*, COUNT(d.id) as document_count,
+                   u.full_name as target_provider_name
+            FROM referrals r
+            LEFT JOIN documents d ON r.id = d.referral_id
+            LEFT JOIN users u ON u.full_name = r.target_doctor
+            WHERE r.user_id = ?
+        '''
+        query_params = [session['user_id']]
+    elif user_role in ['specialist', 'specialist_admin']:
+        # Specialists see referrals sent to them + ones they created
+        base_query = '''
+            SELECT r.*, COUNT(d.id) as document_count,
+                   CASE WHEN r.user_id = ? THEN r.target_doctor ELSE u.full_name END as target_provider_name,
+                   CASE WHEN r.user_id = ? THEN 'sent' ELSE 'received' END as referral_direction
+            FROM referrals r
+            LEFT JOIN documents d ON r.id = d.referral_id
+            LEFT JOIN users u ON r.user_id = u.id
+            WHERE r.user_id = ? OR r.target_doctor = ?
+        '''
+        user_full_name = session.get('full_name', '')
+        query_params = [session['user_id'], session['user_id'], session['user_id'], user_full_name]
+    else:
+        # Patients see referrals where they are the patient
+        base_query = '''
+            SELECT r.*, COUNT(d.id) as document_count,
+                   r.target_doctor as target_provider_name,
+                   u.full_name as referring_provider_name
+            FROM referrals r
+            LEFT JOIN documents d ON r.id = d.referral_id
+            LEFT JOIN users u ON r.user_id = u.id
+            WHERE r.patient_name LIKE ? OR r.user_id = ?
+        '''
+        query_params = [f'%{session.get("full_name", "")}%', session['user_id']]
+    
+    # Add status filter
+    if status_filter != 'all':
+        base_query += ' AND r.status = ?'
+        query_params.append(status_filter)
+    
+    # Add search filter
+    if search_query:
+        base_query += ''' AND (r.patient_name LIKE ? OR r.referring_doctor LIKE ? 
+                             OR r.target_doctor LIKE ? OR r.medical_condition LIKE ?)'''
+        search_pattern = f'%{search_query}%'
+        query_params.extend([search_pattern, search_pattern, search_pattern, search_pattern])
+    
+    # Add GROUP BY and ORDER BY
+    base_query += f''' GROUP BY r.id ORDER BY r.{sort_by} {sort_order.upper()}'''
+    
+    cursor.execute(base_query, query_params)
+    referrals = cursor.fetchall()
+    
+    # Get summary statistics
+    cursor.execute('''
+        SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+            SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed,
+            SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) as cancelled,
+            SUM(CASE WHEN case_status = 'case_accepted' THEN 1 ELSE 0 END) as accepted
+        FROM referrals 
+        WHERE {} = ?
+    '''.format('user_id' if user_role in ['dentist', 'specialist'] else 'patient_name LIKE'), 
+    [session['user_id']] if user_role in ['dentist', 'specialist'] else [f'%{session.get("full_name", "")}%'])
+    
+    stats = cursor.fetchone()
+    
+    # Get available statuses for filter dropdown
+    cursor.execute('SELECT DISTINCT status FROM referrals WHERE user_id = ? ORDER BY status', (session['user_id'],))
+    available_statuses = [row[0] for row in cursor.fetchall()]
+    
+    conn.close()
+    
+    return render_template('referrals.html', 
+                         referrals=referrals,
+                         stats=stats,
+                         available_statuses=available_statuses,
+                         current_filter=status_filter,
+                         current_search=search_query,
+                         current_sort=sort_by,
+                         current_order=sort_order,
+                         user_role=user_role)
 
 
 @app.route('/surgicalInstruction')

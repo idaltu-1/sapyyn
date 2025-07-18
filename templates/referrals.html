@@ -1,0 +1,430 @@
+{% extends "base.html" %}
+
+{% block title %}My Referrals - Sapyyn{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="bi bi-clipboard-data me-2 text-primary"></i>My Referrals</h2>
+                    <p class="text-muted mb-0">Manage and track your patient referrals</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('new_referral') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>New Referral
+                    </a>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <i class="bi bi-clipboard-data text-primary fs-2 me-2"></i>
+                                <span class="h3 mb-0">{{ stats[0] or 0 }}</span>
+                            </div>
+                            <p class="text-muted mb-0">Total Referrals</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <i class="bi bi-clock text-warning fs-2 me-2"></i>
+                                <span class="h3 mb-0">{{ stats[1] or 0 }}</span>
+                            </div>
+                            <p class="text-muted mb-0">Pending</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <i class="bi bi-check-circle text-success fs-2 me-2"></i>
+                                <span class="h3 mb-0">{{ stats[2] or 0 }}</span>
+                            </div>
+                            <p class="text-muted mb-0">Completed</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <i class="bi bi-check2-all text-info fs-2 me-2"></i>
+                                <span class="h3 mb-0">{{ stats[4] or 0 }}</span>
+                            </div>
+                            <p class="text-muted mb-0">Accepted</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters and Search -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status" onchange="this.form.submit()">
+                                <option value="all" {{ 'selected' if current_filter == 'all' else '' }}>All Statuses</option>
+                                {% for status in available_statuses %}
+                                <option value="{{ status }}" {{ 'selected' if current_filter == status else '' }}>
+                                    {{ status.title() }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="sort" class="form-label">Sort By</label>
+                            <select class="form-select" id="sort" name="sort" onchange="this.form.submit()">
+                                <option value="created_at" {{ 'selected' if current_sort == 'created_at' else '' }}>Date Created</option>
+                                <option value="updated_at" {{ 'selected' if current_sort == 'updated_at' else '' }}>Last Updated</option>
+                                <option value="patient_name" {{ 'selected' if current_sort == 'patient_name' else '' }}>Patient Name</option>
+                                <option value="urgency_level" {{ 'selected' if current_sort == 'urgency_level' else '' }}>Urgency</option>
+                                <option value="status" {{ 'selected' if current_sort == 'status' else '' }}>Status</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="order" class="form-label">Order</label>
+                            <select class="form-select" id="order" name="order" onchange="this.form.submit()">
+                                <option value="desc" {{ 'selected' if current_order == 'desc' else '' }}>Newest First</option>
+                                <option value="asc" {{ 'selected' if current_order == 'asc' else '' }}>Oldest First</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Search</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       placeholder="Search patients, doctors, conditions..." 
+                                       value="{{ current_search }}">
+                                <button class="btn btn-outline-secondary" type="submit">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                                {% if current_search %}
+                                <a href="{{ url_for('referrals') }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Referrals List -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light border-0">
+                    <h6 class="card-title mb-0">
+                        <i class="bi bi-list-ul me-2"></i>Referrals List
+                        <span class="badge bg-primary ms-2">{{ referrals|length }}</span>
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    {% if referrals %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Referral ID</th>
+                                    <th>Patient</th>
+                                    {% if user_role in ['dentist', 'dentist_admin'] %}
+                                    <th>Referred To</th>
+                                    {% elif user_role in ['specialist', 'specialist_admin'] %}
+                                    <th>Direction</th>
+                                    <th>Provider</th>
+                                    {% else %}
+                                    <th>Referring Doctor</th>
+                                    <th>Specialist</th>
+                                    {% endif %}
+                                    <th>Condition</th>
+                                    <th>Status</th>
+                                    <th>Urgency</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for referral in referrals %}
+                                <tr>
+                                    <td>
+                                        <code class="text-primary">{{ referral[2] }}</code>
+                                        {% if referral[-1] > 0 %}
+                                        <br><small class="text-muted">
+                                            <i class="bi bi-paperclip"></i> {{ referral[-1] }} docs
+                                        </small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong>{{ referral[3] }}</strong>
+                                    </td>
+                                    {% if user_role in ['dentist', 'dentist_admin'] %}
+                                    <td>{{ referral[5] or 'Not assigned' }}</td>
+                                    {% elif user_role in ['specialist', 'specialist_admin'] %}
+                                    <td>
+                                        {% if referral|length > 20 and referral[20] %}
+                                        <span class="badge bg-{{ 'success' if referral[20] == 'sent' else 'info' }}">
+                                            {{ referral[20].title() }}
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-info">Received</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ referral[19] or referral[5] }}</td>
+                                    {% else %}
+                                    <td>{{ referral[4] or 'Self-referral' }}</td>
+                                    <td>{{ referral[5] }}</td>
+                                    {% endif %}
+                                    <td>
+                                        <span class="text-truncate d-inline-block" style="max-width: 150px;" 
+                                              title="{{ referral[6] }}">
+                                            {{ referral[6] }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% set status_colors = {
+                                            'pending': 'warning',
+                                            'in_progress': 'info', 
+                                            'completed': 'success',
+                                            'cancelled': 'danger',
+                                            'emergency_pending': 'danger'
+                                        } %}
+                                        <span class="badge bg-{{ status_colors.get(referral[8], 'secondary') }}">
+                                            {{ referral[8].replace('_', ' ').title() }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% set urgency_colors = {
+                                            'low': 'success',
+                                            'normal': 'primary',
+                                            'high': 'warning', 
+                                            'urgent': 'danger'
+                                        } %}
+                                        <span class="badge bg-{{ urgency_colors.get(referral[7], 'secondary') }}">
+                                            {{ referral[7].title() }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ referral[11][:10] if referral[11] else 'N/A' }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary" 
+                                                    onclick="viewReferralDetail('{{ referral[2] }}')"
+                                                    title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <a href="{{ url_for('track_referral', referral_id=referral[2]) }}" 
+                                               class="btn btn-outline-info" title="Track">
+                                                <i class="bi bi-geo-alt"></i>
+                                            </a>
+                                            {% if referral[10] %}
+                                            <button class="btn btn-outline-secondary" 
+                                                    onclick="viewQRCode('{{ referral[10] }}')"
+                                                    title="QR Code">
+                                                <i class="bi bi-qr-code"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-clipboard-x text-muted" style="font-size: 3rem;"></i>
+                        <h6 class="text-muted mt-3">No referrals found</h6>
+                        <p class="text-muted">
+                            {% if current_search or current_filter != 'all' %}
+                            Try adjusting your search criteria or filters.
+                            {% else %}
+                            Get started by creating your first referral.
+                            {% endif %}
+                        </p>
+                        {% if not current_search and current_filter == 'all' %}
+                        <a href="{{ url_for('new_referral') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>Create New Referral
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Referral Detail Modal -->
+<div class="modal fade" id="referralDetailModal" tabindex="-1" aria-labelledby="referralDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="referralDetailModalLabel">
+                    <i class="bi bi-clipboard-data me-2"></i>Referral Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="referralDetailContent">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Code Modal -->
+<div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qrCodeModalLabel">
+                    <i class="bi bi-qr-code me-2"></i>Referral QR Code
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center" id="qrCodeContent">
+                <!-- QR Code will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="downloadQRCode()">
+                    <i class="bi bi-download me-2"></i>Download
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewReferralDetail(referralId) {
+    const modal = new bootstrap.Modal(document.getElementById('referralDetailModal'));
+    const content = document.getElementById('referralDetailContent');
+    
+    // Show loading state
+    content.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3 text-muted">Loading referral details...</p>
+        </div>
+    `;
+    
+    modal.show();
+    
+    // Fetch referral details
+    fetch(`/api/referral/${referralId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const referral = data.referral;
+                content.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Basic Information</h6>
+                            <p><strong>Referral ID:</strong> <code>${referral.referral_id}</code></p>
+                            <p><strong>Patient:</strong> ${referral.patient_name}</p>
+                            <p><strong>Referring Doctor:</strong> ${referral.referring_doctor || 'N/A'}</p>
+                            <p><strong>Target Doctor:</strong> ${referral.target_doctor || 'N/A'}</p>
+                            <p><strong>Medical Condition:</strong> ${referral.medical_condition}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Status & Timeline</h6>
+                            <p><strong>Status:</strong> 
+                                <span class="badge bg-primary">${referral.status.replace('_', ' ').toUpperCase()}</span>
+                            </p>
+                            <p><strong>Urgency:</strong> 
+                                <span class="badge bg-warning">${referral.urgency_level.toUpperCase()}</span>
+                            </p>
+                            <p><strong>Created:</strong> ${new Date(referral.created_at).toLocaleString()}</p>
+                            <p><strong>Updated:</strong> ${new Date(referral.updated_at).toLocaleString()}</p>
+                        </div>
+                    </div>
+                    ${referral.notes ? `
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h6>Notes</h6>
+                                <div class="bg-light p-3 rounded">${referral.notes.replace(/\n/g, '<br>')}</div>
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+            } else {
+                content.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="bi bi-exclamation-triangle text-warning fs-2"></i>
+                        <h6 class="mt-3">Error Loading Details</h6>
+                        <p class="text-muted">${data.error || 'Unknown error occurred'}</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading referral details:', error);
+            content.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="bi bi-wifi-off text-muted fs-2"></i>
+                    <h6 class="mt-3">Connection Error</h6>
+                    <p class="text-muted">Please try again later</p>
+                </div>
+            `;
+        });
+}
+
+function viewQRCode(qrCodeData) {
+    const modal = new bootstrap.Modal(document.getElementById('qrCodeModal'));
+    const content = document.getElementById('qrCodeContent');
+    
+    content.innerHTML = `
+        <img src="data:image/png;base64,${qrCodeData}" class="img-fluid" alt="Referral QR Code">
+        <p class="mt-3 text-muted">Scan this QR code to quickly access referral information</p>
+    `;
+    
+    modal.show();
+}
+
+function downloadQRCode() {
+    const img = document.querySelector('#qrCodeContent img');
+    if (img) {
+        const link = document.createElement('a');
+        link.download = 'referral-qr-code.png';
+        link.href = img.src;
+        link.click();
+    }
+}
+</script>
+
+<style>
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+</style>
+{% endblock %}
