@@ -159,39 +159,43 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     {% if session.user_id %}
-                    <!-- Authenticated User Navigation -->
+                    <!-- Primary Portal Navigation Buttons -->
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('dashboard') }}">
                             <i class="bi bi-speedometer2"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('new_referral') }}">
-                            <i class="bi bi-plus-circle"></i> New Referral
+                        <a class="nav-link" href="{{ url_for('my_referrals') }}">
+                            <i class="bi bi-arrow-right-circle"></i> My Referrals
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('upload_file') }}">
-                            <i class="bi bi-cloud-upload"></i> Upload Documents
+                        <a class="nav-link" href="{{ url_for('appointments') }}">
+                            <i class="bi bi-calendar-check"></i> Appointments
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('view_documents') }}">
-                            <i class="bi bi-files"></i> My Documents
+                            <i class="bi bi-files"></i> Documents
                         </a>
                     </li>
-                    <!-- Portal Pages Dropdown -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('messages') }}">
+                            <i class="bi bi-chat-dots"></i> Messages
+                        </a>
+                    </li>
+                    <!-- Additional Portal Functions Dropdown -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="portalDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-grid-3x3-gap"></i> Portal
+                            <i class="bi bi-grid-3x3-gap"></i> More
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('portal_dashboard') }}"><i class="bi bi-speedometer2"></i> Portal Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('new_referral') }}"><i class="bi bi-plus-circle"></i> New Referral</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('upload_file') }}"><i class="bi bi-cloud-upload"></i> Upload Documents</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('referral_history') }}"><i class="bi bi-clock-history"></i> Referral History</a></li>
-
                             <li><a class="dropdown-item" href="#" onclick="promptForReferralId()"><i class="bi bi-search"></i> Track Referral</a></li>
-
-                            <li><a class="dropdown-item" href="{{ url_for('appointments') }}"><i class="bi bi-calendar-check"></i> Appointments</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('rewards_dashboard') }}"><i class="bi bi-trophy"></i> Rewards</a></li>
                             {% if session.role in ['admin', 'dentist_admin', 'specialist_admin'] %}
                             <li><hr class="dropdown-divider"></li>
                             <li><h6 class="dropdown-header">Administration</h6></li>
@@ -201,12 +205,6 @@
                             <li><a class="dropdown-item" href="{{ url_for('serve_static_page', filename='admin-referrals') }}"><i class="bi bi-clipboard-data"></i> Manage Referrals</a></li>
                             {% endif %}
                         </ul>
-                    </li>
-                    <!-- Rewards -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('rewards_dashboard') }}">
-                            <i class="bi bi-trophy"></i> Rewards
-                        </a>
                     </li>
                     {% else %}
                     <!-- Public Navigation - Organized by Categories -->
@@ -306,16 +304,21 @@
                             <span class="d-none d-lg-inline">{{ session.full_name or session.username }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="bi bi-person-circle me-2"></i> Account</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="bi bi-person me-2"></i> Profile</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('settings') }}"><i class="bi bi-gear me-2"></i> Settings</a></li>
                             {% if session.role == 'dentist' %}
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('dentist_portal') }}"><i class="bi bi-person-badge me-2"></i> Dentist Portal</a></li>
                             {% elif session.role == 'specialist' %}
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('specialist_portal') }}"><i class="bi bi-person-check me-2"></i> Specialist Portal</a></li>
                             {% elif session.role == 'patient' %}
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('patient_portal') }}"><i class="bi bi-person-heart me-2"></i> Patient Portal</a></li>
                             {% endif %}
                             {% if session.role in ['admin', 'dentist_admin', 'specialist_admin'] %}
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('admin_portal') }}"><i class="bi bi-shield-check me-2"></i> Admin Portal</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('analytics_dashboard') }}"><i class="bi bi-graph-up me-2"></i> Analytics Dashboard</a></li>
                             {% endif %}

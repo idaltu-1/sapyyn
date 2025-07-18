@@ -3238,6 +3238,22 @@ def appointments():
         return redirect(url_for('login'))
     return redirect(url_for('serve_static_page', filename='appointments'))
 
+@app.route('/messages')
+def messages():
+    """Messages page route"""
+    if 'user_id' not in session:
+        flash('Please log in to view messages.', 'error')
+        return redirect(url_for('login'))
+    return render_template('messages.html')
+
+@app.route('/my-referrals')
+def my_referrals():
+    """My Referrals page route - alias for referral history"""
+    if 'user_id' not in session:
+        flash('Please log in to view your referrals.', 'error')
+        return redirect(url_for('login'))
+    return redirect(url_for('referral_history'))
+
 @app.route('/portal-dashboard')
 def portal_dashboard():
     """Portal dashboard route based on user role"""
