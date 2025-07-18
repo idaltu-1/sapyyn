@@ -17,8 +17,20 @@ from datetime import datetime, timedelta
 import json
 import stripe
 
+# Import new authentication and security modules
+from config import Config
+from auth_utils import (
+    validate_password_complexity, 
+    validate_domain_restriction,
+    require_roles, 
+    require_login, 
+    require_page_access,
+    can_access_page
+)
+from forms import LoginForm, RegistrationForm, PasswordResetRequestForm, PasswordResetForm, ChangePasswordForm
+
 app = Flask(__name__)
-app.secret_key = 'sapyyn-patient-referral-system-2025'
+app.config.from_object(Config)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Stripe configuration
