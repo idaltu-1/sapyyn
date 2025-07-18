@@ -504,6 +504,70 @@ def allowed_file(filename):
     """Check if file extension is allowed"""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def scan_file_for_viruses(file_path):
+    """
+    Placeholder for virus scanning functionality.
+    This function provides a hook for integrating with ClamAV or other antivirus solutions.
+    
+    Args:
+        file_path (str): Path to the file to be scanned
+        
+    Returns:
+        dict: Scan result with status and details
+    """
+    try:
+        # Placeholder implementation
+        # In a real implementation, you would:
+        # 1. Use python-clamd to connect to ClamAV daemon
+        # 2. Scan the file using clamd.scan_file(file_path)
+        # 3. Return appropriate results
+        
+        # Example integration code (commented out):
+        # import clamd
+        # cd = clamd.ClamdUnixSocket()
+        # scan_result = cd.scan(file_path)
+        # if scan_result[file_path][0] == 'FOUND':
+        #     return {
+        #         'status': 'infected',
+        #         'virus_name': scan_result[file_path][1],
+        #         'message': f'Virus detected: {scan_result[file_path][1]}'
+        #     }
+        
+        # For now, return clean status (placeholder)
+        app.logger.info(f'Virus scan placeholder called for file: {file_path}')
+        
+        return {
+            'status': 'clean',
+            'virus_name': None,
+            'message': 'File scanned successfully - no threats detected (placeholder)'
+        }
+        
+    except Exception as e:
+        app.logger.error(f'Virus scan error for {file_path}: {str(e)}')
+        return {
+            'status': 'error',
+            'virus_name': None,
+            'message': f'Scan error: {str(e)}'
+        }
+
+def get_file_mime_type(filename):
+    """Get MIME type based on file extension"""
+    import mimetypes
+    mime_type, _ = mimetypes.guess_type(filename)
+    return mime_type or 'application/octet-stream'
+
+def format_file_size(size_bytes):
+    """Convert file size in bytes to human readable format"""
+    if size_bytes == 0:
+        return "0 B"
+    
+    size_names = ["B", "KB", "MB", "GB", "TB"]
+    import math
+    i = int(math.floor(math.log(size_bytes, 1024)))
+    p = math.pow(1024, i)
+    s = round(size_bytes / p, 2)
+    return f"{s} {size_names[i]}"
+
 def generate_qr_code(data):
     """Generate QR code for referral"""
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
