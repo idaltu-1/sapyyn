@@ -640,6 +640,30 @@ def init_db():
             'admin'
         ))
 
+    # Promotions table for PromotionSlot component
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS promotions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            promotion_type TEXT NOT NULL DEFAULT 'partner',  -- 'partner' or 'house'
+            location TEXT NOT NULL DEFAULT 'DASHBOARD_TOP',  -- Location where promotion should appear
+            weight INTEGER DEFAULT 1,  -- Weight for weighted round-robin selection
+            is_active BOOLEAN DEFAULT TRUE,
+            start_date TIMESTAMP,
+            end_date TIMESTAMP,
+            click_count INTEGER DEFAULT 0,
+            impression_count INTEGER DEFAULT 0,
+            link_url TEXT,
+            image_url TEXT,
+            partner_name TEXT,
+            created_by INTEGER,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (created_by) REFERENCES users (id)
+        )
+    ''')
+
     conn.commit()
     conn.close()
 
@@ -914,6 +938,89 @@ def inject_analytics_config():
         'hotjar_id': ANALYTICS_CONFIG['HOTJAR_SITE_ID'],
         'analytics_enabled': ANALYTICS_CONFIG['ENABLE_ANALYTICS']
     }
+
+def select_promotion(location='DASHBOARD_TOP'):
+    """
+    Select a promotion using weighted round-robin algorithm.
+    Returns a promotion dict or None if no active promotions found.
+    Falls back to house ads if no partner promotions are available.
+    """
+    import random
+    import time
+    from datetime import datetime
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Get active promotions for the specified location
+    current_time = datetime.now().isoformat()
+    cursor.execute('''
+        SELECT id, title, content, promotion_type, weight, link_url, image_url, 
+               partner_name, impression_count, click_count
+        FROM promotions 
+        WHERE is_active = 1 
+        AND location = ?
+        AND (start_date IS NULL OR start_date <= ?)
+        AND (end_date IS NULL OR end_date >= ?)
+        ORDER BY promotion_type DESC  -- Partner promotions first
+    ''', (location, current_time, current_time))
+    
+    promotions = cursor.fetchall()
+    
+    if not promotions:
+        conn.close()
+        return None
+    
+    # Separate partner and house promotions
+    partner_promotions = [p for p in promotions if p[3] == 'partner']
+    house_promotions = [p for p in promotions if p[3] == 'house']
+    
+    # Try to select from partner promotions first
+    selected_promotion = None
+    if partner_promotions:
+        # Weighted round-robin selection
+        total_weight = sum(p[4] for p in partner_promotions)  # p[4] is weight
+        if total_weight > 0:
+            rand_num = random.randint(1, total_weight)
+            cumulative_weight = 0
+            for promo in partner_promotions:
+                cumulative_weight += promo[4]
+                if rand_num <= cumulative_weight:
+                    selected_promotion = promo
+                    break
+    
+    # Fallback to house promotions if no partner promotion selected
+    if not selected_promotion and house_promotions:
+        # For house ads, use simple random selection
+        selected_promotion = random.choice(house_promotions)
+    
+    if selected_promotion:
+        # Convert to dict for easier template usage
+        promotion_dict = {
+            'id': selected_promotion[0],
+            'title': selected_promotion[1],
+            'content': selected_promotion[2],
+            'promotion_type': selected_promotion[3],
+            'weight': selected_promotion[4],
+            'link_url': selected_promotion[5],
+            'image_url': selected_promotion[6],
+            'partner_name': selected_promotion[7],
+            'impression_count': selected_promotion[8],
+            'click_count': selected_promotion[9]
+        }
+        
+        # Increment impression count
+        cursor.execute('''
+            UPDATE promotions SET impression_count = impression_count + 1 
+            WHERE id = ?
+        ''', (selected_promotion[0],))
+        conn.commit()
+        
+        conn.close()
+        return promotion_dict
+    
+    conn.close()
+    return None
 
 @app.route('/')
 def index():
@@ -1346,7 +1453,38 @@ def dashboard():
     
     conn.close()
     
-    return render_template('dashboard.html', referrals=referrals, recent_documents=recent_documents)
+    # Get promotion for dashboard top
+    dashboard_promotion = select_promotion('DASHBOARD_TOP')
+    
+    return render_template('dashboard.html', 
+                         referrals=referrals, 
+                         recent_documents=recent_documents,
+                         dashboard_promotion=dashboard_promotion)
+
+@app.route('/promotion/click/<int:promotion_id>')
+def promotion_click(promotion_id):
+    """Track promotion click and redirect to the promotion URL"""
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Increment click count
+    cursor.execute('''
+        UPDATE promotions SET click_count = click_count + 1 
+        WHERE id = ?
+    ''', (promotion_id,))
+    
+    # Get the promotion URL
+    cursor.execute('SELECT link_url FROM promotions WHERE id = ?', (promotion_id,))
+    result = cursor.fetchone()
+    
+    conn.commit()
+    conn.close()
+    
+    if result and result[0]:
+        return redirect(result[0])
+    else:
+        flash('Promotion link not found', 'error')
+        return redirect(url_for('dashboard'))
 
 @app.route('/referral/new', methods=['GET', 'POST'])
 @require_active_user
@@ -5115,6 +5253,107 @@ def cancel_appointment(appointment_id: int):
         conn.close()
     return redirect(url_for('portal_appointments'))
 
+
+# Promotion Management Admin Routes
+@app.route('/admin/promotions')
+@require_roles(['admin'])
+def admin_promotions():
+    """Admin page for managing promotions"""
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Get all promotions
+    cursor.execute('''
+        SELECT id, title, content, promotion_type, location, weight, is_active, 
+               start_date, end_date, click_count, impression_count, link_url, 
+               partner_name, created_at
+        FROM promotions 
+        ORDER BY is_active DESC, promotion_type DESC, created_at DESC
+    ''')
+    promotions = cursor.fetchall()
+    
+    # Get stats
+    cursor.execute('''
+        SELECT 
+            COUNT(*) as total,
+            COUNT(CASE WHEN is_active = 1 THEN 1 END) as active,
+            COUNT(CASE WHEN promotion_type = 'partner' THEN 1 END) as partner,
+            COUNT(CASE WHEN promotion_type = 'house' THEN 1 END) as house,
+            SUM(impression_count) as total_impressions,
+            SUM(click_count) as total_clicks
+        FROM promotions
+    ''')
+    stats = cursor.fetchone()
+    
+    conn.close()
+    
+    return render_template('admin_promotions.html', 
+                         promotions=promotions, 
+                         stats=stats)
+
+@app.route('/admin/promotions/new', methods=['GET', 'POST'])
+@require_roles(['admin'])
+def new_promotion():
+    """Create a new promotion"""
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        promotion_type = request.form['promotion_type']
+        location = request.form['location']
+        weight = int(request.form['weight'])
+        link_url = request.form.get('link_url', '')
+        image_url = request.form.get('image_url', '')
+        partner_name = request.form.get('partner_name', '')
+        start_date = request.form.get('start_date', '')
+        end_date = request.form.get('end_date', '')
+        
+        try:
+            conn = sqlite3.connect('sapyyn.db')
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                INSERT INTO promotions 
+                (title, content, promotion_type, location, weight, is_active,
+                 link_url, image_url, partner_name, start_date, end_date, created_by)
+                VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?)
+            ''', (title, content, promotion_type, location, weight, 
+                  link_url or None, image_url or None, partner_name or None,
+                  start_date or None, end_date or None, session['user_id']))
+            
+            conn.commit()
+            conn.close()
+            
+            flash('Promotion created successfully!', 'success')
+            return redirect(url_for('admin_promotions'))
+            
+        except Exception as e:
+            flash(f'Error creating promotion: {str(e)}', 'error')
+    
+    return render_template('new_promotion.html')
+
+@app.route('/admin/promotions/<int:promotion_id>/toggle', methods=['POST'])
+@require_roles(['admin'])
+def toggle_promotion(promotion_id):
+    """Toggle promotion active status"""
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute('''
+            UPDATE promotions 
+            SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END
+            WHERE id = ?
+        ''', (promotion_id,))
+        
+        conn.commit()
+        flash('Promotion status updated successfully!', 'success')
+        
+    except Exception as e:
+        flash(f'Error updating promotion: {str(e)}', 'error')
+    finally:
+        conn.close()
+    
+    return redirect(url_for('admin_promotions'))
 
 
 def create_demo_users_if_needed():
