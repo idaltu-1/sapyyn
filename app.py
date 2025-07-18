@@ -565,6 +565,53 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
+    # ---------------------------------------------------------------------------
+    # Appointments table
+    #
+    # Create a dedicated table to store appointment bookings between patients and
+    # providers. This table references the users table twice (once for the
+    # patient and once for the provider) and stores the scheduled datetime,
+    # optional appointment type, notes, status and timestamps. If the table
+    # already exists this statement will be ignored. Keeping this DDL close to
+    # other schema alterations ensures the database is ready before any routes
+    # interact with appointments.
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS appointments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            provider_id INTEGER NOT NULL,
+            appointment_date_time TIMESTAMP NOT NULL,
+            appointment_type TEXT,
+            notes TEXT,
+            status TEXT DEFAULT 'scheduled',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id),
+            FOREIGN KEY (provider_id) REFERENCES users (id)
+        )
+    ''')
+
+    # -----------------------------------------------------------------------
+    # Seed a default super administrator account if one does not already exist.
+    # This ensures the system has at least one user with full privileges after
+    # database initialization.  The credentials are pulled from the user’s
+    # configuration: email wgray@stloralsurgery.com and a strong password.  If
+    # the email already exists, no action is taken.
+    cursor.execute("SELECT id FROM users WHERE email = ?", ("wgray@stloralsurgery.com",))
+    if cursor.fetchone() is None:
+        from werkzeug.security import generate_password_hash
+        password_hash = generate_password_hash('P@$sW0rD54321$')
+        cursor.execute('''
+            INSERT INTO users (username, email, password_hash, full_name, role, created_at, is_verified)
+            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, 1)
+        ''', (
+            'wgray@stloralsurgery.com',
+            'wgray@stloralsurgery.com',
+            password_hash,
+            'Super Admin',
+            'admin'
+        ))
+
     conn.commit()
     conn.close()
 
@@ -674,6 +721,42 @@ def update_fraud_score(user_id, ip_address, email, device_fingerprint):
     conn.close()
     
     return score >= 50.0  # Return True if user should be paused
+
+# ---------------------------------------------------------------------------
+# Email Notification Utility
+#
+# The application occasionally needs to notify administrators or advocates when
+# important events occur, such as when an appointment is booked or a reward is
+# issued.  A full featured implementation would integrate with an email
+# provider (e.g., SMTP, SendGrid, SES).  For now we provide a simple helper
+# that logs the intent to send an email.  This allows the rest of the
+# application to call send_email() without crashing if an email service is not
+# configured.  To wire up a real service, replace the body of this function
+# with code that sends an email using your chosen provider.
+def send_email(to_email: str, subject: str, message: str) -> None:
+    """Send an email notification.
+
+    Parameters
+    ----------
+    to_email : str
+        Recipient email address.
+    subject : str
+        Subject line for the email.
+    message : str
+        Body of the email.
+
+    Notes
+    -----
+    This is a stub implementation.  It simply prints the email to the
+    application log.  Replace the print statement with your preferred email
+    sending logic (for example, using smtplib or a transactional email API).
+    """
+    try:
+        # Log the email being "sent".  In a production system you might use
+        # smtplib, sendgrid, or another service here.
+        print(f"[Email] To: {to_email} | Subject: {subject}\n{message}\n")
+    except Exception as e:
+        app.logger.error(f'Failed to send email to {to_email}: {e}')
 
 def record_device_fingerprint(fingerprint_hash, user_agent, screen_resolution, timezone, language, plugins, canvas_fingerprint):
     """Record or update device fingerprint"""
@@ -2742,15 +2825,24 @@ def dentist_portal():
         WHERE target_doctor LIKE ? OR target_doctor = ?
     ''', (f"%{session['full_name']}%", session['full_name']))
     incoming_stats = cursor.fetchone()
-    
+    # Determine unread notifications for this dentist (messages addressed to them)
+    cursor.execute('''
+        SELECT COUNT(*) FROM messages
+        WHERE recipient_id = ? AND is_read = 0 AND is_deleted_by_recipient = 0
+    ''', (session['user_id'],))
+    unread_count = cursor.fetchone()[0] or 0
+    unread_notifications = True if unread_count > 0 else False
+
     conn.close()
-    
+
     return render_template('portal/dentist.html', 
                          provider_info=provider_info,
                          stats=stats,
                          recent_referrals=recent_referrals,
                          incoming_stats=incoming_stats,
-                         user_role=session.get('role'))
+                         user_role=session.get('role'),
+                         active='dashboard',
+                         unread_notifications=unread_notifications)
 
 @app.route('/portal/specialist')
 @require_roles(['specialist', 'specialist_admin'])
@@ -2808,15 +2900,24 @@ def specialist_portal():
         ORDER BY created_at DESC LIMIT 10
     ''', (session['full_name'], f"%{session['full_name']}%"))
     incoming_referrals = cursor.fetchall()
-    
+    # Determine unread notifications for this specialist (messages addressed to them)
+    cursor.execute('''
+        SELECT COUNT(*) FROM messages
+        WHERE recipient_id = ? AND is_read = 0 AND is_deleted_by_recipient = 0
+    ''', (session['user_id'],))
+    unread_count = cursor.fetchone()[0] or 0
+    unread_notifications = True if unread_count > 0 else False
+
     conn.close()
-    
+
     return render_template('portal/specialist.html',
                          provider_info=provider_info,
                          incoming_stats=incoming_stats,
                          outgoing_stats=outgoing_stats,
                          incoming_referrals=incoming_referrals,
-                         user_role=session.get('role'))
+                         user_role=session.get('role'),
+                         active='dashboard',
+                         unread_notifications=unread_notifications)
 
 @app.route('/portal/patient')
 @require_roles(['patient'])
@@ -2853,14 +2954,24 @@ def patient_portal():
         WHERE patient_name LIKE ? OR notes LIKE ?
     ''', (f"%{session['full_name']}%", f"%{session['full_name']}%"))
     referral_stats = cursor.fetchone()
+
+    # Determine unread notifications (messages that the user has not read)
+    cursor.execute('''
+        SELECT COUNT(*) FROM messages
+        WHERE recipient_id = ? AND is_read = 0 AND is_deleted_by_recipient = 0
+    ''', (session['user_id'],))
+    unread_count = cursor.fetchone()[0] or 0
+    unread_notifications = True if unread_count > 0 else False
     
     conn.close()
-    
+
     return render_template('portal/patient.html',
                          referrals=referrals,
                          documents=documents,
                          referral_stats=referral_stats,
-                         user_role=session.get('role'))
+                         user_role=session.get('role'),
+                         active='dashboard',
+                         unread_notifications=unread_notifications)
 
 @app.route('/portal/admin')
 @require_roles(['dentist_admin', 'specialist_admin', 'admin'])
@@ -2967,8 +3078,16 @@ def admin_portal():
     ), (session['user_id'],) if user_role != 'admin' else ())
     recent_activity = cursor.fetchall()
     
+    # Determine unread notifications for this admin
+    cursor.execute('''
+        SELECT COUNT(*) FROM messages
+        WHERE recipient_id = ? AND is_read = 0 AND is_deleted_by_recipient = 0
+    ''', (session['user_id'],))
+    unread_count = cursor.fetchone()[0] or 0
+    unread_notifications = True if unread_count > 0 else False
+
     conn.close()
-    
+
     return render_template('portal/admin.html',
                          practice_info=practice_info,
                          practices_info=practices_info,
@@ -2976,7 +3095,9 @@ def admin_portal():
                          stats=stats,
                          recent_activity=recent_activity,
                          user_role=user_role,
-                         is_super_admin=(user_role == 'admin'))
+                         is_super_admin=(user_role == 'admin'),
+                         active='dashboard',
+                         unread_notifications=unread_notifications)
 
 @app.route('/portal/messages')
 def messages_portal():
@@ -2984,8 +3105,26 @@ def messages_portal():
     if 'user_id' not in session:
         flash('Please log in to access messages.', 'error')
         return redirect(url_for('login'))
-    
-    return render_template('messages.html', user_role=session.get('role'))
+    # Determine unread notifications for this user
+    user_id = session.get('user_id')
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            SELECT COUNT(*) FROM messages
+            WHERE recipient_id = ? AND is_read = 0 AND is_deleted_by_recipient = 0
+        ''', (user_id,))
+        unread_count = cursor.fetchone()[0] or 0
+        unread_notifications = True if unread_count > 0 else False
+    except Exception:
+        unread_notifications = False
+    finally:
+        conn.close()
+
+    return render_template('messages.html',
+                           user_role=session.get('role'),
+                           active='messages',
+                           unread_notifications=unread_notifications)
 
 @app.route('/portal/provider-code/generate', methods=['POST'])
 @require_roles(['dentist', 'dentist_admin', 'specialist', 'specialist_admin'])
@@ -3860,11 +3999,17 @@ def track_referral_page():
 
 @app.route('/appointments')
 def appointments():
-    """Appointments page route"""
+    """Legacy appointments page route.
+
+    This endpoint previously served a static appointments page.  It now simply
+    redirects authenticated users to the new dynamic appointments portal and
+    unauthenticated users to the login page.
+    """
     if 'user_id' not in session:
         flash('Please log in to view appointments.', 'error')
         return redirect(url_for('login'))
-    return redirect(url_for('serve_static_page', filename='appointments'))
+    # Redirect logged in users to the new appointments portal
+    return redirect(url_for('portal_appointments'))
 
 @app.route('/find-provider')
 def find_provider():
@@ -4337,6 +4482,39 @@ def analytics_dashboard():
     
     return render_template('analytics_dashboard.html')
 
+
+@app.route('/analytics/referrals')
+@require_roles(['admin', 'dentist_admin', 'specialist_admin'])
+def analytics_referrals():
+    """Display referral conversion metrics and cost‑per‑acquisition.
+
+    Administrators can access this endpoint to see high level statistics
+    summarising referral performance.  Conversions are defined as referrals
+    that have been accepted or completed.  The cost per acquisition (CPA) is
+    calculated as the total actual value of converted referrals divided by the
+    number of conversions.  If no conversions exist the CPA is zero.  The
+    results are passed to a dedicated template for display.
+    """
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    # Total number of referrals
+    cursor.execute('SELECT COUNT(*) FROM referrals')
+    total_referrals = cursor.fetchone()[0] or 0
+    # Count of converted referrals (accepted or completed)
+    cursor.execute("SELECT COUNT(*) FROM referrals WHERE status IN ('accepted', 'completed')")
+    conversions = cursor.fetchone()[0] or 0
+    # Sum of actual_value for converted referrals
+    cursor.execute("SELECT SUM(COALESCE(actual_value, 0)) FROM referrals WHERE status IN ('accepted', 'completed')")
+    total_value = cursor.fetchone()[0] or 0.0
+    conn.close()
+    # Compute CPA
+    cpa = (total_value / conversions) if conversions else 0.0
+    return render_template('analytics_referrals.html',
+                           total_referrals=total_referrals,
+                           conversions=conversions,
+                           total_value=total_value,
+                           cpa=cpa)
+
 @app.route('/api/feedback/<int:feedback_id>')
 def get_feedback_detail(feedback_id):
     """Get detailed feedback information"""
@@ -4420,6 +4598,251 @@ def export_feedback():
 def page_not_found(e):
     """Render custom 404 page"""
     return render_template('404.html'), 404
+
+
+# ---------------------------------------------------------------------------
+# Appointments Portal
+#
+# These routes power the appointments functionality of the portal.  Patients can
+# create new appointments with providers, providers can manage appointments
+# scheduled with them, and administrators have a global view.  The route
+# '/portal/appointments' handles listing and creation.  Additional endpoints
+# support updating and deleting appointments.  Access control is enforced via
+# the require_roles decorator and additional checks within each handler.
+
+@app.route('/portal/appointments', methods=['GET', 'POST'])
+@require_roles(['patient', 'dentist', 'specialist', 'dentist_admin', 'specialist_admin', 'admin'])
+def portal_appointments():
+    """List appointments and handle creation of new appointments.
+
+    - Patients can view their upcoming and past appointments and schedule
+      additional ones with a chosen provider.
+    - Providers (dentists and specialists) see appointments where they are the
+      provider.
+    - Administrators see all appointments.
+
+    For POST requests, only patients are allowed to create new appointments.
+    The form must provide 'provider_id', 'appointment_date_time', optional
+    'type' and 'notes'.  Upon successful creation an email notification is
+    logged via send_email().
+    """
+    user_id = session.get('user_id')
+    user_role = session.get('role')
+
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    # Make results return tuples instead of Row objects for simplicity
+    # (if row_factory is set globally, this can be removed).
+
+    # Handle creation
+    if request.method == 'POST':
+        action = request.form.get('action', 'create')
+        # Only allow patients to create appointments
+        if action == 'create' and user_role == 'patient':
+            provider_id = request.form.get('provider_id')
+            appointment_dt = request.form.get('appointment_date_time')
+            appointment_type = request.form.get('type')
+            notes = request.form.get('notes')
+            if not provider_id or not appointment_dt:
+                flash('Provider and appointment date/time are required.', 'error')
+            else:
+                try:
+                    cursor.execute('''
+                        INSERT INTO appointments (user_id, provider_id, appointment_date_time, appointment_type, notes, status)
+                        VALUES (?, ?, ?, ?, ?, 'scheduled')
+                    ''', (user_id, provider_id, appointment_dt, appointment_type, notes))
+                    conn.commit()
+                    # Notify provider and admin via email (stubbed)
+                    try:
+                        # Fetch provider email
+                        cursor.execute('SELECT email, full_name FROM users WHERE id = ?', (provider_id,))
+                        provider_info = cursor.fetchone()
+                        provider_email = provider_info[0] if provider_info else None
+                        provider_name = provider_info[1] if provider_info else 'Provider'
+                        patient_name = session.get('full_name', 'Patient')
+                        email_subject = 'New Appointment Scheduled'
+                        email_message = f"An appointment has been scheduled by {patient_name} with you on {appointment_dt}."
+                        if provider_email:
+                            send_email(provider_email, email_subject, email_message)
+                        # Also notify administrators (all dentist_admin, specialist_admin and admin users)
+                        cursor.execute("SELECT email FROM users WHERE role IN ('admin','dentist_admin','specialist_admin')")
+                        admin_emails = cursor.fetchall()
+                        for admin_email in admin_emails:
+                            send_email(admin_email[0], email_subject, f"{patient_name} booked an appointment with {provider_name} on {appointment_dt}.")
+                    except Exception as e:
+                        app.logger.warning(f'Could not send appointment notification: {e}')
+                    flash('Appointment scheduled successfully!', 'success')
+                    return redirect(url_for('portal_appointments'))
+                except Exception as e:
+                    conn.rollback()
+                    app.logger.error(f'Error scheduling appointment: {e}')
+                    flash('An error occurred while scheduling the appointment.', 'error')
+        else:
+            flash('You are not authorized to perform this action.', 'error')
+            return redirect(url_for('portal_appointments'))
+
+    # GET request: fetch appointments based on role
+    appointments = []
+    providers = []
+    try:
+        if user_role == 'patient':
+            # List appointments for the patient
+            cursor.execute('''
+                SELECT a.id, a.appointment_date_time, a.appointment_type, a.notes, a.status, u.full_name AS provider_name
+                FROM appointments a
+                JOIN users u ON a.provider_id = u.id
+                WHERE a.user_id = ?
+                ORDER BY a.appointment_date_time DESC
+            ''', (user_id,))
+            appointments = cursor.fetchall()
+            # Providers list for booking
+            cursor.execute("SELECT id, full_name FROM users WHERE role IN ('dentist','specialist','dentist_admin','specialist_admin')")
+            providers = cursor.fetchall()
+            template = 'portal/appointments_patient.html'
+        elif user_role in ['dentist', 'specialist', 'dentist_admin', 'specialist_admin']:
+            # Provider view: show appointments where this user is the provider
+            cursor.execute('''
+                SELECT a.id, a.appointment_date_time, a.appointment_type, a.notes, a.status, u.full_name AS patient_name
+                FROM appointments a
+                JOIN users u ON a.user_id = u.id
+                WHERE a.provider_id = ?
+                ORDER BY a.appointment_date_time DESC
+            ''', (user_id,))
+            appointments = cursor.fetchall()
+            template = 'portal/appointments_dentist.html'
+        else:
+            # Admin view: show all appointments
+            cursor.execute('''
+                SELECT a.id, a.appointment_date_time, a.appointment_type, a.notes, a.status,
+                       p.full_name AS patient_name, d.full_name AS provider_name
+                FROM appointments a
+                JOIN users p ON a.user_id = p.id
+                JOIN users d ON a.provider_id = d.id
+                ORDER BY a.appointment_date_time DESC
+            ''')
+            appointments = cursor.fetchall()
+            template = 'portal/appointments_admin.html'
+    except Exception as e:
+        app.logger.error(f'Error loading appointments: {e}')
+        flash('An error occurred while loading appointments.', 'error')
+    finally:
+        # Still open connection here? connection is closed after we compute unread notifications below
+        pass
+
+    # Determine unread notifications for the logged-in user
+    try:
+        # Re-open connection if closed earlier
+        if conn:
+            pass
+    except NameError:
+        # Shouldn't happen
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            SELECT COUNT(*) FROM messages
+            WHERE recipient_id = ? AND is_read = 0 AND is_deleted_by_recipient = 0
+        ''', (user_id,))
+        unread_count = cursor.fetchone()[0] or 0
+        unread_notifications = True if unread_count > 0 else False
+    except Exception:
+        unread_notifications = False
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+
+    # Render the appropriate template with active nav and notifications
+    return render_template(template, appointments=appointments, providers=providers,
+                           active='appointments', unread_notifications=unread_notifications)
+
+
+@app.route('/portal/appointments/<int:appointment_id>/update', methods=['POST'])
+@require_roles(['dentist', 'specialist', 'dentist_admin', 'specialist_admin', 'admin'])
+def update_appointment(appointment_id: int):
+    """Update an existing appointment's status or notes.
+
+    Providers and administrators can update the status and notes of an
+    appointment.  The form should submit a 'status' value and optionally
+    'notes'.  After updating the record the user is redirected back to
+    the appointments page.
+    """
+    new_status = request.form.get('status')
+    new_notes = request.form.get('notes')
+    if not new_status and not new_notes:
+        flash('No changes submitted.', 'info')
+        return redirect(url_for('portal_appointments'))
+
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    try:
+        # Only allow update on appointments where the logged‑in user is the provider,
+        # or the user is an administrator
+        user_id = session.get('user_id')
+        user_role = session.get('role')
+        if user_role not in ['admin', 'dentist_admin', 'specialist_admin']:
+            cursor.execute('SELECT provider_id FROM appointments WHERE id = ?', (appointment_id,))
+            row = cursor.fetchone()
+            if not row or row[0] != user_id:
+                conn.close()
+                flash('You do not have permission to update this appointment.', 'error')
+                return redirect(url_for('portal_appointments'))
+        # Build the update statement dynamically
+        fields = []
+        params = []
+        if new_status:
+            fields.append('status = ?')
+            params.append(new_status)
+        if new_notes is not None:
+            fields.append('notes = ?')
+            params.append(new_notes)
+        params.append(appointment_id)
+        cursor.execute(f"UPDATE appointments SET {', '.join(fields)}, updated_at = CURRENT_TIMESTAMP WHERE id = ?", params)
+        conn.commit()
+        flash('Appointment updated successfully.', 'success')
+    except Exception as e:
+        conn.rollback()
+        app.logger.error(f'Error updating appointment: {e}')
+        flash('An error occurred while updating the appointment.', 'error')
+    finally:
+        conn.close()
+    return redirect(url_for('portal_appointments'))
+
+
+@app.route('/portal/appointments/<int:appointment_id>/delete', methods=['POST'])
+@require_roles(['patient', 'admin', 'dentist_admin', 'specialist_admin'])
+def delete_appointment(appointment_id: int):
+    """Delete (cancel) an appointment.
+
+    Patients can cancel their own appointments; administrators can delete any
+    appointment.  If a patient attempts to delete an appointment that they do
+    not own, an error is shown.  After deletion the user is redirected
+    back to the appointments page.
+    """
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    try:
+        user_id = session.get('user_id')
+        user_role = session.get('role')
+        if user_role not in ['admin', 'dentist_admin', 'specialist_admin']:
+            # Ensure the appointment belongs to the patient
+            cursor.execute('SELECT user_id FROM appointments WHERE id = ?', (appointment_id,))
+            row = cursor.fetchone()
+            if not row or row[0] != user_id:
+                conn.close()
+                flash('You do not have permission to cancel this appointment.', 'error')
+                return redirect(url_for('portal_appointments'))
+        cursor.execute('DELETE FROM appointments WHERE id = ?', (appointment_id,))
+        conn.commit()
+        flash('Appointment cancelled successfully.', 'success')
+    except Exception as e:
+        conn.rollback()
+        app.logger.error(f'Error deleting appointment: {e}')
+        flash('An error occurred while cancelling the appointment.', 'error')
+    finally:
+        conn.close()
+    return redirect(url_for('portal_appointments'))
 
 
 
@@ -4520,8 +4943,8 @@ def my_referrals():
     return render_template('my_referrals.html', referrals=referrals)
 
 
-if if __name__ == '__main__':
-    
+if __name__ == '__main__':
+    # Initialize the database and create demo users when running the app directly.
     init_db()
     create_demo_users_if_needed()
     app.run(debug=True, host='0.0.0.0', port=5000)
