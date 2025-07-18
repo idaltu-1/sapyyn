@@ -290,6 +290,27 @@ def init_db():
         )
     ''')
     
+    # Messages table for portal messaging
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sender_id INTEGER NOT NULL,
+            recipient_id INTEGER NOT NULL,
+            subject TEXT NOT NULL,
+            content TEXT NOT NULL,
+            message_type TEXT DEFAULT 'general',
+            referral_id INTEGER,
+            is_read BOOLEAN DEFAULT FALSE,
+            is_deleted_by_sender BOOLEAN DEFAULT FALSE,
+            is_deleted_by_recipient BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            read_at TIMESTAMP,
+            FOREIGN KEY (sender_id) REFERENCES users (id),
+            FOREIGN KEY (recipient_id) REFERENCES users (id),
+            FOREIGN KEY (referral_id) REFERENCES referrals (id)
+        )
+    ''')
+    
     # Subscription Plans table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS subscription_plans (
@@ -2628,6 +2649,15 @@ def admin_portal():
                          user_role=user_role,
                          is_super_admin=(user_role == 'admin'))
 
+@app.route('/portal/messages')
+def messages_portal():
+    """Messages portal for all user types"""
+    if 'user_id' not in session:
+        flash('Please log in to access messages.', 'error')
+        return redirect(url_for('login'))
+    
+    return render_template('messages.html', user_role=session.get('role'))
+
 @app.route('/portal/provider-code/generate', methods=['POST'])
 @require_roles(['dentist', 'dentist_admin', 'specialist', 'specialist_admin'])
 def generate_new_provider_code():
@@ -2744,6 +2774,275 @@ def create_quick_referral():
     except Exception as e:
         app.logger.error(f'Error creating quick referral: {str(e)}')
         return jsonify({'success': False, 'message': 'Internal server error'}), 500
+
+# Messages API endpoints
+@app.route('/api/messages', methods=['GET'])
+def get_messages():
+    """Get messages for the current user"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    try:
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        user_id = session['user_id']
+        message_type = request.args.get('type', 'all')  # 'sent', 'received', 'all'
+        
+        if message_type == 'sent':
+            cursor.execute('''
+                SELECT m.id, m.subject, m.content, m.message_type, m.referral_id, 
+                       m.is_read, m.created_at, u.full_name as recipient_name,
+                       u.role as recipient_role
+                FROM messages m
+                JOIN users u ON m.recipient_id = u.id
+                WHERE m.sender_id = ? AND m.is_deleted_by_sender = FALSE
+                ORDER BY m.created_at DESC
+            ''', (user_id,))
+        elif message_type == 'received':
+            cursor.execute('''
+                SELECT m.id, m.subject, m.content, m.message_type, m.referral_id,
+                       m.is_read, m.created_at, u.full_name as sender_name,
+                       u.role as sender_role
+                FROM messages m
+                JOIN users u ON m.sender_id = u.id
+                WHERE m.recipient_id = ? AND m.is_deleted_by_recipient = FALSE
+                ORDER BY m.created_at DESC
+            ''', (user_id,))
+        else:  # all messages
+            cursor.execute('''
+                SELECT m.id, m.subject, m.content, m.message_type, m.referral_id,
+                       m.is_read, m.created_at, 
+                       CASE WHEN m.sender_id = ? THEN u2.full_name ELSE u1.full_name END as contact_name,
+                       CASE WHEN m.sender_id = ? THEN u2.role ELSE u1.role END as contact_role,
+                       CASE WHEN m.sender_id = ? THEN 'sent' ELSE 'received' END as direction
+                FROM messages m
+                JOIN users u1 ON m.sender_id = u1.id
+                JOIN users u2 ON m.recipient_id = u2.id
+                WHERE (m.sender_id = ? AND m.is_deleted_by_sender = FALSE) 
+                   OR (m.recipient_id = ? AND m.is_deleted_by_recipient = FALSE)
+                ORDER BY m.created_at DESC
+            ''', (user_id, user_id, user_id, user_id, user_id))
+        
+        messages = cursor.fetchall()
+        conn.close()
+        
+        # Convert to list of dictionaries
+        message_list = []
+        for msg in messages:
+            message_list.append({
+                'id': msg[0],
+                'subject': msg[1],
+                'content': msg[2],
+                'message_type': msg[3],
+                'referral_id': msg[4],
+                'is_read': msg[5],
+                'created_at': msg[6],
+                'contact_name': msg[7],
+                'contact_role': msg[8],
+                'direction': msg[9] if len(msg) > 9 else message_type
+            })
+        
+        return jsonify({'success': True, 'messages': message_list})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/messages', methods=['POST'])
+def send_message():
+    """Send a new message"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['recipient_id', 'subject', 'content']
+        for field in required_fields:
+            if field not in data or not data[field]:
+                return jsonify({'success': False, 'error': f'Missing required field: {field}'}), 400
+        
+        sender_id = session['user_id']
+        recipient_id = data['recipient_id']
+        subject = data['subject']
+        content = data['content']
+        message_type = data.get('message_type', 'general')
+        referral_id = data.get('referral_id')
+        
+        # Verify recipient exists
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT id FROM users WHERE id = ?', (recipient_id,))
+        if not cursor.fetchone():
+            conn.close()
+            return jsonify({'success': False, 'error': 'Recipient not found'}), 404
+        
+        # Insert message
+        cursor.execute('''
+            INSERT INTO messages (sender_id, recipient_id, subject, content, message_type, referral_id)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (sender_id, recipient_id, subject, content, message_type, referral_id))
+        
+        message_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True, 'message_id': message_id})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/messages/<int:message_id>/read', methods=['POST'])
+def mark_message_read(message_id):
+    """Mark a message as read"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    try:
+        user_id = session['user_id']
+        
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        # Verify user is the recipient of this message
+        cursor.execute('''
+            SELECT id FROM messages 
+            WHERE id = ? AND recipient_id = ?
+        ''', (message_id, user_id))
+        
+        if not cursor.fetchone():
+            conn.close()
+            return jsonify({'success': False, 'error': 'Message not found or access denied'}), 404
+        
+        # Mark as read
+        cursor.execute('''
+            UPDATE messages 
+            SET is_read = TRUE, read_at = CURRENT_TIMESTAMP
+            WHERE id = ? AND recipient_id = ?
+        ''', (message_id, user_id))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/messages/<int:message_id>', methods=['DELETE'])
+def delete_message(message_id):
+    """Delete a message (soft delete)"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    try:
+        user_id = session['user_id']
+        
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        # Check if user is sender or recipient
+        cursor.execute('''
+            SELECT sender_id, recipient_id FROM messages WHERE id = ?
+        ''', (message_id,))
+        
+        result = cursor.fetchone()
+        if not result:
+            conn.close()
+            return jsonify({'success': False, 'error': 'Message not found'}), 404
+        
+        sender_id, recipient_id = result
+        
+        # Soft delete based on user role
+        if user_id == sender_id:
+            cursor.execute('''
+                UPDATE messages SET is_deleted_by_sender = TRUE WHERE id = ?
+            ''', (message_id,))
+        elif user_id == recipient_id:
+            cursor.execute('''
+                UPDATE messages SET is_deleted_by_recipient = TRUE WHERE id = ?
+            ''', (message_id,))
+        else:
+            conn.close()
+            return jsonify({'success': False, 'error': 'Access denied'}), 403
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/users/contacts')
+def get_user_contacts():
+    """Get list of users that can be messaged"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    try:
+        user_id = session['user_id']
+        user_role = session.get('role', 'patient')
+        
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        # Different contact lists based on user role
+        if user_role == 'patient':
+            # Patients can message dentists and specialists
+            cursor.execute('''
+                SELECT id, full_name, role, email 
+                FROM users 
+                WHERE role IN ('dentist', 'specialist', 'dentist_admin', 'specialist_admin') 
+                AND id != ?
+                ORDER BY full_name
+            ''', (user_id,))
+        elif user_role in ['dentist', 'dentist_admin']:
+            # Dentists can message patients, specialists, and admins
+            cursor.execute('''
+                SELECT id, full_name, role, email 
+                FROM users 
+                WHERE role IN ('patient', 'specialist', 'specialist_admin', 'admin') 
+                AND id != ?
+                ORDER BY full_name
+            ''', (user_id,))
+        elif user_role in ['specialist', 'specialist_admin']:
+            # Specialists can message patients, dentists, and admins
+            cursor.execute('''
+                SELECT id, full_name, role, email 
+                FROM users 
+                WHERE role IN ('patient', 'dentist', 'dentist_admin', 'admin') 
+                AND id != ?
+                ORDER BY full_name
+            ''', (user_id,))
+        else:  # admin
+            # Admins can message everyone
+            cursor.execute('''
+                SELECT id, full_name, role, email 
+                FROM users 
+                WHERE id != ?
+                ORDER BY full_name
+            ''', (user_id,))
+        
+        contacts = cursor.fetchall()
+        conn.close()
+        
+        # Convert to list of dictionaries
+        contact_list = []
+        for contact in contacts:
+            contact_list.append({
+                'id': contact[0],
+                'name': contact[1],
+                'role': contact[2],
+                'email': contact[3]
+            })
+        
+        return jsonify({'success': True, 'contacts': contact_list})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/referral/by-code', methods=['POST'])
 def create_referral_by_code():
