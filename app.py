@@ -1529,10 +1529,20 @@ def change_password():
     return redirect(url_for('settings'))
 
 def generate_provider_code():
-    """Generate a unique 6-digit provider code"""
+    """Generate a unique 6-character alphanumeric provider code"""
     import random
-    while True:
-        code = f"{random.randint(100000, 999999)}"
+    import string
+    
+    # Use alphanumeric characters (excluding confusing ones like 0, O, I, 1, L)
+    chars = '23456789ABCDEFGHJKMNPQRSTUVWXYZ'
+    
+    max_attempts = 100  # Prevent infinite loops
+    attempt = 0
+    
+    while attempt < max_attempts:
+        # Generate 6-character alphanumeric code
+        code = ''.join(random.choice(chars) for _ in range(6))
+        
         conn = sqlite3.connect('sapyyn.db')
         cursor = conn.cursor()
         cursor.execute('SELECT id FROM provider_codes WHERE provider_code = ?', (code,))
@@ -1540,6 +1550,41 @@ def generate_provider_code():
             conn.close()
             return code
         conn.close()
+        attempt += 1
+    
+    # Fallback if we can't find a unique code (very unlikely with 30^6 combinations)
+    raise Exception("Unable to generate unique provider code after 100 attempts")
+
+def check_role_permission(required_roles, user_role=None):
+    """Check if user has permission for required roles"""
+    if user_role is None:
+        user_role = session.get('role')
+    
+    if not user_role:
+        return False
+    
+    # Convert single role to list for uniform handling
+    if isinstance(required_roles, str):
+        required_roles = [required_roles]
+    
+    return user_role in required_roles
+
+def require_roles(required_roles):
+    """Decorator to require specific roles for routes"""
+    def decorator(f):
+        def wrapper(*args, **kwargs):
+            if 'user_id' not in session:
+                flash('Please log in to access this page.', 'error')
+                return redirect(url_for('login'))
+            
+            if not check_role_permission(required_roles):
+                flash('Access denied. You do not have permission to view this page.', 'error')
+                return redirect(url_for('dashboard'))
+            
+            return f(*args, **kwargs)
+        wrapper.__name__ = f.__name__
+        return wrapper
+    return decorator
 
 def get_user_subscription(user_id):
     """Get user's current subscription details"""
@@ -1557,10 +1602,29 @@ def get_user_subscription(user_id):
     return result
 
 def create_provider_code(user_id, provider_type, practice_name=None, specialization=None):
-    """Create a provider code for a user"""
-    code = generate_provider_code()
+    """Create a provider code for a user (dentists and specialists only)"""
+    
+    # Only create provider codes for dentists and specialists
+    valid_provider_types = ['dentist', 'specialist', 'dentist_admin', 'specialist_admin']
+    if provider_type not in valid_provider_types:
+        raise ValueError(f"Provider codes can only be created for dentists and specialists, not {provider_type}")
+    
+    # Check if user already has an active provider code
     conn = sqlite3.connect('sapyyn.db')
     cursor = conn.cursor()
+    cursor.execute('''
+        SELECT provider_code FROM provider_codes 
+        WHERE user_id = ? AND is_active = TRUE
+    ''', (user_id,))
+    existing_code = cursor.fetchone()
+    
+    if existing_code:
+        conn.close()
+        return existing_code[0]  # Return existing code
+    
+    # Generate new code
+    code = generate_provider_code()
+    
     cursor.execute('''
         INSERT INTO provider_codes (user_id, provider_code, provider_type, practice_name, specialization)
         VALUES (?, ?, ?, ?, ?)
@@ -1577,16 +1641,9 @@ def pricing():
 # Portal Routes for Different User Types
 
 @app.route('/portal/dentist')
+@require_roles(['dentist', 'dentist_admin'])
 def dentist_portal():
     """Dentist portal dashboard"""
-    if 'user_id' not in session:
-        flash('Please log in to access the dentist portal.', 'error')
-        return redirect(url_for('login'))
-    
-    if session.get('role') not in ['dentist', 'dentist_admin']:
-        flash('Access denied. This portal is for dentists only.', 'error')
-        return redirect(url_for('dashboard'))
-    
     conn = sqlite3.connect('sapyyn.db')
     cursor = conn.cursor()
     
@@ -1594,46 +1651,64 @@ def dentist_portal():
     cursor.execute('''
         SELECT provider_code, practice_name, specialization 
         FROM provider_codes 
-        WHERE user_id = ? AND provider_type = 'dentist' AND is_active = TRUE
+        WHERE user_id = ? AND provider_type IN ('dentist', 'dentist_admin') AND is_active = TRUE
     ''', (session['user_id'],))
     provider_info = cursor.fetchone()
     
-    # Get referral stats
+    # Create provider code if none exists
+    if not provider_info:
+        try:
+            new_code = create_provider_code(
+                session['user_id'], 
+                session.get('role', 'dentist'),
+                'Professional Practice',
+                'General Dentistry'
+            )
+            provider_info = (new_code, 'Professional Practice', 'General Dentistry')
+        except ValueError as e:
+            flash(f'Error creating provider code: {str(e)}', 'error')
+            provider_info = None
+    
+    # Get referral stats (only referrals created by this dentist)
     cursor.execute('''
         SELECT COUNT(*) as total, 
                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-               SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed
+               SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed,
+               SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) as accepted
         FROM referrals WHERE user_id = ?
     ''', (session['user_id'],))
     stats = cursor.fetchone()
     
-    # Get recent referrals
+    # Get recent referrals created by this dentist
     cursor.execute('''
-        SELECT referral_id, patient_name, target_doctor, status, created_at
+        SELECT referral_id, patient_name, target_doctor, status, created_at, medical_condition
         FROM referrals 
         WHERE user_id = ? 
         ORDER BY created_at DESC LIMIT 5
     ''', (session['user_id'],))
     recent_referrals = cursor.fetchall()
     
+    # Get incoming referrals if this is a specialist dentist
+    cursor.execute('''
+        SELECT COUNT(*) as incoming_total
+        FROM referrals 
+        WHERE target_doctor LIKE ? OR target_doctor = ?
+    ''', (f"%{session['full_name']}%", session['full_name']))
+    incoming_stats = cursor.fetchone()
+    
     conn.close()
     
     return render_template('portal/dentist.html', 
                          provider_info=provider_info,
                          stats=stats,
-                         recent_referrals=recent_referrals)
+                         recent_referrals=recent_referrals,
+                         incoming_stats=incoming_stats,
+                         user_role=session.get('role'))
 
 @app.route('/portal/specialist')
+@require_roles(['specialist', 'specialist_admin'])
 def specialist_portal():
     """Specialist portal dashboard"""
-    if 'user_id' not in session:
-        flash('Please log in to access the specialist portal.', 'error')
-        return redirect(url_for('login'))
-    
-    if session.get('role') not in ['specialist', 'specialist_admin']:
-        flash('Access denied. This portal is for specialists only.', 'error')
-        return redirect(url_for('dashboard'))
-    
     conn = sqlite3.connect('sapyyn.db')
     cursor = conn.cursor()
     
@@ -1641,53 +1716,71 @@ def specialist_portal():
     cursor.execute('''
         SELECT provider_code, practice_name, specialization 
         FROM provider_codes 
-        WHERE user_id = ? AND provider_type = 'specialist' AND is_active = TRUE
+        WHERE user_id = ? AND provider_type IN ('specialist', 'specialist_admin') AND is_active = TRUE
     ''', (session['user_id'],))
     provider_info = cursor.fetchone()
+    
+    # Create provider code if none exists
+    if not provider_info:
+        try:
+            new_code = create_provider_code(
+                session['user_id'], 
+                session.get('role', 'specialist'),
+                'Specialist Practice',
+                'Specialty Care'
+            )
+            provider_info = (new_code, 'Specialist Practice', 'Specialty Care')
+        except ValueError as e:
+            flash(f'Error creating provider code: {str(e)}', 'error')
+            provider_info = None
     
     # Get incoming referrals for this specialist
     cursor.execute('''
         SELECT COUNT(*) as total, 
                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-               SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) as accepted
+               SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) as accepted,
+               SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed
         FROM referrals 
         WHERE target_doctor = ? OR target_doctor LIKE ?
     ''', (session['full_name'], f"%{session['full_name']}%"))
-    stats = cursor.fetchone()
+    incoming_stats = cursor.fetchone()
+    
+    # Get referrals created by this specialist (if they also refer patients)
+    cursor.execute('''
+        SELECT COUNT(*) as outgoing_total,
+               SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as outgoing_pending
+        FROM referrals WHERE user_id = ?
+    ''', (session['user_id'],))
+    outgoing_stats = cursor.fetchone()
     
     # Get recent incoming referrals
     cursor.execute('''
-        SELECT referral_id, patient_name, referring_doctor, status, created_at
+        SELECT referral_id, patient_name, referring_doctor, status, created_at, medical_condition, urgency_level
         FROM referrals 
         WHERE target_doctor = ? OR target_doctor LIKE ?
-        ORDER BY created_at DESC LIMIT 5
+        ORDER BY created_at DESC LIMIT 10
     ''', (session['full_name'], f"%{session['full_name']}%"))
-    recent_referrals = cursor.fetchall()
+    incoming_referrals = cursor.fetchall()
     
     conn.close()
     
     return render_template('portal/specialist.html',
                          provider_info=provider_info,
-                         stats=stats,
-                         recent_referrals=recent_referrals)
+                         incoming_stats=incoming_stats,
+                         outgoing_stats=outgoing_stats,
+                         incoming_referrals=incoming_referrals,
+                         user_role=session.get('role'))
 
 @app.route('/portal/patient')
+@require_roles(['patient'])
 def patient_portal():
     """Patient portal dashboard"""
-    if 'user_id' not in session:
-        flash('Please log in to access the patient portal.', 'error')
-        return redirect(url_for('login'))
-    
-    if session.get('role') != 'patient':
-        flash('Access denied. This portal is for patients only.', 'error')
-        return redirect(url_for('dashboard'))
-    
     conn = sqlite3.connect('sapyyn.db')
     cursor = conn.cursor()
     
     # Get patient's referrals (referrals where they are the subject)
     cursor.execute('''
-        SELECT referral_id, referring_doctor, target_doctor, medical_condition, status, created_at
+        SELECT referral_id, referring_doctor, target_doctor, medical_condition, status, created_at, urgency_level
         FROM referrals 
         WHERE patient_name LIKE ? OR notes LIKE ?
         ORDER BY created_at DESC LIMIT 10
@@ -1703,100 +1796,196 @@ def patient_portal():
     ''', (session['user_id'],))
     documents = cursor.fetchall()
     
+    # Get referral summary stats for patient
+    cursor.execute('''
+        SELECT COUNT(*) as total_referrals,
+               SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+               SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) as accepted,
+               SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed
+        FROM referrals 
+        WHERE patient_name LIKE ? OR notes LIKE ?
+    ''', (f"%{session['full_name']}%", f"%{session['full_name']}%"))
+    referral_stats = cursor.fetchone()
+    
     conn.close()
     
     return render_template('portal/patient.html',
                          referrals=referrals,
-                         documents=documents)
+                         documents=documents,
+                         referral_stats=referral_stats,
+                         user_role=session.get('role'))
 
 @app.route('/portal/admin')
+@require_roles(['dentist_admin', 'specialist_admin', 'admin'])
 def admin_portal():
     """Admin portal for practice management"""
-    if 'user_id' not in session:
-        flash('Please log in to access the admin portal.', 'error')
-        return redirect(url_for('login'))
-    
-    if session.get('role') not in ['dentist_admin', 'specialist_admin', 'admin']:
-        flash('Access denied. This portal is for administrators only.', 'error')
-        return redirect(url_for('dashboard'))
-    
     conn = sqlite3.connect('sapyyn.db')
     cursor = conn.cursor()
     
-    # Get practice information
-    cursor.execute('''
-        SELECT p.*, us.plan_id, sp.plan_name, sp.plan_type
-        FROM practices p
-        LEFT JOIN user_subscriptions us ON p.subscription_id = us.id
-        LEFT JOIN subscription_plans sp ON us.plan_id = sp.id
-        WHERE p.admin_user_id = ?
-    ''', (session['user_id'],))
-    practice_info = cursor.fetchone()
+    user_role = session.get('role')
     
-    # Get practice members
-    cursor.execute('''
-        SELECT pm.*, u.full_name, u.email, u.role
-        FROM practice_members pm
-        JOIN users u ON pm.user_id = u.id
-        WHERE pm.practice_id = (SELECT id FROM practices WHERE admin_user_id = ?)
-    ''', (session['user_id'],))
-    members = cursor.fetchall()
+    # Get practice information based on admin type
+    if user_role == 'admin':
+        # Super admin can see all practices
+        cursor.execute('''
+            SELECT p.*, us.plan_id, sp.plan_name, sp.plan_type, u.full_name as admin_name
+            FROM practices p
+            LEFT JOIN user_subscriptions us ON p.subscription_id = us.id
+            LEFT JOIN subscription_plans sp ON us.plan_id = sp.id
+            LEFT JOIN users u ON p.admin_user_id = u.id
+            ORDER BY p.created_at DESC
+        ''')
+        practices_info = cursor.fetchall()
+        practice_info = None  # Admin sees all practices, not just one
+    else:
+        # Practice-specific admin
+        cursor.execute('''
+            SELECT p.*, us.plan_id, sp.plan_name, sp.plan_type
+            FROM practices p
+            LEFT JOIN user_subscriptions us ON p.subscription_id = us.id
+            LEFT JOIN subscription_plans sp ON us.plan_id = sp.id
+            WHERE p.admin_user_id = ?
+        ''', (session['user_id'],))
+        practice_info = cursor.fetchone()
+        practices_info = [practice_info] if practice_info else []
     
-    # Get practice stats
-    cursor.execute('''
-        SELECT COUNT(*) as total_referrals,
-               COUNT(DISTINCT user_id) as active_users
-        FROM referrals 
-        WHERE user_id IN (
-            SELECT user_id FROM practice_members 
-            WHERE practice_id = (SELECT id FROM practices WHERE admin_user_id = ?)
-        )
-    ''', (session['user_id'],))
+    # Get practice members (based on admin level)
+    if user_role == 'admin':
+        # Super admin sees all users
+        cursor.execute('''
+            SELECT u.id, u.full_name, u.email, u.role, u.created_at, u.is_verified,
+                   pc.provider_code, pc.practice_name as provider_practice
+            FROM users u
+            LEFT JOIN provider_codes pc ON u.id = pc.user_id AND pc.is_active = TRUE
+            ORDER BY u.created_at DESC
+            LIMIT 50
+        ''')
+        members = cursor.fetchall()
+    else:
+        # Practice admin sees their practice members
+        cursor.execute('''
+            SELECT pm.*, u.full_name, u.email, u.role, u.created_at,
+                   pc.provider_code, pc.practice_name as provider_practice
+            FROM practice_members pm
+            JOIN users u ON pm.user_id = u.id
+            LEFT JOIN provider_codes pc ON u.id = pc.user_id AND pc.is_active = TRUE
+            WHERE pm.practice_id = (SELECT id FROM practices WHERE admin_user_id = ?)
+        ''', (session['user_id'],))
+        members = cursor.fetchall()
+    
+    # Get comprehensive stats based on admin level
+    if user_role == 'admin':
+        # System-wide stats for super admin
+        cursor.execute('''
+            SELECT 
+                COUNT(DISTINCT u.id) as total_users,
+                COUNT(DISTINCT CASE WHEN u.role IN ('dentist', 'dentist_admin') THEN u.id END) as total_dentists,
+                COUNT(DISTINCT CASE WHEN u.role IN ('specialist', 'specialist_admin') THEN u.id END) as total_specialists,
+                COUNT(DISTINCT CASE WHEN u.role = 'patient' THEN u.id END) as total_patients,
+                COUNT(DISTINCT r.id) as total_referrals,
+                COUNT(DISTINCT CASE WHEN r.status = 'pending' THEN r.id END) as pending_referrals,
+                COUNT(DISTINCT pc.id) as active_provider_codes
+            FROM users u
+            LEFT JOIN referrals r ON u.id = r.user_id
+            LEFT JOIN provider_codes pc ON u.id = pc.user_id AND pc.is_active = TRUE
+        ''')
+    else:
+        # Practice-specific stats
+        cursor.execute('''
+            SELECT COUNT(*) as total_referrals,
+                   COUNT(DISTINCT user_id) as active_users,
+                   SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_referrals,
+                   SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_referrals
+            FROM referrals 
+            WHERE user_id IN (
+                SELECT user_id FROM practice_members 
+                WHERE practice_id = (SELECT id FROM practices WHERE admin_user_id = ?)
+            )
+        ''', (session['user_id'],))
+    
     stats = cursor.fetchone()
+    
+    # Get recent system activity for admins
+    cursor.execute('''
+        SELECT 'referral' as activity_type, referral_id as item_id, patient_name as description, 
+               status, created_at, u.full_name as user_name
+        FROM referrals r
+        JOIN users u ON r.user_id = u.id
+        {} 
+        ORDER BY created_at DESC 
+        LIMIT 10
+    '''.format(
+        '' if user_role == 'admin' else 
+        'WHERE r.user_id IN (SELECT user_id FROM practice_members WHERE practice_id = (SELECT id FROM practices WHERE admin_user_id = ?))'
+    ), (session['user_id'],) if user_role != 'admin' else ())
+    recent_activity = cursor.fetchall()
     
     conn.close()
     
     return render_template('portal/admin.html',
                          practice_info=practice_info,
+                         practices_info=practices_info,
                          members=members,
-                         stats=stats)
+                         stats=stats,
+                         recent_activity=recent_activity,
+                         user_role=user_role,
+                         is_super_admin=(user_role == 'admin'))
 
 @app.route('/portal/provider-code/generate', methods=['POST'])
+@require_roles(['dentist', 'dentist_admin', 'specialist', 'specialist_admin'])
 def generate_new_provider_code():
-    """Generate new provider code for user"""
-    if 'user_id' not in session:
-        return jsonify({'error': 'Not authenticated'}), 401
+    """Generate new provider code for user (dentists and specialists only)"""
+    data = request.get_json()
+    provider_type = data.get('provider_type', session.get('role'))
+    practice_name = data.get('practice_name', 'Professional Practice')
+    specialization = data.get('specialization', 'General')
     
-    provider_type = request.json.get('provider_type')
-    practice_name = request.json.get('practice_name')
-    specialization = request.json.get('specialization')
+    # Validate provider type matches user role
+    user_role = session.get('role')
+    valid_combinations = {
+        'dentist': ['dentist'],
+        'dentist_admin': ['dentist', 'dentist_admin'],
+        'specialist': ['specialist'],
+        'specialist_admin': ['specialist', 'specialist_admin']
+    }
     
-    if not provider_type:
-        return jsonify({'error': 'Provider type is required'}), 400
+    if provider_type not in valid_combinations.get(user_role, []):
+        return jsonify({'error': f'Cannot create {provider_type} code for {user_role} user'}), 400
     
     try:
         new_code = create_provider_code(session['user_id'], provider_type, practice_name, specialization)
-        return jsonify({'success': True, 'provider_code': new_code})
+        return jsonify({
+            'success': True, 
+            'provider_code': new_code,
+            'message': f'New 6-character alphanumeric provider code generated: {new_code}'
+        })
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': f'Failed to generate provider code: {str(e)}'}), 500
 
 @app.route('/api/referral/by-code', methods=['POST'])
 def create_referral_by_code():
     """Create referral using provider code"""
-    provider_code = request.json.get('provider_code')
-    patient_name = request.json.get('patient_name')
-    referring_doctor = request.json.get('referring_doctor', 'Self-referral')
-    medical_condition = request.json.get('medical_condition', '')
+    data = request.get_json()
+    provider_code = data.get('provider_code', '').upper().strip()  # Normalize to uppercase
+    patient_name = data.get('patient_name')
+    referring_doctor = data.get('referring_doctor', 'Self-referral')
+    medical_condition = data.get('medical_condition', '')
     
     if not provider_code or not patient_name:
         return jsonify({'error': 'Provider code and patient name are required'}), 400
+    
+    # Validate provider code format (6 alphanumeric characters)
+    if len(provider_code) != 6 or not provider_code.isalnum():
+        return jsonify({'error': 'Provider code must be exactly 6 alphanumeric characters'}), 400
     
     conn = sqlite3.connect('sapyyn.db')
     cursor = conn.cursor()
     
     # Find provider by code
     cursor.execute('''
-        SELECT pc.user_id, pc.practice_name, u.full_name
+        SELECT pc.user_id, pc.practice_name, u.full_name, pc.provider_type, pc.specialization
         FROM provider_codes pc
         JOIN users u ON pc.user_id = u.id
         WHERE pc.provider_code = ? AND pc.is_active = TRUE
@@ -1806,16 +1995,22 @@ def create_referral_by_code():
     
     if not provider:
         conn.close()
-        return jsonify({'error': 'Invalid provider code'}), 404
+        return jsonify({'error': 'Invalid provider code or provider not found'}), 404
+    
+    # Verify provider is a dentist or specialist
+    if provider[3] not in ['dentist', 'dentist_admin', 'specialist', 'specialist_admin']:
+        conn.close()
+        return jsonify({'error': 'Provider code is not valid for referrals'}), 400
     
     # Create referral
     referral_id = str(uuid.uuid4())[:8]
     target_doctor = provider[2]  # full_name
     
     cursor.execute('''
-        INSERT INTO referrals (user_id, referral_id, patient_name, referring_doctor, target_doctor, medical_condition)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ''', (provider[0], referral_id, patient_name, referring_doctor, target_doctor, medical_condition))
+        INSERT INTO referrals (user_id, referral_id, patient_name, referring_doctor, target_doctor, medical_condition, status, notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (provider[0], referral_id, patient_name, referring_doctor, target_doctor, medical_condition, 'pending', 
+          f'Referral created using provider code {provider_code} for {provider[3]} {provider[4] or "practice"}'))
     
     conn.commit()
     conn.close()
@@ -1824,7 +2019,10 @@ def create_referral_by_code():
         'success': True, 
         'referral_id': referral_id,
         'target_doctor': target_doctor,
-        'practice_name': provider[1]
+        'practice_name': provider[1],
+        'provider_type': provider[3],
+        'specialization': provider[4],
+        'message': f'Referral successfully created to {provider[3]} {target_doctor}'
     })
 
 # Stripe Payment Routes
@@ -2644,19 +2842,26 @@ def create_demo_users_if_needed():
     cursor = conn.cursor()
     
     # Check if demo users already exist
-    cursor.execute('SELECT COUNT(*) FROM users WHERE username IN (?, ?, ?)', 
-                   ('doctor1', 'patient1', 'admin1'))
+    cursor.execute('SELECT COUNT(*) FROM users WHERE username IN (?, ?, ?, ?)', 
+                   ('dentist1', 'specialist1', 'patient1', 'admin1'))
     existing_count = cursor.fetchone()[0]
     
     if existing_count == 0:
         # Demo users don't exist, create them
         demo_users = [
             {
-                'username': 'doctor1',
-                'email': 'doctor@sapyyn.com',
+                'username': 'dentist1',
+                'email': 'dentist@sapyyn.com',
                 'password': 'password123',
                 'full_name': 'Dr. Sarah Johnson',
-                'role': 'doctor'
+                'role': 'dentist'
+            },
+            {
+                'username': 'specialist1',
+                'email': 'specialist@sapyyn.com',
+                'password': 'password123',
+                'full_name': 'Dr. Michael Chen',
+                'role': 'specialist'
             },
             {
                 'username': 'patient1',
@@ -2670,7 +2875,7 @@ def create_demo_users_if_needed():
                 'email': 'admin@sapyyn.com',
                 'password': 'password123',
                 'full_name': 'Admin User',
-                'role': 'admin'
+                'role': 'dentist_admin'
             }
         ]
         
@@ -2678,10 +2883,27 @@ def create_demo_users_if_needed():
             try:
                 password_hash = generate_password_hash(user['password'])
                 cursor.execute('''
-                    INSERT OR IGNORE INTO users (username, email, password_hash, full_name, role)
-                    VALUES (?, ?, ?, ?, ?)
+                    INSERT OR IGNORE INTO users (username, email, password_hash, full_name, role, is_verified)
+                    VALUES (?, ?, ?, ?, ?, TRUE)
                 ''', (user['username'], user['email'], password_hash, user['full_name'], user['role']))
-                print(f"Created demo user: {user['username']} ({user['role']})")
+                
+                user_id = cursor.lastrowid
+                
+                # Create provider codes for dentists and specialists
+                if user['role'] in ['dentist', 'specialist', 'dentist_admin', 'specialist_admin']:
+                    try:
+                        provider_code = create_provider_code(
+                            user_id, 
+                            user['role'],
+                            f"{user['full_name']} Practice",
+                            'General' if user['role'].startswith('dentist') else 'Specialty Care'
+                        )
+                        print(f"Created demo user: {user['username']} ({user['role']}) - Provider Code: {provider_code}")
+                    except Exception as e:
+                        print(f"Warning: Could not create provider code for {user['username']}: {e}")
+                else:
+                    print(f"Created demo user: {user['username']} ({user['role']})")
+                    
             except Exception as e:
                 print(f"Error creating demo user {user['username']}: {e}")
         
@@ -2689,6 +2911,10 @@ def create_demo_users_if_needed():
         print("Demo users created successfully!")
     else:
         print("Demo users already exist.")
+    
+    # Update existing 'doctor' role users to 'dentist' for compatibility
+    cursor.execute("UPDATE users SET role = 'dentist' WHERE role = 'doctor'")
+    conn.commit()
     
     conn.close()
 
