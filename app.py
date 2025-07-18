@@ -13,6 +13,7 @@ import uuid
 import qrcode
 from io import BytesIO
 import base64
+import hashlib
 from datetime import datetime, timedelta
 import json
 import stripe
@@ -497,8 +498,282 @@ def init_db():
         )
     ''')
 
+    # Fraud Detection tables
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS fraud_scores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            ip_address TEXT,
+            email TEXT,
+            device_fingerprint TEXT,
+            fraud_score DECIMAL(5,2) DEFAULT 0.0,
+            risk_level TEXT DEFAULT 'low',
+            is_paused BOOLEAN DEFAULT FALSE,
+            reasons TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+    
+    # Device Fingerprints table for deduplication
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS device_fingerprints (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fingerprint_hash TEXT UNIQUE NOT NULL,
+            user_agent TEXT,
+            screen_resolution TEXT,
+            timezone TEXT,
+            language TEXT,
+            plugins TEXT,
+            canvas_fingerprint TEXT,
+            first_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            user_count INTEGER DEFAULT 0
+        )
+    ''')
+    
+    # Duplicate Detection Log
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS duplicate_detections (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            detection_type TEXT NOT NULL,
+            original_user_id INTEGER,
+            duplicate_user_id INTEGER,
+            matching_field TEXT,
+            matching_value TEXT,
+            action_taken TEXT,
+            detected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (original_user_id) REFERENCES users (id),
+            FOREIGN KEY (duplicate_user_id) REFERENCES users (id)
+        )
+    ''')
+    
+    # Add fraud score to users table if it doesn't exist
+    try:
+        cursor.execute('ALTER TABLE users ADD COLUMN fraud_score DECIMAL(5,2) DEFAULT 0.0')
+    except sqlite3.OperationalError:
+        pass
+    
+    try:
+        cursor.execute('ALTER TABLE users ADD COLUMN is_paused BOOLEAN DEFAULT FALSE')
+    except sqlite3.OperationalError:
+        pass
+    
+    try:
+        cursor.execute('ALTER TABLE users ADD COLUMN device_fingerprint TEXT')
+    except sqlite3.OperationalError:
+        pass
+
     conn.commit()
     conn.close()
+
+def calculate_fraud_score(user_id, ip_address, email, device_fingerprint):
+    """Calculate fraud score based on various factors"""
+    score = 0.0
+    reasons = []
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Check for duplicate emails
+    cursor.execute('SELECT COUNT(*) FROM users WHERE email = ? AND id != ?', (email, user_id))
+    email_count = cursor.fetchone()[0]
+    if email_count > 0:
+        score += 30.0
+        reasons.append(f"Duplicate email found ({email_count} matches)")
+    
+    # Check for duplicate IP addresses
+    cursor.execute('SELECT COUNT(DISTINCT user_id) FROM compliance_audit_trail WHERE ip_address = ?', (ip_address,))
+    ip_count = cursor.fetchone()[0]
+    if ip_count > 5:
+        score += 20.0
+        reasons.append(f"High IP usage ({ip_count} users)")
+    elif ip_count > 2:
+        score += 10.0
+        reasons.append(f"Moderate IP usage ({ip_count} users)")
+    
+    # Check for duplicate device fingerprints
+    if device_fingerprint:
+        cursor.execute('SELECT user_count FROM device_fingerprints WHERE fingerprint_hash = ?', (device_fingerprint,))
+        fp_result = cursor.fetchone()
+        if fp_result and fp_result[0] > 1:
+            score += 25.0
+            reasons.append(f"Device fingerprint shared ({fp_result[0]} users)")
+    
+    # Check registration patterns (multiple registrations in short time from same IP)
+    cursor.execute('''
+        SELECT COUNT(*) FROM compliance_audit_trail 
+        WHERE ip_address = ? AND action_type = 'user_registration' 
+        AND timestamp > datetime('now', '-1 hour')
+    ''', (ip_address,))
+    recent_registrations = cursor.fetchone()[0]
+    if recent_registrations > 3:
+        score += 40.0
+        reasons.append(f"Rapid registrations from IP ({recent_registrations} in last hour)")
+    elif recent_registrations > 1:
+        score += 15.0
+        reasons.append(f"Multiple recent registrations ({recent_registrations} in last hour)")
+    
+    conn.close()
+    
+    # Determine risk level
+    if score >= 50.0:
+        risk_level = 'high'
+    elif score >= 25.0:
+        risk_level = 'medium'
+    else:
+        risk_level = 'low'
+    
+    return score, risk_level, reasons
+
+def update_fraud_score(user_id, ip_address, email, device_fingerprint):
+    """Update fraud score for a user and auto-pause if needed"""
+    score, risk_level, reasons = calculate_fraud_score(user_id, ip_address, email, device_fingerprint)
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Insert/update fraud score record
+    cursor.execute('''
+        INSERT INTO fraud_scores 
+        (user_id, ip_address, email, device_fingerprint, fraud_score, risk_level, reasons, is_paused)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (user_id, ip_address, email, device_fingerprint, score, risk_level, 
+          ', '.join(reasons), score >= 50.0))
+    
+    # Update user fraud score and pause status
+    cursor.execute('''
+        UPDATE users SET fraud_score = ?, is_paused = ? WHERE id = ?
+    ''', (score, score >= 50.0, user_id))
+    
+    # Log duplicate detections if score is high
+    if score >= 25.0:
+        for reason in reasons:
+            if 'email' in reason.lower():
+                cursor.execute('''
+                    INSERT INTO duplicate_detections 
+                    (detection_type, duplicate_user_id, matching_field, matching_value, action_taken)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', ('email_duplicate', user_id, 'email', email, 'flagged' if score < 50.0 else 'paused'))
+            elif 'ip' in reason.lower():
+                cursor.execute('''
+                    INSERT INTO duplicate_detections 
+                    (detection_type, duplicate_user_id, matching_field, matching_value, action_taken)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', ('ip_duplicate', user_id, 'ip_address', ip_address, 'flagged' if score < 50.0 else 'paused'))
+            elif 'fingerprint' in reason.lower():
+                cursor.execute('''
+                    INSERT INTO duplicate_detections 
+                    (detection_type, duplicate_user_id, matching_field, matching_value, action_taken)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', ('device_duplicate', user_id, 'device_fingerprint', device_fingerprint, 
+                      'flagged' if score < 50.0 else 'paused'))
+    
+    conn.commit()
+    conn.close()
+    
+    return score >= 50.0  # Return True if user should be paused
+
+def record_device_fingerprint(fingerprint_hash, user_agent, screen_resolution, timezone, language, plugins, canvas_fingerprint):
+    """Record or update device fingerprint"""
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Check if fingerprint exists
+    cursor.execute('SELECT id, user_count FROM device_fingerprints WHERE fingerprint_hash = ?', (fingerprint_hash,))
+    existing = cursor.fetchone()
+    
+    if existing:
+        # Update existing fingerprint
+        cursor.execute('''
+            UPDATE device_fingerprints 
+            SET last_seen = CURRENT_TIMESTAMP, user_count = user_count + 1
+            WHERE id = ?
+        ''', (existing[0],))
+    else:
+        # Insert new fingerprint
+        cursor.execute('''
+            INSERT INTO device_fingerprints 
+            (fingerprint_hash, user_agent, screen_resolution, timezone, language, plugins, canvas_fingerprint, user_count)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+        ''', (fingerprint_hash, user_agent, screen_resolution, timezone, language, plugins, canvas_fingerprint))
+    
+    conn.commit()
+    conn.close()
+
+def hash_patient_id(patient_id):
+    """Hash patient ID for use in URLs and emails"""
+    import hashlib
+    # Use a consistent salt for hashing
+    salt = app.secret_key.encode('utf-8')
+    return hashlib.sha256(f"{patient_id}{salt}".encode('utf-8')).hexdigest()[:16]
+
+def unhash_patient_id(hashed_id):
+    """Find the original patient ID from hash (for internal use only)"""
+    # Note: This is for reverse lookup in database - not cryptographically reversible
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT referral_id FROM referrals WHERE hashed_referral_id = ?', (hashed_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result else None
+
+def generate_secure_referral_url(referral_id):
+    """Generate a secure URL for referral tracking that doesn't expose patient info"""
+    hashed_id = hash_patient_id(referral_id)
+    # Store the mapping in database for lookup
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute('ALTER TABLE referrals ADD COLUMN hashed_referral_id TEXT')
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+    
+    cursor.execute('UPDATE referrals SET hashed_referral_id = ? WHERE referral_id = ?', 
+                  (hashed_id, referral_id))
+    conn.commit()
+    conn.close()
+    
+    return f"/referral/track/{hashed_id}"
+
+def log_audit_action(user_id, action, entity_type, entity_id, action_details, ip_address, user_agent):
+    """Enhanced audit logging with fraud detection tracking"""
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        INSERT INTO compliance_audit_trail (user_id, action_type, entity_type, entity_id, action_details, ip_address, user_agent)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (user_id, action, entity_type, entity_id, action_details, ip_address, user_agent))
+    
+    conn.commit()
+    conn.close()
+
+def check_user_paused(user_id):
+    """Check if user is paused due to fraud score"""
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT is_paused FROM users WHERE id = ?', (user_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result else False
+
+def require_active_user(f):
+    """Decorator to check if user is not paused"""
+    from functools import wraps
+    
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('login'))
+        
+        if check_user_paused(session['user_id']):
+            flash('Your account has been temporarily suspended. Please contact support.', 'error')
+            return redirect(url_for('dashboard'))
+        
+        return f(*args, **kwargs)
+    return decorated_function
 
 def allowed_file(filename):
     """Check if file extension is allowed"""
@@ -593,6 +868,43 @@ def complete_onboarding():
         ))
         
         user_id = cursor.lastrowid
+        
+        # Get IP address and user agent for fraud detection
+        ip_address = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', ''))
+        user_agent = request.headers.get('User-Agent', '')
+        device_fingerprint = data.get('deviceFingerprint', '')
+        
+        # Record device fingerprint if provided
+        if device_fingerprint:
+            record_device_fingerprint(
+                device_fingerprint,
+                user_agent,
+                data.get('screenResolution', ''),
+                data.get('timezone', ''),
+                data.get('language', ''),
+                data.get('plugins', ''),
+                data.get('canvasFingerprint', '')
+            )
+            
+            # Update user's device fingerprint
+            cursor.execute('UPDATE users SET device_fingerprint = ? WHERE id = ?', 
+                         (device_fingerprint, user_id))
+        
+        # Log registration audit
+        log_audit_action(user_id, 'user_registration', 'user', user_id, 
+                        f'Account created via onboarding - {data["accountType"]}', 
+                        ip_address, user_agent)
+        
+        # Calculate and update fraud score
+        is_paused = update_fraud_score(user_id, ip_address, data['email'], device_fingerprint)
+        
+        if is_paused:
+            conn.close()
+            return jsonify({
+                'success': False, 
+                'message': 'Account has been flagged for review. Please contact support.',
+                'fraud_detected': True
+            }), 403
         
         # Add profile information
         cursor.execute('''
@@ -692,10 +1004,24 @@ def login():
         
         conn = sqlite3.connect('sapyyn.db')
         cursor = conn.cursor()
-        cursor.execute('SELECT id, username, password_hash, full_name, role FROM users WHERE username = ?', (username,))
+        cursor.execute('SELECT id, username, password_hash, full_name, role, is_paused FROM users WHERE username = ?', (username,))
         user = cursor.fetchone()
         
         if user and check_password_hash(user[2], password):
+            # Check if user is paused due to fraud score
+            if user[5]:  # is_paused column
+                conn.close()
+                flash('Your account has been temporarily suspended. Please contact support.', 'error')
+                return redirect(url_for('login'))
+            
+            # Get IP address and user agent for audit logging
+            ip_address = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', ''))
+            user_agent = request.headers.get('User-Agent', '')
+            
+            # Log successful login
+            log_audit_action(user[0], 'user_login', 'user', user[0], 
+                           'Successful login', ip_address, user_agent)
+            
             session['user_id'] = user[0]
             session['username'] = user[1]
             session['full_name'] = user[3]
@@ -907,6 +1233,7 @@ def dashboard():
     return render_template('dashboard.html', referrals=referrals, recent_documents=recent_documents)
 
 @app.route('/referral/new', methods=['GET', 'POST'])
+@require_active_user
 def new_referral():
     """Create new referral"""
     if 'user_id' not in session:
@@ -1145,6 +1472,7 @@ def check_subscription_required(f):
 
 @app.route('/api/referral/emergency', methods=['POST'])
 @check_subscription_required
+@require_active_user
 def create_emergency_referral():
     """Create emergency referral with priority processing"""
     try:
@@ -1208,6 +1536,7 @@ def create_emergency_referral():
 
 @app.route('/api/referral/routine', methods=['POST'])
 @check_subscription_required
+@require_active_user
 def create_routine_referral():
     """Create routine referral with standard processing"""
     try:
@@ -1336,9 +1665,9 @@ def request_consultation():
         app.logger.error(f'Error creating consultation request: {str(e)}')
         return jsonify({'success': False, 'message': 'Internal server error'}), 500
 
-@app.route('/referral/track/<referral_id>')
-def track_referral(referral_id):
-    """Track referral progress page"""
+@app.route('/referral/track/<hashed_referral_id>')
+def track_referral(hashed_referral_id):
+    """Track referral progress page using hashed ID for privacy"""
     if 'user_id' not in session:
         flash('Please log in to track your referral.', 'error')
         return redirect(url_for('login'))
@@ -1346,11 +1675,11 @@ def track_referral(referral_id):
     conn = sqlite3.connect('sapyyn.db')
     cursor = conn.cursor()
     
-    # Get referral details
+    # Get referral details using hashed ID to protect patient privacy
     cursor.execute('''
         SELECT * FROM referrals 
-        WHERE referral_id = ? AND user_id = ?
-    ''', (referral_id, session['user_id']))
+        WHERE hashed_referral_id = ? AND user_id = ?
+    ''', (hashed_referral_id, session['user_id']))
     
     referral = cursor.fetchone()
     conn.close()
@@ -1361,10 +1690,10 @@ def track_referral(referral_id):
     
     return render_template('track_referral.html', referral=referral)
 
-@app.route('/consultation/track/<consultation_id>')
-def track_consultation(consultation_id):
-    """Track consultation request page"""
-    return track_referral(consultation_id)  # Same functionality for now
+@app.route('/consultation/track/<hashed_consultation_id>')
+def track_consultation(hashed_consultation_id):
+    """Track consultation request page using hashed ID"""
+    return track_referral(hashed_consultation_id)  # Same functionality for now
 
 # Case Acceptance Management Routes
 @app.route('/api/case/update-status', methods=['POST'])
@@ -3630,6 +3959,147 @@ def loyalty_rewards():
     """Loyalty rewards page - redirect to rewards dashboard"""
 
     return redirect(url_for('rewards_dashboard'))
+
+@app.route('/fraud-admin')
+def fraud_admin():
+    """Fraud detection administration dashboard"""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    # Check admin privileges  
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT role FROM users WHERE id = ?', (session['user_id'],))
+    user_role = cursor.fetchone()[0]
+    
+    if user_role not in ['admin']:
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('dashboard'))
+    
+    # Get fraud statistics
+    cursor.execute('SELECT COUNT(*) FROM fraud_scores WHERE fraud_score >= 50')
+    high_risk_count = cursor.fetchone()[0]
+    
+    cursor.execute('SELECT COUNT(*) FROM fraud_scores WHERE fraud_score >= 25 AND fraud_score < 50')
+    medium_risk_count = cursor.fetchone()[0]
+    
+    cursor.execute('SELECT COUNT(*) FROM users WHERE is_paused = 1')
+    paused_users_count = cursor.fetchone()[0]
+    
+    cursor.execute('SELECT COUNT(*) FROM duplicate_detections WHERE detected_at > datetime("now", "-24 hours")')
+    recent_duplicates = cursor.fetchone()[0]
+    
+    # Get recent high fraud scores
+    cursor.execute('''
+        SELECT fs.*, u.username, u.email, u.full_name
+        FROM fraud_scores fs
+        JOIN users u ON fs.user_id = u.id
+        WHERE fs.fraud_score >= 25
+        ORDER BY fs.created_at DESC
+        LIMIT 20
+    ''')
+    high_fraud_users = cursor.fetchall()
+    
+    # Get duplicate detection summary
+    cursor.execute('''
+        SELECT detection_type, COUNT(*) as count
+        FROM duplicate_detections
+        WHERE detected_at > datetime("now", "-7 days")
+        GROUP BY detection_type
+    ''')
+    duplicate_stats = cursor.fetchall()
+    
+    # Get device fingerprint sharing
+    cursor.execute('''
+        SELECT fingerprint_hash, user_count, last_seen
+        FROM device_fingerprints
+        WHERE user_count > 1
+        ORDER BY user_count DESC
+        LIMIT 10
+    ''')
+    shared_devices = cursor.fetchall()
+    
+    conn.close()
+    
+    return render_template('fraud_admin.html',
+        high_risk_count=high_risk_count,
+        medium_risk_count=medium_risk_count,
+        paused_users_count=paused_users_count,
+        recent_duplicates=recent_duplicates,
+        high_fraud_users=high_fraud_users,
+        duplicate_stats=duplicate_stats,
+        shared_devices=shared_devices
+    )
+
+@app.route('/fraud-admin/user/<int:user_id>/unpause', methods=['POST'])
+def unpause_user(user_id):
+    """Unpause a user after admin review"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Not authenticated'}), 401
+    
+    # Check admin privileges
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT role FROM users WHERE id = ?', (session['user_id'],))
+    user_role = cursor.fetchone()[0]
+    
+    if user_role not in ['admin']:
+        return jsonify({'success': False, 'message': 'Admin privileges required'}), 403
+    
+    # Unpause user and reset fraud score
+    cursor.execute('''
+        UPDATE users SET is_paused = 0, fraud_score = 0 WHERE id = ?
+    ''', (user_id,))
+    
+    # Log admin action
+    cursor.execute('SELECT username FROM users WHERE id = ?', (user_id,))
+    username = cursor.fetchone()[0]
+    
+    log_audit_action(session['user_id'], 'admin_unpause_user', 'user', user_id,
+                    f'Admin unpaused user: {username}',
+                    request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', '')),
+                    request.headers.get('User-Agent', ''))
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'success': True, 'message': 'User unpaused successfully'})
+
+@app.route('/fraud-admin/fraud-scores')
+def fraud_scores_api():
+    """API endpoint for fraud scores data"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    # Check admin privileges
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT role FROM users WHERE id = ?', (session['user_id'],))
+    user_role = cursor.fetchone()[0]
+    
+    if user_role not in ['admin']:
+        return jsonify({'error': 'Admin privileges required'}), 403
+    
+    # Get fraud score distribution
+    cursor.execute('''
+        SELECT 
+            CASE 
+                WHEN fraud_score >= 50 THEN 'High (50+)'
+                WHEN fraud_score >= 25 THEN 'Medium (25-49)'
+                WHEN fraud_score > 0 THEN 'Low (1-24)'
+                ELSE 'Clean (0)'
+            END as risk_category,
+            COUNT(*) as count
+        FROM users
+        GROUP BY risk_category
+    ''')
+    distribution = cursor.fetchall()
+    
+    conn.close()
+    
+    return jsonify({
+        'distribution': [{'category': row[0], 'count': row[1]} for row in distribution]
+    })
 
 @app.route('/hipaa')
 def hipaa():
