@@ -150,7 +150,7 @@
                             <p class="text-muted">Sign in to your Sapyyn account</p>
                         </div>
                         
-                        <form method="POST" class="login-form">
+                        <form method="POST" class="login-form" id="loginForm">
                             <!-- Username Field -->
                             <div class="form-floating mb-3">
                                 <input type="text" 
@@ -198,7 +198,7 @@
                             
                             <!-- Login Button -->
                             <div class="d-grid mb-4">
-                                <button type="submit" class="btn btn-primary btn-lg">
+                                <button type="button" id="loginButton" class="btn btn-primary btn-lg">
                                     <i class="bi bi-box-arrow-in-right me-2"></i>
                                     Sign In
                                 </button>
@@ -261,5 +261,44 @@
 {% block extra_scripts %}
 <script>
 // Password toggle functionality is handled by main.js UIEnhancements
+function submitLoginForm() {
+    const form = document.getElementById('loginForm');
+    const username = form.querySelector('input[name="username"]').value.trim();
+    const password = form.querySelector('input[name="password"]').value.trim();
+    
+    // Basic validation
+    if (!username || !password) {
+        alert('Please enter both username and password');
+        return false;
+    }
+    
+    // Submit the form programmatically
+    console.log('Submitting form for user:', username);
+    form.submit();
+}
+
+// Proper event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('loginForm');
+    const loginButton = document.getElementById('loginButton');
+    
+    // Add click event listener to the login button
+    if (loginButton) {
+        loginButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            submitLoginForm();
+        });
+    }
+    
+    // Handle Enter key press in form fields
+    if (form) {
+        form.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                submitLoginForm();
+            }
+        });
+    }
+});
 </script>
 {% endblock %}
