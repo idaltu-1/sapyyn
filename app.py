@@ -17,6 +17,8 @@ import hashlib
 from datetime import datetime, timedelta
 import json
 import stripe
+from nocodebackend_client import create_nocodebackend_clients
+import logging
 
 app = Flask(__name__)
 app.secret_key = 'sapyyn-patient-referral-system-2025'
@@ -35,6 +37,14 @@ ANALYTICS_CONFIG = {
     'ENVIRONMENT': os.environ.get('FLASK_ENV', 'development')
 }
 
+# NoCodeBackend configuration
+NOCODEBACKEND_CONFIG = {
+    'API_KEY': os.environ.get('NOCODEBACKEND_API_KEY'),
+    'BASE_URL': os.environ.get('NOCODEBACKEND_BASE_URL', 'https://api.nocodebackend.com'),
+    'REFERRALOMSDB_INSTANCE': os.environ.get('REFERRALOMSDB_INSTANCE', '35557_referralomsdb'),
+    'WEBSITE_UPLOADS_INSTANCE': os.environ.get('WEBSITE_UPLOADS_INSTANCE', '35557_website_uploads')
+}
+
 # Configuration
 UPLOAD_FOLDER = 'patient-referral'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'xls', 'xlsx'}
@@ -43,6 +53,13 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Ensure upload folder exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Initialize NoCodeBackend clients
+referral_client, uploads_client = create_nocodebackend_clients(NOCODEBACKEND_CONFIG)
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Database initialization
 def init_db():
@@ -5981,6 +5998,192 @@ def track_promotion_event(promotion_id):
         return jsonify({'success': True})
         
     except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# NoCodeBackend Integration Endpoints
+@app.route('/api/nocodebackend/referrals', methods=['GET'])
+def get_nocodebackend_referrals():
+    """Get referrals from the NoCodeBackend referralomsdb"""
+    try:
+        if not referral_client:
+            return jsonify({'error': 'NoCodeBackend client not configured'}), 500
+            
+        limit = request.args.get('limit', 50, type=int)
+        offset = request.args.get('offset', 0, type=int)
+        
+        referrals = referral_client.get_referrals(limit=limit, offset=offset)
+        
+        if referrals is None:
+            return jsonify({'error': 'Failed to fetch referrals'}), 500
+            
+        return jsonify({
+            'success': True,
+            'data': referrals,
+            'count': len(referrals)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching NoCodeBackend referrals: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/nocodebackend/referrals/<referral_id>', methods=['GET'])
+def get_nocodebackend_referral(referral_id):
+    """Get a specific referral from NoCodeBackend referralomsdb"""
+    try:
+        if not referral_client:
+            return jsonify({'error': 'NoCodeBackend client not configured'}), 500
+            
+        referral = referral_client.get_referral_by_id(referral_id)
+        
+        if referral is None:
+            return jsonify({'error': 'Referral not found'}), 404
+            
+        return jsonify({
+            'success': True,
+            'data': referral
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching NoCodeBackend referral {referral_id}: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/nocodebackend/uploads', methods=['GET'])
+def get_nocodebackend_uploads():
+    """Get uploads from the NoCodeBackend website_uploads database"""
+    try:
+        if not uploads_client:
+            return jsonify({'error': 'NoCodeBackend uploads client not configured'}), 500
+            
+        limit = request.args.get('limit', 50, type=int)
+        offset = request.args.get('offset', 0, type=int)
+        referral_id = request.args.get('referral_id')
+        
+        if referral_id:
+            uploads = uploads_client.get_uploads_by_referral(referral_id)
+        else:
+            uploads = uploads_client.get_uploads(limit=limit, offset=offset)
+        
+        if uploads is None:
+            return jsonify({'error': 'Failed to fetch uploads'}), 500
+            
+        return jsonify({
+            'success': True,
+            'data': uploads,
+            'count': len(uploads)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching NoCodeBackend uploads: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/nocodebackend/uploads/<upload_id>', methods=['GET'])
+def get_nocodebackend_upload(upload_id):
+    """Get a specific upload from NoCodeBackend website_uploads database"""
+    try:
+        if not uploads_client:
+            return jsonify({'error': 'NoCodeBackend uploads client not configured'}), 500
+            
+        upload = uploads_client.get_upload_by_id(upload_id)
+        
+        if upload is None:
+            return jsonify({'error': 'Upload not found'}), 404
+            
+        return jsonify({
+            'success': True,
+            'data': upload
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching NoCodeBackend upload {upload_id}: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/nocodebackend/sync-referral', methods=['POST'])
+def sync_referral_to_nocodebackend():
+    """Sync a local referral to NoCodeBackend referralomsdb"""
+    try:
+        if not referral_client:
+            return jsonify({'error': 'NoCodeBackend client not configured'}), 500
+            
+        data = request.get_json()
+        referral_id = data.get('referral_id')
+        
+        if not referral_id:
+            return jsonify({'error': 'referral_id is required'}), 400
+            
+        # Get local referral data
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT * FROM referrals WHERE id = ? OR referral_id = ?
+        ''', (referral_id, referral_id))
+        
+        referral = cursor.fetchone()
+        conn.close()
+        
+        if not referral:
+            return jsonify({'error': 'Local referral not found'}), 404
+            
+        # Convert to NoCodeBackend format
+        referral_data = {
+            'local_id': referral[0],
+            'referral_id': referral[2],
+            'patient_name': referral[3],
+            'referring_doctor': referral[4],
+            'target_doctor': referral[5],
+            'medical_condition': referral[6],
+            'urgency_level': referral[7],
+            'status': referral[8],
+            'notes': referral[9],
+            'created_at': referral[11],
+            'updated_at': referral[12]
+        }
+        
+        # Sync to NoCodeBackend
+        result = referral_client.create_referral(referral_data)
+        
+        if result is None:
+            return jsonify({'error': 'Failed to sync referral to NoCodeBackend'}), 500
+            
+        return jsonify({
+            'success': True,
+            'message': 'Referral synced successfully',
+            'nocodebackend_data': result
+        })
+        
+    except Exception as e:
+        logger.error(f"Error syncing referral to NoCodeBackend: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/nocodebackend/status', methods=['GET'])
+def nocodebackend_status():
+    """Check the status of NoCodeBackend integration"""
+    try:
+        status = {
+            'configured': bool(NOCODEBACKEND_CONFIG.get('API_KEY')),
+            'referral_client': referral_client is not None,
+            'uploads_client': uploads_client is not None,
+            'config': {
+                'base_url': NOCODEBACKEND_CONFIG.get('BASE_URL'),
+                'referral_instance': NOCODEBACKEND_CONFIG.get('REFERRALOMSDB_INSTANCE'),
+                'uploads_instance': NOCODEBACKEND_CONFIG.get('WEBSITE_UPLOADS_INSTANCE'),
+                'api_key_set': bool(NOCODEBACKEND_CONFIG.get('API_KEY'))
+            }
+        }
+        
+        return jsonify({
+            'success': True,
+            'status': status
+        })
+        
+    except Exception as e:
+        logger.error(f"Error checking NoCodeBackend status: {e}")
         return jsonify({'error': str(e)}), 500
 
 
