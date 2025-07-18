@@ -52,19 +52,24 @@ def test_fraud_detection():
     # Test 4: Simulating duplicate email fraud
     print("\n⚠️  Test 4: Simulating duplicate email detection")
     
-    # Create a test user first
+    # Create a test user first with unique email
+    import time
+    timestamp = int(time.time())
+    unique_email = f'duplicate{timestamp}@test.com'
+    unique_username = f'frauduser{timestamp}'
+    
     conn = sqlite3.connect('sapyyn.db')
     cursor = conn.cursor()
     cursor.execute('''
         INSERT INTO users (username, email, password_hash, full_name, role)
         VALUES (?, ?, ?, ?, ?)
-    ''', ('frauduser', 'duplicate@test.com', 'hash123', 'Fraud User', 'patient'))
+    ''', (unique_username, unique_email, 'hash123', 'Fraud User', 'patient'))
     user_id = cursor.lastrowid
     conn.commit()
     conn.close()
     
     # Now test fraud detection with duplicate email
-    score, risk, reasons = calculate_fraud_score(999, '192.168.1.100', 'duplicate@test.com', 'device123')
+    score, risk, reasons = calculate_fraud_score(999, '192.168.1.100', unique_email, 'device123')
     print(f"Fraud score with duplicate email: {score}, Risk: {risk}")
     print(f"Reasons: {reasons}")
     assert score > 0, "Should detect duplicate email"
