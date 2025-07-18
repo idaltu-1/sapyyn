@@ -2,6 +2,105 @@
 
 {% block title %}Login - Sapyyn{% endblock %}
 
+{% block extra_head %}
+<style>
+    .login-page-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .login-brand-section {
+        background: rgba(44, 90, 160, 0.9);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .login-brand-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('{{ url_for("static", filename="images/medical-pattern.png") }}') repeat;
+        opacity: 0.1;
+    }
+    
+    .login-form-section {
+        background: white;
+        position: relative;
+    }
+    
+    .login-form-container {
+        max-width: 400px;
+        width: 100%;
+        padding: 2rem;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+    
+    .divider {
+        position: relative;
+        text-align: center;
+        margin: 1.5rem 0;
+    }
+    
+    .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #dee2e6;
+    }
+    
+    .divider-text {
+        background: white;
+        padding: 0 1rem;
+        position: relative;
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: none;
+        z-index: 5;
+    }
+    
+    .form-floating {
+        position: relative;
+    }
+    
+    .demo-credentials {
+        border: 1px solid #e9ecef;
+    }
+    
+    .demo-user code {
+        font-size: 0.8rem;
+        display: block;
+        margin: 0.25rem 0;
+    }
+    
+    @media (max-width: 991.98px) {
+        .login-brand-section {
+            display: none !important;
+        }
+        
+        .login-form-container {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="login-page-wrapper">
     <div class="container-fluid">
