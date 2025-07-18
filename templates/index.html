@@ -165,41 +165,132 @@
     </div>
 </div>
 
-<!-- Quick Referral Section -->
-<div class="bg-light py-5 quick-referral-section">
+<!-- Referral Management Section -->
+<div class="bg-light py-5 referral-management-section">
     <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="fw-bold">Referral Management Portal</h2>
+                <p class="lead text-muted">Access our comprehensive referral management platform. Professional features require a trial subscription or higher.</p>
+            </div>
+        </div>
+        
+        <!-- Primary Referral Actions -->
+        <div class="row g-4 mb-5">
+            <!-- Start Emergency Referral -->
+            <div class="col-lg-4">
+                <div class="card h-100 shadow border-0 referral-action-card emergency-card">
+                    <div class="card-body p-4 text-center">
+                        <div class="bg-danger bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-exclamation-triangle-fill text-danger fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3 text-danger">Start Emergency Referral</h4>
+                        <p class="text-muted mb-4">
+                            Urgent cases requiring immediate specialist attention. Fast-track processing with instant notifications.
+                        </p>
+                        <div class="mb-3">
+                            <span class="badge bg-danger text-white mb-2">Priority Processing</span>
+                            <span class="badge bg-warning text-dark">6-Digit Quick Access</span>
+                        </div>
+                        <button class="btn btn-danger btn-lg w-100 referral-action-btn" 
+                                data-referral-type="emergency" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#referralModal">
+                            <i class="bi bi-lightning-fill me-2"></i>Start Emergency Referral
+                        </button>
+                        <p class="small text-muted mt-2">
+                            <i class="bi bi-lock me-1"></i>Requires trial subscription or higher
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Create Routine Referral -->
+            <div class="col-lg-4">
+                <div class="card h-100 shadow border-0 referral-action-card routine-card">
+                    <div class="card-body p-4 text-center">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-clipboard2-heart-fill text-primary fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3 text-primary">Create Routine Referral</h4>
+                        <p class="text-muted mb-4">
+                            Standard referral process with comprehensive documentation and tracking capabilities.
+                        </p>
+                        <div class="mb-3">
+                            <span class="badge bg-primary text-white mb-2">Full Documentation</span>
+                            <span class="badge bg-info text-white">Progress Tracking</span>
+                        </div>
+                        <button class="btn btn-primary btn-lg w-100 referral-action-btn" 
+                                data-referral-type="routine" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#referralModal">
+                            <i class="bi bi-plus-circle me-2"></i>Create Routine Referral
+                        </button>
+                        <p class="small text-muted mt-2">
+                            <i class="bi bi-lock me-1"></i>Requires trial subscription or higher
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Request Consultation -->
+            <div class="col-lg-4">
+                <div class="card h-100 shadow border-0 referral-action-card consultation-card">
+                    <div class="card-body p-4 text-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-chat-dots-fill text-success fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3 text-success">Request Consultation</h4>
+                        <p class="text-muted mb-4">
+                            Connect with specialists for case discussions, second opinions, and collaborative treatment planning.
+                        </p>
+                        <div class="mb-3">
+                            <span class="badge bg-success text-white mb-2">Expert Guidance</span>
+                            <span class="badge bg-info text-white">HIPAA Compliant</span>
+                        </div>
+                        <button class="btn btn-success btn-lg w-100 referral-action-btn" 
+                                data-referral-type="consultation" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#referralModal">
+                            <i class="bi bi-chat-square-text me-2"></i>Request Consultation
+                        </button>
+                        <p class="small text-muted mt-2">
+                            <i class="bi bi-lock me-1"></i>Requires trial subscription or higher
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Access Section -->
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="card shadow-sm border-0 quick-referral-card">
-                    <div class="card-body p-5 text-center">
-                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-4">
-                            <i class="bi bi-lightning-charge-fill text-primary fs-1"></i>
+                <div class="card shadow-sm border-0 quick-access-card">
+                    <div class="card-body p-4 text-center">
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-lightning-charge-fill text-warning fs-2"></i>
                         </div>
-                        <h3 class="fw-bold mb-3">Quick Referral Access</h3>
-                        <p class="text-muted mb-4">Have a 6-digit provider code? Enter it below for instant referral</p>
+                        <h5 class="fw-bold mb-3">Quick Access with 6-Digit Code</h5>
+                        <p class="text-muted mb-4">Already have a provider code? Access your referral instantly</p>
                         
                         <form id="quickReferralForm" class="row g-3 justify-content-center">
                             <div class="col-md-6">
-                                <label for="homeProviderCode" class="form-label">6-Digit Provider Code</label>
-                                <input type="text" class="form-control form-control-lg text-center" 
+                                <label for="homeProviderCode" class="form-label">Enter 6-Digit Provider Code</label>
+                                <input type="text" class="form-control form-control-lg text-center fs-3 fw-bold" 
                                        id="homeProviderCode" placeholder="000000" maxlength="6" pattern="[0-9]{6}">
                             </div>
                             <div class="col-md-6 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary btn-lg w-100">
-                                    <i class="bi bi-search me-2"></i>Find Provider
+                                <button type="submit" class="btn btn-warning btn-lg w-100">
+                                    <i class="bi bi-search me-2"></i>Access Now
                                 </button>
                             </div>
                         </form>
                         
-                        <div class="mt-4">
-                            <p class="small text-muted mb-2">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Provider codes are 6-digit numbers (e.g., 123456) given by your healthcare provider
-                            </p>
+                        <div class="mt-3">
                             <div class="d-flex justify-content-center gap-3 flex-wrap">
-                                <span class="badge bg-success">Instant Access</span>
-                                <span class="badge bg-info">Secure Connection</span>
-                                <span class="badge bg-warning text-dark">HIPAA Compliant</span>
+                                <span class="badge bg-success">Emergency Access</span>
+                                <span class="badge bg-info">No Login Required</span>
+                                <span class="badge bg-warning text-dark">Instant Connection</span>
                             </div>
                         </div>
                     </div>
@@ -596,6 +687,84 @@
         </div>
     </div>
 </div>
+
+<!-- Referral Action Modal -->
+<div class="modal fade" id="referralModal" tabindex="-1" aria-labelledby="referralModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="referralModalLabel">Start Referral Process</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modalContent">
+                    <!-- Content will be dynamically loaded -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Subscription Required Modal -->
+<div class="modal fade" id="subscriptionModal" tabindex="-1" aria-labelledby="subscriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-primary" id="subscriptionModalLabel">
+                    <i class="bi bi-star-fill me-2"></i>Subscription Required
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                    <i class="bi bi-lock-fill text-primary fs-1"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Professional Features Await</h4>
+                <p class="text-muted mb-4">Access to referral management features requires at minimum a trial subscription. Start your free 14-day trial to unlock:</p>
+                
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="feature-item">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Unlimited referrals</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="feature-item">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Priority support</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="feature-item">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>QR code generation</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="feature-item">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Document management</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('start_free_trial') }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Start Free 14-Day Trial
+                    </a>
+                    <a href="{{ url_for('pricing') }}" class="btn btn-outline-primary">
+                        View All Plans
+                    </a>
+                </div>
+                
+                <p class="small text-muted mt-3 mb-0">
+                    <i class="bi bi-shield-check me-1"></i>No credit card required • Cancel anytime
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
@@ -651,6 +820,386 @@ document.addEventListener('DOMContentLoaded', function() {
     showSlides(slideIndex);
     resetInterval();
     
+    // Referral Action Buttons Handler
+    const referralActionBtns = document.querySelectorAll('.referral-action-btn');
+    
+    referralActionBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const referralType = this.getAttribute('data-referral-type');
+            
+            {% if session.user_id %}
+                // Check if user has subscription
+                checkSubscriptionAndProceed(referralType);
+            {% else %}
+                // Show subscription modal for non-logged-in users
+                showSubscriptionModal();
+            {% endif %}
+        });
+    });
+    
+    function checkSubscriptionAndProceed(referralType) {
+        // Show loading state
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Checking access...';
+        btn.disabled = true;
+        
+        // Check subscription status via API
+        fetch('/api/check-subscription')
+            .then(response => response.json())
+            .then(data => {
+                if (data.has_subscription) {
+                    // Proceed with referral creation
+                    createReferral(referralType);
+                } else {
+                    // Show subscription required modal
+                    showSubscriptionModal();
+                }
+            })
+            .catch(error => {
+                console.error('Error checking subscription:', error);
+                showSubscriptionModal();
+            })
+            .finally(() => {
+                // Restore button state
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+    }
+    
+    function createReferral(referralType) {
+        let modalContent = '';
+        
+        switch(referralType) {
+            case 'emergency':
+                modalContent = getEmergencyReferralContent();
+                break;
+            case 'routine':
+                modalContent = getRoutineReferralContent();
+                break;
+            case 'consultation':
+                modalContent = getConsultationContent();
+                break;
+        }
+        
+        document.getElementById('modalContent').innerHTML = modalContent;
+        document.getElementById('referralModalLabel').textContent = getModalTitle(referralType);
+        
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('referralModal'));
+        modal.show();
+    }
+    
+    function getModalTitle(type) {
+        switch(type) {
+            case 'emergency': return 'Start Emergency Referral';
+            case 'routine': return 'Create Routine Referral';
+            case 'consultation': return 'Request Consultation';
+            default: return 'Start Referral Process';
+        }
+    }
+    
+    function getEmergencyReferralContent() {
+        return `
+            <div class="text-center mb-4">
+                <div class="bg-danger bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                    <i class="bi bi-exclamation-triangle-fill text-danger fs-1"></i>
+                </div>
+                <h4 class="fw-bold text-danger">Emergency Referral</h4>
+                <p class="text-muted">Urgent cases requiring immediate specialist attention</p>
+            </div>
+            
+            <form id="emergencyReferralForm" action="/api/referral/emergency" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="patientName" class="form-label">Patient Name *</label>
+                        <input type="text" class="form-control" id="patientName" name="patient_name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="urgencyLevel" class="form-label">Urgency Level *</label>
+                        <select class="form-select" id="urgencyLevel" name="urgency_level" required>
+                            <option value="critical">Critical - Immediate</option>
+                            <option value="urgent">Urgent - Same Day</option>
+                            <option value="priority">Priority - 24-48 Hours</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="referringDoctor" class="form-label">Referring Doctor</label>
+                        <input type="text" class="form-control" id="referringDoctor" name="referring_doctor" value="{{ session.full_name }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="targetSpecialty" class="form-label">Target Specialty *</label>
+                        <select class="form-select" id="targetSpecialty" name="target_specialty" required>
+                            <option value="">Select Specialty</option>
+                            <option value="oral_surgery">Oral Surgery</option>
+                            <option value="endodontics">Endodontics</option>
+                            <option value="periodontics">Periodontics</option>
+                            <option value="orthodontics">Orthodontics</option>
+                            <option value="prosthodontics">Prosthodontics</option>
+                            <option value="pediatric">Pediatric Dentistry</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label for="emergencyDetails" class="form-label">Emergency Details *</label>
+                        <textarea class="form-control" id="emergencyDetails" name="emergency_details" rows="3" 
+                                  placeholder="Describe the emergency situation, symptoms, and why immediate attention is required" required></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label for="contactNumber" class="form-label">Emergency Contact Number *</label>
+                        <input type="tel" class="form-control" id="contactNumber" name="contact_number" required>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning mt-3">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Emergency Priority:</strong> This referral will be marked as urgent and sent immediately to available specialists.
+                </div>
+                
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-danger flex-fill">
+                        <i class="bi bi-lightning-fill me-2"></i>Submit Emergency Referral
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        `;
+    }
+    
+    function getRoutineReferralContent() {
+        return `
+            <div class="text-center mb-4">
+                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                    <i class="bi bi-clipboard2-heart-fill text-primary fs-1"></i>
+                </div>
+                <h4 class="fw-bold text-primary">Routine Referral</h4>
+                <p class="text-muted">Standard referral with comprehensive documentation</p>
+            </div>
+            
+            <form id="routineReferralForm" action="/api/referral/routine" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="patientNameRoutine" class="form-label">Patient Name *</label>
+                        <input type="text" class="form-control" id="patientNameRoutine" name="patient_name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="patientAge" class="form-label">Patient Age</label>
+                        <input type="number" class="form-control" id="patientAge" name="patient_age" min="1" max="120">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="referringDoctorRoutine" class="form-label">Referring Doctor</label>
+                        <input type="text" class="form-control" id="referringDoctorRoutine" name="referring_doctor" value="{{ session.full_name }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="targetSpecialtyRoutine" class="form-label">Target Specialty *</label>
+                        <select class="form-select" id="targetSpecialtyRoutine" name="target_specialty" required>
+                            <option value="">Select Specialty</option>
+                            <option value="oral_surgery">Oral Surgery</option>
+                            <option value="endodontics">Endodontics</option>
+                            <option value="periodontics">Periodontics</option>
+                            <option value="orthodontics">Orthodontics</option>
+                            <option value="prosthodontics">Prosthodontics</option>
+                            <option value="pediatric">Pediatric Dentistry</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label for="medicalCondition" class="form-label">Medical Condition/Diagnosis *</label>
+                        <textarea class="form-control" id="medicalCondition" name="medical_condition" rows="2" 
+                                  placeholder="Primary diagnosis or condition requiring specialist care" required></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label for="treatmentHistory" class="form-label">Treatment History</label>
+                        <textarea class="form-control" id="treatmentHistory" name="treatment_history" rows="2" 
+                                  placeholder="Previous treatments, medications, and relevant medical history"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="preferredDate" class="form-label">Preferred Appointment Date</label>
+                        <input type="date" class="form-control" id="preferredDate" name="preferred_date" min="${new Date().toISOString().split('T')[0]}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="insuranceInfo" class="form-label">Insurance Information</label>
+                        <input type="text" class="form-control" id="insuranceInfo" name="insurance_info" placeholder="Insurance provider and plan">
+                    </div>
+                    <div class="col-12">
+                        <label for="additionalNotes" class="form-label">Additional Notes</label>
+                        <textarea class="form-control" id="additionalNotes" name="additional_notes" rows="2" 
+                                  placeholder="Any additional information for the specialist"></textarea>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary flex-fill">
+                        <i class="bi bi-plus-circle me-2"></i>Create Referral
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        `;
+    }
+    
+    function getConsultationContent() {
+        return `
+            <div class="text-center mb-4">
+                <div class="bg-success bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                    <i class="bi bi-chat-dots-fill text-success fs-1"></i>
+                </div>
+                <h4 class="fw-bold text-success">Request Consultation</h4>
+                <p class="text-muted">Connect with specialists for expert guidance</p>
+            </div>
+            
+            <form id="consultationForm" action="/api/consultation/request" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="consultationType" class="form-label">Consultation Type *</label>
+                        <select class="form-select" id="consultationType" name="consultation_type" required>
+                            <option value="">Select Type</option>
+                            <option value="second_opinion">Second Opinion</option>
+                            <option value="treatment_planning">Treatment Planning</option>
+                            <option value="case_discussion">Case Discussion</option>
+                            <option value="educational">Educational Consultation</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="specialtyConsult" class="form-label">Specialty Area *</label>
+                        <select class="form-select" id="specialtyConsult" name="specialty" required>
+                            <option value="">Select Specialty</option>
+                            <option value="oral_surgery">Oral Surgery</option>
+                            <option value="endodontics">Endodontics</option>
+                            <option value="periodontics">Periodontics</option>
+                            <option value="orthodontics">Orthodontics</option>
+                            <option value="prosthodontics">Prosthodontics</option>
+                            <option value="pediatric">Pediatric Dentistry</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label for="caseDescription" class="form-label">Case Description *</label>
+                        <textarea class="form-control" id="caseDescription" name="case_description" rows="3" 
+                                  placeholder="Describe the case you'd like to discuss with a specialist" required></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label for="specificQuestions" class="form-label">Specific Questions</label>
+                        <textarea class="form-control" id="specificQuestions" name="specific_questions" rows="2" 
+                                  placeholder="Any specific questions you have for the specialist"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="urgencyConsult" class="form-label">Urgency Level</label>
+                        <select class="form-select" id="urgencyConsult" name="urgency">
+                            <option value="normal">Normal (3-5 days)</option>
+                            <option value="priority">Priority (1-2 days)</option>
+                            <option value="urgent">Urgent (Same day)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="preferredMethod" class="form-label">Preferred Communication</label>
+                        <select class="form-select" id="preferredMethod" name="preferred_method">
+                            <option value="chat">In-platform Chat</option>
+                            <option value="video">Video Call</option>
+                            <option value="phone">Phone Call</option>
+                            <option value="email">Email</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>HIPAA Compliant:</strong> All consultations are conducted through secure, encrypted channels.
+                </div>
+                
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-success flex-fill">
+                        <i class="bi bi-chat-square-text me-2"></i>Submit Consultation Request
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        `;
+    }
+    
+    function showSubscriptionModal() {
+        const subscriptionModal = new bootstrap.Modal(document.getElementById('subscriptionModal'));
+        subscriptionModal.show();
+    }
+    
+    // Handle form submissions in the referral modal
+    document.addEventListener('submit', function(e) {
+        if (e.target.matches('#emergencyReferralForm, #routineReferralForm, #consultationForm')) {
+            e.preventDefault();
+            submitReferralForm(e.target);
+        }
+    });
+    
+    function submitReferralForm(form) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        // Show loading state
+        submitBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Processing...';
+        submitBtn.disabled = true;
+        
+        // Prepare form data
+        const formData = new FormData(form);
+        
+        // Submit form
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message and redirect
+                showSuccessMessage(data.message, data.referral_id);
+                setTimeout(() => {
+                    window.location.href = data.redirect_url || '/dashboard';
+                }, 2000);
+            } else {
+                // Show error message
+                showErrorMessage(data.message || 'An error occurred while processing your request.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorMessage('Network error. Please check your connection and try again.');
+        })
+        .finally(() => {
+            // Restore button state
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    }
+    
+    function showSuccessMessage(message, referralId) {
+        const modalContent = document.getElementById('modalContent');
+        modalContent.innerHTML = `
+            <div class="text-center py-4">
+                <div class="bg-success bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                    <i class="bi bi-check-circle-fill text-success fs-1"></i>
+                </div>
+                <h4 class="fw-bold text-success mb-3">Request Submitted Successfully!</h4>
+                <p class="text-muted mb-3">${message}</p>
+                ${referralId ? `<p class="fw-bold">Referral ID: <span class="text-primary">${referralId}</span></p>` : ''}
+                <div class="d-grid gap-2 mt-4">
+                    <a href="/dashboard" class="btn btn-primary">Go to Dashboard</a>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        `;
+    }
+    
+    function showErrorMessage(message) {
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-danger alert-dismissible fade show mt-3';
+        alert.innerHTML = `
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        const modalContent = document.getElementById('modalContent');
+        modalContent.insertBefore(alert, modalContent.firstChild);
+    }
+    
     // Inline Signup Forms Handler
     const inlineSignupForm = document.getElementById('inlineSignupForm');
     const ctaSignupForm = document.getElementById('ctaSignupForm');
@@ -659,7 +1208,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!form) return;
         
         form.addEventListener('submit', function(e) {
-            const email = form.querySelector('input[email]').value.trim();
+            const email = form.querySelector('input[name="email"]').value.trim();
             
             // Basic email validation
             if (!email || !email.includes('@')) {
@@ -715,19 +1264,39 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show loading state
             const submitBtn = quickReferralForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Searching...';
+            submitBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Connecting...';
             submitBtn.disabled = true;
             
-            // Simulate API call to find provider
-            setTimeout(() => {
-                {% if session.user_id %}
-                // Redirect to patient portal with provider code
-                window.location.href = '/portal/patient?provider_code=' + providerCode;
-                {% else %}
-                // Redirect to registration with provider code
-                window.location.href = '/register?provider_code=' + providerCode + '&role=patient';
-                {% endif %}
-            }, 1000);
+            // Check provider code via API
+            fetch('/api/provider-code/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ provider_code: providerCode })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    {% if session.user_id %}
+                    // Redirect to appropriate portal with provider code
+                    window.location.href = '/portal/patient?provider_code=' + providerCode;
+                    {% else %}
+                    // Redirect to registration with provider code
+                    window.location.href = '/register?provider_code=' + providerCode + '&role=patient';
+                    {% endif %}
+                } else {
+                    alert('Invalid provider code. Please check the code and try again.');
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error validating provider code:', error);
+                alert('Error validating code. Please try again.');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
         });
         
         // Format input as user types
@@ -744,22 +1313,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.classList.remove('is-valid');
             } else {
                 this.classList.remove('is-valid', 'is-invalid');
-            }
-        });
-    }
-    
-    // Sticky navbar behavior enhancement
-    const navbar = document.getElementById('mainNavbar');
-    const stickySignUpBtn = document.getElementById('stickySignUpBtn');
-    
-    if (navbar && stickySignUpBtn) {
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 100) {
-                navbar.classList.add('navbar-scrolled');
-                stickySignUpBtn.classList.add('btn-pulse');
-            } else {
-                navbar.classList.remove('navbar-scrolled');
-                stickySignUpBtn.classList.remove('btn-pulse');
             }
         });
     }
@@ -784,6 +1337,183 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
+/* Referral Management Section Styles */
+.referral-management-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 100%);
+}
+
+.referral-action-card {
+    transition: all 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+}
+
+.referral-action-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.referral-action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.emergency-card::before {
+    background: linear-gradient(90deg, #dc3545, #b02a37);
+}
+
+.routine-card::before {
+    background: linear-gradient(90deg, #007bff, #0056b3);
+}
+
+.consultation-card::before {
+    background: linear-gradient(90deg, #198754, #146c43);
+}
+
+.referral-action-card:hover::before {
+    opacity: 1;
+}
+
+.referral-action-btn {
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.referral-action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.referral-action-btn:hover::before {
+    left: 100%;
+}
+
+.quick-access-card {
+    border-radius: 15px;
+    border: 2px solid #ffc107;
+    background: linear-gradient(135deg, #fff 0%, #fffdf7 100%);
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+    border-radius: 15px 15px 0 0;
+}
+
+.feature-item {
+    text-align: left;
+    padding: 0.5rem 0;
+}
+
+/* Form Styles in Modals */
+.modal .form-control {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.modal .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.modal .form-select {
+    border-radius: 8px;
+}
+
+.modal .btn {
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* Loading Animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.2em;
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: 12px;
+    border: none;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-left: 4px solid #17a2b8;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-left: 4px solid #28a745;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-left: 4px solid #dc3545;
+}
+
+/* Badge Enhancements */
+.badge {
+    font-weight: 500;
+    padding: 0.5rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+    .referral-action-card {
+        margin-bottom: 1.5rem;
+    }
+    
+    .modal-dialog {
+        margin: 1rem;
+    }
+    
+    .quick-access-card .row {
+        text-align: center;
+    }
+    
+    .quick-access-card .col-md-6:last-child {
+        margin-top: 1rem;
+    }
+}
+
 /* Hero Section Rotating Images */
 .hero-image-container {
     position: relative;

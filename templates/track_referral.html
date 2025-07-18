@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Track Referral - {{ referral[2] }} | Sapyyn{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h3 class="mb-0">
+                        <i class="bi bi-clipboard2-pulse me-2"></i>
+                        Referral Tracking
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="fw-bold text-primary">Referral ID</h5>
+                            <p class="fs-4 fw-bold text-dark">{{ referral[2] }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="fw-bold text-primary">Status</h5>
+                            <span class="badge 
+                                {% if referral[8] == 'emergency_pending' %}bg-danger
+                                {% elif referral[8] == 'consultation_pending' %}bg-info
+                                {% elif referral[8] == 'pending' %}bg-warning text-dark
+                                {% elif referral[8] == 'completed' %}bg-success
+                                {% else %}bg-secondary
+                                {% endif %} fs-6 px-3 py-2">
+                                {{ referral[8].replace('_', ' ').title() }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Patient Name</h6>
+                            <p>{{ referral[3] }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Referring Doctor</h6>
+                            <p>{{ referral[4] or 'N/A' }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Target Specialty</h6>
+                            <p>{{ referral[5] }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Urgency Level</h6>
+                            <span class="badge 
+                                {% if referral[7] == 'critical' %}bg-danger
+                                {% elif referral[7] == 'urgent' %}bg-warning text-dark
+                                {% else %}bg-info
+                                {% endif %}">
+                                {{ referral[7].title() }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Medical Condition/Case Details</h6>
+                        <div class="p-3 bg-light rounded">
+                            {{ referral[6] }}
+                        </div>
+                    </div>
+                    
+                    {% if referral[9] %}
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Additional Notes</h6>
+                        <div class="p-3 bg-light rounded">
+                            {{ referral[9] }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if referral[10] %}
+                    <div class="text-center mb-4">
+                        <h6 class="fw-bold">QR Code</h6>
+                        <img src="data:image/png;base64,{{ referral[10] }}" alt="Referral QR Code" class="img-fluid" style="max-width: 200px;">
+                        <p class="small text-muted mt-2">Share this QR code for quick access</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="text-center">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary me-2">
+                            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                        <button class="btn btn-outline-primary" onclick="window.print()">
+                            <i class="bi bi-printer me-2"></i>Print Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

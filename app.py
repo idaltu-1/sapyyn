@@ -923,8 +923,328 @@ def api_stats():
     })
 
 # ============================================================================
-# REWARD SYSTEM ROUTES
+# NEW REFERRAL MANAGEMENT API ROUTES
 # ============================================================================
+
+@app.route('/api/check-subscription')
+def check_subscription():
+    """Check if current user has active subscription"""
+    if 'user_id' not in session:
+        return jsonify({'has_subscription': False, 'message': 'Not authenticated'})
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Check for active subscription or trial
+    cursor.execute('''
+        SELECT us.subscription_status, us.trial_end_date, sp.plan_name
+        FROM user_subscriptions us
+        JOIN subscription_plans sp ON us.plan_id = sp.id
+        WHERE us.user_id = ? AND us.subscription_status IN ('active', 'trial')
+        ORDER BY us.created_at DESC LIMIT 1
+    ''', (session['user_id'],))
+    
+    subscription = cursor.fetchone()
+    conn.close()
+    
+    if subscription:
+        status, trial_end, plan_name = subscription
+        
+        # Check if trial is still valid
+        if status == 'trial' and trial_end:
+            from datetime import datetime
+            trial_end_date = datetime.fromisoformat(trial_end.replace('Z', '+00:00') if trial_end.endswith('Z') else trial_end)
+            if trial_end_date < datetime.now():
+                return jsonify({'has_subscription': False, 'message': 'Trial expired'})
+        
+        return jsonify({
+            'has_subscription': True, 
+            'subscription_status': status,
+            'plan_name': plan_name
+        })
+    
+    return jsonify({'has_subscription': False, 'message': 'No active subscription'})
+
+@app.route('/api/provider-code/validate', methods=['POST'])
+def validate_provider_code():
+    """Validate a 6-digit provider code"""
+    data = request.get_json()
+    provider_code = data.get('provider_code')
+    
+    if not provider_code or len(provider_code) != 6 or not provider_code.isdigit():
+        return jsonify({'valid': False, 'message': 'Invalid provider code format'})
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT pc.user_id, pc.practice_name, pc.provider_type, pc.specialization, u.full_name
+        FROM provider_codes pc
+        JOIN users u ON pc.user_id = u.id
+        WHERE pc.provider_code = ? AND pc.is_active = TRUE
+    ''', (provider_code,))
+    
+    provider = cursor.fetchone()
+    conn.close()
+    
+    if provider:
+        return jsonify({
+            'valid': True,
+            'provider': {
+                'name': provider[4],
+                'practice': provider[1],
+                'type': provider[2],
+                'specialty': provider[3]
+            }
+        })
+    
+    return jsonify({'valid': False, 'message': 'Provider code not found'})
+
+def check_subscription_required(f):
+    """Decorator to check if user has required subscription for referral features"""
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return jsonify({'success': False, 'message': 'Authentication required'}), 401
+        
+        # Check subscription status
+        subscription_check = check_subscription()
+        subscription_data = subscription_check.get_json()
+        
+        if not subscription_data.get('has_subscription'):
+            return jsonify({
+                'success': False, 
+                'message': 'Active subscription required for referral features',
+                'requires_subscription': True,
+                'redirect_url': '/start-free-trial'
+            }), 403
+        
+        return f(*args, **kwargs)
+    
+    decorated_function.__name__ = f.__name__
+    return decorated_function
+
+@app.route('/api/referral/emergency', methods=['POST'])
+@check_subscription_required
+def create_emergency_referral():
+    """Create emergency referral with priority processing"""
+    try:
+        # Generate unique referral ID
+        referral_id = str(uuid.uuid4())[:8].upper()
+        
+        # Get form data
+        patient_name = request.form.get('patient_name')
+        urgency_level = request.form.get('urgency_level', 'urgent')
+        referring_doctor = request.form.get('referring_doctor', session.get('full_name'))
+        target_specialty = request.form.get('target_specialty')
+        emergency_details = request.form.get('emergency_details')
+        contact_number = request.form.get('contact_number')
+        
+        # Validation
+        if not all([patient_name, target_specialty, emergency_details, contact_number]):
+            return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+        
+        # Create medical condition from emergency details
+        medical_condition = f"EMERGENCY: {emergency_details}"
+        
+        # Generate QR code
+        qr_data = f"Emergency Referral\nID: {referral_id}\nPatient: {patient_name}\nUrgency: {urgency_level}\nContact: {contact_number}"
+        qr_code = generate_qr_code(qr_data)
+        
+        # Save to database
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            INSERT INTO referrals (
+                user_id, referral_id, patient_name, referring_doctor, target_doctor,
+                medical_condition, urgency_level, status, notes, qr_code, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            session['user_id'], referral_id, patient_name, referring_doctor, target_specialty,
+            medical_condition, urgency_level, 'emergency_pending',
+            f"Emergency contact: {contact_number}\nDetails: {emergency_details}",
+            qr_code, datetime.now()
+        ))
+        
+        conn.commit()
+        conn.close()
+        
+        # Log the emergency referral creation for audit
+        log_compliance_action(
+            session['user_id'], 'CREATE', 'emergency_referral', 
+            referral_id, f'Emergency referral created for {patient_name}', request
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'Emergency referral submitted successfully. Specialists will be notified immediately.',
+            'referral_id': referral_id,
+            'redirect_url': f'/referral/track/{referral_id}'
+        })
+        
+    except Exception as e:
+        app.logger.error(f'Error creating emergency referral: {str(e)}')
+        return jsonify({'success': False, 'message': 'Internal server error'}), 500
+
+@app.route('/api/referral/routine', methods=['POST'])
+@check_subscription_required
+def create_routine_referral():
+    """Create routine referral with standard processing"""
+    try:
+        # Generate unique referral ID
+        referral_id = str(uuid.uuid4())[:8].upper()
+        
+        # Get form data
+        patient_name = request.form.get('patient_name')
+        patient_age = request.form.get('patient_age')
+        referring_doctor = request.form.get('referring_doctor', session.get('full_name'))
+        target_specialty = request.form.get('target_specialty')
+        medical_condition = request.form.get('medical_condition')
+        treatment_history = request.form.get('treatment_history', '')
+        preferred_date = request.form.get('preferred_date')
+        insurance_info = request.form.get('insurance_info', '')
+        additional_notes = request.form.get('additional_notes', '')
+        
+        # Validation
+        if not all([patient_name, target_specialty, medical_condition]):
+            return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+        
+        # Compile notes
+        notes_parts = []
+        if patient_age:
+            notes_parts.append(f"Patient age: {patient_age}")
+        if treatment_history:
+            notes_parts.append(f"Treatment history: {treatment_history}")
+        if preferred_date:
+            notes_parts.append(f"Preferred appointment: {preferred_date}")
+        if insurance_info:
+            notes_parts.append(f"Insurance: {insurance_info}")
+        if additional_notes:
+            notes_parts.append(f"Additional notes: {additional_notes}")
+        
+        notes = "\n".join(notes_parts)
+        
+        # Generate QR code
+        qr_data = f"Routine Referral\nID: {referral_id}\nPatient: {patient_name}\nSpecialty: {target_specialty}"
+        qr_code = generate_qr_code(qr_data)
+        
+        # Save to database
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            INSERT INTO referrals (
+                user_id, referral_id, patient_name, referring_doctor, target_doctor,
+                medical_condition, urgency_level, status, notes, qr_code, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            session['user_id'], referral_id, patient_name, referring_doctor, target_specialty,
+            medical_condition, 'normal', 'pending', notes, qr_code, datetime.now()
+        ))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Routine referral created successfully. You will receive updates on the progress.',
+            'referral_id': referral_id,
+            'redirect_url': f'/referral/track/{referral_id}'
+        })
+        
+    except Exception as e:
+        app.logger.error(f'Error creating routine referral: {str(e)}')
+        return jsonify({'success': False, 'message': 'Internal server error'}), 500
+
+@app.route('/api/consultation/request', methods=['POST'])
+@check_subscription_required
+def request_consultation():
+    """Request consultation with specialist"""
+    try:
+        # Generate unique consultation ID
+        consultation_id = str(uuid.uuid4())[:8].upper()
+        
+        # Get form data
+        consultation_type = request.form.get('consultation_type')
+        specialty = request.form.get('specialty')
+        case_description = request.form.get('case_description')
+        specific_questions = request.form.get('specific_questions', '')
+        urgency = request.form.get('urgency', 'normal')
+        preferred_method = request.form.get('preferred_method', 'chat')
+        
+        # Validation
+        if not all([consultation_type, specialty, case_description]):
+            return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+        
+        # Compile consultation details
+        consultation_details = f"Type: {consultation_type}\nSpecialty: {specialty}\nCase: {case_description}"
+        if specific_questions:
+            consultation_details += f"\nQuestions: {specific_questions}"
+        
+        notes = f"Urgency: {urgency}\nPreferred method: {preferred_method}\nDetails: {consultation_details}"
+        
+        # Generate QR code for consultation
+        qr_data = f"Consultation Request\nID: {consultation_id}\nType: {consultation_type}\nSpecialty: {specialty}"
+        qr_code = generate_qr_code(qr_data)
+        
+        # Save as special referral type
+        conn = sqlite3.connect('sapyyn.db')
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            INSERT INTO referrals (
+                user_id, referral_id, patient_name, referring_doctor, target_doctor,
+                medical_condition, urgency_level, status, notes, qr_code, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            session['user_id'], consultation_id, f"Consultation Request - {consultation_type}",
+            session.get('full_name'), specialty, case_description, urgency, 
+            'consultation_pending', notes, qr_code, datetime.now()
+        ))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Consultation request submitted successfully. A specialist will contact you soon.',
+            'referral_id': consultation_id,
+            'redirect_url': f'/consultation/track/{consultation_id}'
+        })
+        
+    except Exception as e:
+        app.logger.error(f'Error creating consultation request: {str(e)}')
+        return jsonify({'success': False, 'message': 'Internal server error'}), 500
+
+@app.route('/referral/track/<referral_id>')
+def track_referral(referral_id):
+    """Track referral progress page"""
+    if 'user_id' not in session:
+        flash('Please log in to track your referral.', 'error')
+        return redirect(url_for('login'))
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Get referral details
+    cursor.execute('''
+        SELECT * FROM referrals 
+        WHERE referral_id = ? AND user_id = ?
+    ''', (referral_id, session['user_id']))
+    
+    referral = cursor.fetchone()
+    conn.close()
+    
+    if not referral:
+        flash('Referral not found.', 'error')
+        return redirect(url_for('dashboard'))
+    
+    return render_template('track_referral.html', referral=referral)
+
+@app.route('/consultation/track/<consultation_id>')
+def track_consultation(consultation_id):
+    """Track consultation request page"""
+    return track_referral(consultation_id)  # Same functionality for now
 
 def log_compliance_action(user_id, action_type, entity_type, entity_id, action_details, request):
     """Log compliance actions for audit trail"""
@@ -2244,7 +2564,7 @@ def referral_history():
     return redirect(url_for('serve_static_page', filename='Referral History'))
 
 @app.route('/track-referral')
-def track_referral():
+def track_referral_page():
     """Track referral page route"""
     if 'user_id' not in session:
         flash('Please log in to track referrals.', 'error')
