@@ -1,0 +1,439 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Promotion - Sapyyn{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    .form-container {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .image-preview {
+        max-width: 300px;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 2px dashed #ddd;
+        margin-top: 10px;
+    }
+    
+    .current-image {
+        max-width: 300px;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
+    
+    .file-upload-area {
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        transition: border-color 0.3s ease;
+    }
+    
+    .file-upload-area:hover {
+        border-color: #007bff;
+    }
+    
+    .file-upload-area.dragover {
+        border-color: #007bff;
+        background-color: #e3f2fd;
+    }
+    
+    .file-info {
+        color: #6c757d;
+        font-size: 0.9em;
+        margin-top: 10px;
+    }
+    
+    .date-range-inputs {
+        display: flex;
+        gap: 15px;
+    }
+    
+    @media (max-width: 768px) {
+        .date-range-inputs {
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+    
+    .form-group label {
+        font-weight: 500;
+        color: #495057;
+    }
+    
+    .required {
+        color: #dc3545;
+    }
+    
+    .toggle-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+    
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 34px;
+    }
+    
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+        background-color: #2196F3;
+    }
+    
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+    
+    .current-image-section {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .stats-summary {
+        background-color: #e9ecef;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .stat-item {
+        display: inline-block;
+        margin-right: 20px;
+    }
+    
+    .stat-label {
+        font-weight: bold;
+        color: #6c757d;
+        font-size: 0.9em;
+    }
+    
+    .stat-value {
+        font-size: 1.1em;
+        color: #495057;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="form-container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Edit Promotion</h2>
+                    <a href="{{ url_for('promotions_list') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                </div>
+                
+                <!-- Stats Summary -->
+                <div class="stats-summary">
+                    <h5>Current Performance</h5>
+                    <div class="stat-item">
+                        <div class="stat-label">Impressions</div>
+                        <div class="stat-value">{{ promotion[11] or 0 }}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Clicks</div>
+                        <div class="stat-value">{{ promotion[12] or 0 }}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">CTR</div>
+                        <div class="stat-value">{{ "%.2f"|format(promotion[13] or 0) }}%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Status</div>
+                        <div class="stat-value">{{ promotion[9]|title }}</div>
+                    </div>
+                </div>
+                
+                <form method="POST" enctype="multipart/form-data" id="promotionForm">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="title">Promotion Title <span class="required">*</span></label>
+                                <input type="text" class="form-control" id="title" name="title" 
+                                       value="{{ promotion[2] }}" 
+                                       placeholder="Enter a compelling title for your promotion" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4"
+                                  placeholder="Describe your promotion offer and benefits">{{ promotion[3] or '' }}</textarea>
+                    </div>
+                    
+                    <!-- Current Image -->
+                    {% if promotion[4] %}
+                    <div class="current-image-section">
+                        <label>Current Image</label>
+                        <div class="mb-2">
+                            <img src="{{ url_for('static', filename=promotion[4].replace('static/', '')) }}" 
+                                 alt="Current promotion image" class="current-image">
+                        </div>
+                        <p class="text-muted mb-0">
+                            <small>{{ promotion[5] }} - Upload a new image below to replace it</small>
+                        </p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label for="image">{% if promotion[4] %}Replace {% endif %}Promotion Image</label>
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                            <p class="mb-2">Click to select or drag and drop your image</p>
+                            <div class="file-info">
+                                PNG or JPG only • Maximum 500KB
+                            </div>
+                        </div>
+                        <input type="file" class="form-control-file" id="image" name="image" 
+                               accept=".png,.jpg,.jpeg" style="display: none;">
+                        <img id="imagePreview" class="image-preview" alt="Preview" style="display: none;">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="start_date">Start Date <span class="required">*</span></label>
+                                <input type="date" class="form-control flatpickr" id="start_date" name="start_date" 
+                                       value="{{ promotion[6] }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="end_date">End Date <span class="required">*</span></label>
+                                <input type="date" class="form-control flatpickr" id="end_date" name="end_date" 
+                                       value="{{ promotion[7] }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="target_audience">Target Audience</label>
+                                <select class="form-control" id="target_audience" name="target_audience">
+                                    <option value="">Select audience type</option>
+                                    <option value="general" {% if promotion[10] == 'general' %}selected{% endif %}>General Patients</option>
+                                    <option value="new_patients" {% if promotion[10] == 'new_patients' %}selected{% endif %}>New Patients</option>
+                                    <option value="existing_patients" {% if promotion[10] == 'existing_patients' %}selected{% endif %}>Existing Patients</option>
+                                    <option value="specialists" {% if promotion[10] == 'specialists' %}selected{% endif %}>Specialist Referrals</option>
+                                    <option value="emergency" {% if promotion[10] == 'emergency' %}selected{% endif %}>Emergency Cases</option>
+                                    <option value="cosmetic" {% if promotion[10] == 'cosmetic' %}selected{% endif %}>Cosmetic Procedures</option>
+                                    <option value="orthodontics" {% if promotion[10] == 'orthodontics' %}selected{% endif %}>Orthodontics</option>
+                                    <option value="oral_surgery" {% if promotion[10] == 'oral_surgery' %}selected{% endif %}>Oral Surgery</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="budget">Budget ($)</label>
+                                <input type="number" class="form-control" id="budget" name="budget" 
+                                       step="0.01" min="0" placeholder="0.00" 
+                                       value="{{ promotion[11] if promotion[11] else '' }}">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="toggle-container">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="is_active" name="is_active" 
+                                       {% if promotion[8] %}checked{% endif %}>
+                                <span class="slider"></span>
+                            </label>
+                            <label for="is_active">Promotion is active</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save"></i> Update Promotion
+                        </button>
+                        <a href="{{ url_for('promotions_list') }}" class="btn btn-outline-secondary btn-lg ml-3">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize date pickers
+    flatpickr('#start_date', {
+        dateFormat: 'Y-m-d',
+        onChange: function(selectedDates, dateStr, instance) {
+            // Update end date minimum to be after start date
+            const endDatePicker = document.querySelector('#end_date')._flatpickr;
+            endDatePicker.set('minDate', dateStr);
+        }
+    });
+    
+    flatpickr('#end_date', {
+        dateFormat: 'Y-m-d'
+    });
+    
+    // File upload handling
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('image');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    // Click to select file
+    fileUploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+    
+    // Drag and drop functionality
+    fileUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+    });
+    
+    fileUploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+    });
+    
+    fileUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            handleFileSelect(files[0]);
+        }
+    });
+    
+    // File input change
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+        }
+    });
+    
+    function handleFileSelect(file) {
+        // Validate file type
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Only PNG and JPG images are allowed.');
+            fileInput.value = '';
+            return;
+        }
+        
+        // Validate file size (500KB)
+        if (file.size > 500 * 1024) {
+            alert('Image file must be 500KB or smaller.');
+            fileInput.value = '';
+            return;
+        }
+        
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = 'block';
+            
+            // Update upload area
+            fileUploadArea.innerHTML = `
+                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                <p class="mb-2"><strong>${file.name}</strong></p>
+                <div class="file-info">
+                    ${(file.size / 1024).toFixed(1)} KB • Click to change
+                </div>
+            `;
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    // Form validation
+    document.getElementById('promotionForm').addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value.trim();
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        
+        if (!title) {
+            alert('Please enter a promotion title.');
+            e.preventDefault();
+            return;
+        }
+        
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates.');
+            e.preventDefault();
+            return;
+        }
+        
+        if (new Date(startDate) >= new Date(endDate)) {
+            alert('End date must be after start date.');
+            e.preventDefault();
+            return;
+        }
+        
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+        submitBtn.disabled = true;
+        
+        // Re-enable if there's an error (form won't submit)
+        setTimeout(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }, 10000);
+    });
+});
+</script>
+{% endblock %}

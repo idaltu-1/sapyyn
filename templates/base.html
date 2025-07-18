@@ -217,6 +217,11 @@
                             <li><a class="dropdown-item" href="{{ url_for('serve_static_page', filename='admin-users') }}"><i class="bi bi-people"></i> Manage Users</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('serve_static_page', filename='admin-referrals') }}"><i class="bi bi-clipboard-data"></i> Manage Referrals</a></li>
                             {% endif %}
+                            {% if session.role in ['dentist', 'specialist', 'dentist_admin', 'specialist_admin', 'admin'] %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Marketing</h6></li>
+                            <li><a class="dropdown-item" href="{{ url_for('promotions_list') }}"><i class="bi bi-megaphone"></i> Promotions</a></li>
+                            {% endif %}
                         </ul>
                     </li>
                     <!-- Rewards -->
