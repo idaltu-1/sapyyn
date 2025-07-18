@@ -63,6 +63,15 @@
     .navbar-nav {
         flex-direction: row !important;
     }
+    
+    /* Prevent button overlap on desktop */
+    .navbar-nav .nav-item {
+        margin-left: 0.25rem;
+    }
+    
+    .navbar-nav .nav-item .btn {
+        white-space: nowrap;
+    }
 }
 
 /* Ensure mobile menu works correctly */
@@ -77,6 +86,25 @@
     
     .navbar-toggler {
         display: block !important;
+        border: none;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    /* Fix mobile navigation spacing */
+    .navbar-nav .nav-item {
+        margin: 0.25rem 0;
+    }
+    
+    .navbar-nav .nav-item .btn {
+        display: block;
+        width: 100%;
+        margin: 0.5rem 0;
+        text-align: center;
+    }
+    
+    /* Prevent button overlap in mobile */
+    .navbar-nav .nav-item:last-child {
+        margin-bottom: 1rem;
     }
 }
 
@@ -86,6 +114,33 @@ body {
     line-height: 1.7;
     color: var(--sapyyn-gray-700);
     background-color: var(--sapyyn-gray-50);
+}
+
+/* Improved section spacing */
+.py-5 {
+    padding-top: 4rem !important;
+    padding-bottom: 4rem !important;
+}
+
+/* Better responsive spacing */
+@media (max-width: 768px) {
+    .py-5 {
+        padding-top: 2.5rem !important;
+        padding-bottom: 2.5rem !important;
+    }
+}
+
+/* Enhanced container spacing */
+.container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+@media (max-width: 576px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
 }
 
 .navbar-brand {
@@ -98,6 +153,59 @@ body {
 .navbar-brand:hover {
     transform: translateY(-1px);
     color: var(--sapyyn-warning-light) !important;
+}
+
+/* Enhanced navbar styling */
+.navbar {
+    background: var(--sapyyn-primary) !important;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    min-height: 70px;
+}
+
+.navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    padding: 0.75rem 1rem !important;
+    border-radius: var(--border-radius-sm);
+    margin: 0 0.125rem;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: white !important;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Button in navbar improvements */
+.navbar .btn {
+    font-weight: 600;
+    border-radius: var(--border-radius-md);
+    transition: all 0.3s ease;
+}
+
+.navbar .btn-warning {
+    background: linear-gradient(135deg, var(--sapyyn-warning) 0%, var(--sapyyn-warning-light) 100%);
+    border: none;
+    color: var(--sapyyn-dark);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.navbar .btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+.navbar .btn-outline-light {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.navbar .btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
 }
 
 .navbar-logo {
@@ -137,9 +245,10 @@ body {
 /* Enhanced Hero Section */
 .hero-section {
     background: linear-gradient(135deg, var(--dental-blue) 0%, var(--sapyyn-primary) 35%, var(--dental-blue-light) 100%);
-    min-height: 100vh;
+    min-height: 75vh;
     position: relative;
     overflow: hidden;
+    padding: 4rem 0;
 }
 
 /* Add subtle pattern overlay for texture */
@@ -185,12 +294,26 @@ body {
     letter-spacing: 0.025em;
     transition: all 0.3s ease;
     box-shadow: 0 4px 14px 0 rgba(30, 64, 175, 0.3);
+    border-radius: var(--border-radius-md);
 }
 
 .btn-primary:hover {
     background: linear-gradient(135deg, var(--sapyyn-primary-dark) 0%, var(--dental-blue) 100%);
     transform: translateY(-1px);
     box-shadow: 0 8px 25px 0 rgba(30, 64, 175, 0.4);
+}
+
+/* Improved button sizes and spacing */
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: var(--border-radius-sm);
+}
+
+.btn-lg {
+    padding: 0.75rem 2rem;
+    font-size: 1.125rem;
+    border-radius: var(--border-radius-md);
 }
 
 /* Trust indicators styling */
@@ -1182,13 +1305,6 @@ body {
     }
 }
 
-/* Hero Section */
-.hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 100px 0;
-    color: white;
-}
-
 .hero-icon {
     font-size: 8rem;
     opacity: 0.8;
@@ -1646,25 +1762,7 @@ body {
     }
 }
 
-/* Enhanced Hero Section Styles */
-.hero-section {
-    position: relative;
-    min-height: 85vh;
-    display: flex;
-    align-items: center;
-    color: white;
-    overflow: hidden;
-}
-
-.hero-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #1d4ed8 100%);
-    z-index: -2;
-}
+/* Enhanced Hero Section Styles - Removed duplicate, using main hero-section above */
 
 .gradient-overlay {
     position: absolute;
