@@ -1,0 +1,36 @@
+repos:
+  # Basic Python code quality
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-json
+      - id: pretty-format-json
+        args: ['--autofix']
+
+  # MyPy static type checking with strict mode
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        args: [--strict]
+        additional_dependencies: [types-requests, types-flask]
+
+  # Pylint for code quality
+  - repo: https://github.com/pylint-dev/pylint
+    rev: v3.2.7
+    hooks:
+      - id: pylint
+        args: [--disable=C0114,C0115,C0116,R0903,R0913] # Disable some overly strict rules
+        additional_dependencies: [flask, werkzeug, stripe, qrcode, pillow]
+
+  # Bandit for security scanning
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.9
+    hooks:
+      - id: bandit
+        args: ['-f', 'json', '-o', 'bandit-report.json']
+        exclude: ^(venv/|test_|tests/)
