@@ -37,8 +37,8 @@ app.config.from_object(config_class)
 # Initialize security features
 csrf = CSRFProtect(app)
 limiter = Limiter(
-    app,
     key_func=get_remote_address,
+    app=app,
     default_limits=["200 per day", "50 per hour"]
 )
 

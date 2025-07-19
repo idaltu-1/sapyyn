@@ -6,6 +6,10 @@ import os
 import requests
 import logging
 from urllib.parse import urljoin
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 

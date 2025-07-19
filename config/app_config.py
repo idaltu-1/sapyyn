@@ -5,12 +5,18 @@ Centralizes all configuration settings and removes hardcoded values
 import os
 import secrets
 from typing import Dict, Any
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 class Config:
     """Base configuration class"""
     
     # Security Configuration
     SECRET_KEY = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
+    FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
+    DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
     
     # Database Configuration
     DATABASE_NAME = os.environ.get('DATABASE_NAME', 'sapyyn.db')
