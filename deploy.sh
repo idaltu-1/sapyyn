@@ -80,8 +80,18 @@ echo ""
 # Install Python dependencies
 echo -e "${YELLOW}📦 Installing Python dependencies...${NC}"
 if [ -f "requirements.txt" ]; then
-    pip3 install -r requirements.txt
-    echo -e "${GREEN}✅ Python dependencies installed${NC}"
+    if pip3 install -r requirements.txt --timeout 30; then
+        echo -e "${GREEN}✅ Python dependencies installed${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Python dependency installation had issues (possibly network timeout)${NC}"
+        echo -e "${YELLOW}   Checking if critical dependencies are available...${NC}"
+        if python3 -c "import flask" 2>/dev/null; then
+            echo -e "${GREEN}✅ Flask is available, continuing...${NC}"
+        else
+            echo -e "${RED}❌ Flask not available. Please install manually: pip3 install flask${NC}"
+            exit 1
+        fi
+    fi
 else
     echo -e "${RED}❌ requirements.txt not found${NC}"
     exit 1
@@ -92,12 +102,19 @@ echo ""
 # Install Node.js dependencies and build frontend (if available)
 if command_exists npm && [ -f "package.json" ]; then
     echo -e "${YELLOW}📦 Installing Node.js dependencies...${NC}"
-    npm install
-    echo -e "${GREEN}✅ Node.js dependencies installed${NC}"
-    
-    echo -e "${YELLOW}🏗️  Building frontend assets...${NC}"
-    npm run build
-    echo -e "${GREEN}✅ Frontend assets built${NC}"
+    if npm install --timeout 30000; then
+        echo -e "${GREEN}✅ Node.js dependencies installed${NC}"
+        
+        echo -e "${YELLOW}🏗️  Building frontend assets...${NC}"
+        if npm run build; then
+            echo -e "${GREEN}✅ Frontend assets built${NC}"
+        else
+            echo -e "${YELLOW}⚠️  Frontend build failed, continuing without frontend assets${NC}"
+        fi
+    else
+        echo -e "${YELLOW}⚠️  Node.js dependency installation failed (possibly network timeout)${NC}"
+        echo -e "${YELLOW}   Continuing without frontend build...${NC}"
+    fi
 else
     echo -e "${YELLOW}⚠️  Skipping frontend build (npm or package.json not available)${NC}"
 fi
