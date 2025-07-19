@@ -21,7 +21,7 @@
 /about  /static/about_page.html  200
 /pricing  /static/pricing_page.html  200
 /resources  /static/resources_page.html  200
-/surgicalInstruction  /static/surgical_instruction_page.html  200
+/surgicalInstruction  /static/surgical-instruction-page.html  200
 /contact  /static/contact.html  200
 
 # Additional feature pages - redirect to static pages
