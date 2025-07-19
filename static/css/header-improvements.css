@@ -1,0 +1,441 @@
+/* Header Navigation Bar Improvements - Logo Duplication Fix and Redesign */
+
+/* Reset and base header styling */
+.PR_headertop {
+  position: relative;
+  top: 0;
+  width: 100%;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  z-index: 12;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  border: none;
+}
+
+.landing_page_navbar {
+  position: relative !important;
+  background: transparent !important;
+  display: flex;
+  align-items: center;
+  border: none !important;
+  padding: 15px 0;
+}
+
+/* Logo container improvements */
+.PR_logowrp {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0;
+}
+
+.PR_logowrp img {
+  height: 50px;
+  width: auto;
+  transition: all 0.3s ease;
+  filter: brightness(1.1);
+  object-fit: contain;
+}
+
+.PR_logowrp:hover img {
+  transform: scale(1.05);
+  filter: brightness(1.2);
+}
+
+/* Header menu wrapper improvements */
+.PR_headermenuwrp {
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.PR_headertop .bg-primary {
+  background-color: transparent !important;
+}
+
+/* Navigation styling improvements */
+.PR_headermenuwrp .navbar {
+  padding: 0;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.PR_headermenuwrp .navbar-collapse {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+}
+
+.PR_headermenuwrp .navbar-nav {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  gap: 0.5rem;
+}
+
+.PR_headermenuwrp .nav-item {
+  display: flex;
+  align-items: center;
+  margin: 0 0.25rem;
+}
+
+/* Navigation link improvements */
+.PR_headermenuwrp .nav-link {
+  color: white !important;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.2;
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+
+.PR_headermenuwrp .nav-link:hover {
+  color: #fbbf24 !important;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Active state for Surgical Instruction tab */
+.PR_headermenuwrp .nav-link[href="/surgicalInstruction"] {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fbbf24 !important;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.PR_headermenuwrp .nav-link[href="/surgicalInstruction"]:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #f59e0b !important;
+}
+
+/* Home icon link styling */
+.PR_headertop .navbar .nav-link:first-child {
+  cursor: pointer !important;
+  position: relative;
+  font-size: 0;
+  padding: 12px 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.PR_headertop .navbar .nav-link:first-child:before {
+  cursor: pointer !important;
+  background: url(webpack:///mini-css-extract-plugin/_next/static/media/home_icon_nav.907bea87.png);
+  background-repeat: no-repeat;
+  font-size: 0;
+  width: 24px;
+  height: 24px;
+  background-size: 100% 100%;
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease;
+}
+
+.PR_headertop .navbar .nav-link:first-child:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.PR_headertop .navbar .nav-link:first-child:hover:before {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* CTA Button improvements */
+.PR_headermenuwrp .PR_createacc_btn,
+.PR_headermenuwrp .PR_signbtn {
+  padding: 10px 20px;
+  line-height: 1.2;
+  color: #000 !important;
+  font-weight: 600;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+  margin-left: 0.5rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.PR_headermenuwrp .PR_createacc_btn:hover,
+.PR_headermenuwrp .PR_signbtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #000 !important;
+}
+
+.PR_headermenuwrp .PR_createacc_btn {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+}
+
+.PR_headermenuwrp .PR_signbtn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white !important;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.PR_headermenuwrp .PR_signbtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: white !important;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Mobile responsiveness improvements */
+@media (max-width: 991.98px) {
+  .landing_page_navbar {
+    padding: 10px 0;
+  }
+  
+  .PR_logowrp img {
+    height: 45px;
+  }
+  
+  .PR_headermenuwrp .navbar {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .PR_headermenuwrp .navbar-toggler {
+    border: none;
+    padding: 0.5rem 0.75rem;
+    margin-right: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .PR_headermenuwrp .navbar-toggler:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  
+  .PR_headermenuwrp .navbar-toggler-icon {
+    color: #fff;
+    filter: invert(100%);
+    opacity: 1;
+    border: 0;
+    width: 30px;
+    height: 30px;
+  }
+  
+  .PR_headermenuwrp .navbar-collapse {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 100%;
+    border: 1px solid #afafb3;
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    left: auto;
+    margin: 0 auto;
+    z-index: 999;
+    border-radius: 8px;
+    padding: 30px 20px;
+    height: 100vh;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+  
+  .PR_headermenuwrp .navbar-nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+  
+  .PR_headermenuwrp .nav-item {
+    margin: 0;
+    width: 100%;
+  }
+  
+  .PR_headermenuwrp .nav-link {
+    padding: 15px 20px;
+    text-align: center;
+    font-size: 18px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 0.5rem;
+  }
+  
+  .PR_headermenuwrp .PR_createacc_btn,
+  .PR_headermenuwrp .PR_signbtn {
+    margin: 0.5rem 0;
+    padding: 15px 20px;
+    text-align: center;
+    font-size: 18px;
+    width: 100%;
+  }
+  
+  .closemob {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 30px;
+    height: 30px;
+    opacity: 1;
+    display: block;
+    background-color: transparent;
+    z-index: 9;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+  }
+  
+  .closemob:hover {
+    opacity: 0.6;
+  }
+  
+  .closemob:after,
+  .closemob:before {
+    position: absolute;
+    right: 13px;
+    content: " ";
+    height: 20px;
+    width: 2px;
+    background-color: #fff;
+    top: 5px;
+  }
+  
+  .closemob:before {
+    transform: rotate(45deg);
+  }
+  
+  .closemob:after {
+    transform: rotate(-45deg);
+  }
+}
+
+@media (max-width: 767px) {
+  .container {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+  
+  .PR_logowrp img {
+    height: 40px;
+  }
+  
+  .PR_headermenuwrp .nav-link {
+    font-size: 16px;
+    padding: 12px 15px;
+  }
+  
+  .PR_headermenuwrp .PR_createacc_btn,
+  .PR_headermenuwrp .PR_signbtn {
+    font-size: 16px;
+    padding: 12px 20px;
+  }
+}
+
+/* Desktop-specific improvements */
+@media (min-width: 992px) {
+  .PR_headermenuwrp .navbar-collapse {
+    display: flex !important;
+    visibility: visible !important;
+  }
+  
+  .PR_headermenuwrp .navbar-toggler {
+    display: none !important;
+  }
+  
+  .PR_headermenuwrp .navbar-nav {
+    flex-direction: row !important;
+    align-items: center;
+  }
+  
+  .PR_headermenuwrp .nav-item {
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+  }
+  
+  .PR_headermenuwrp .navbar {
+    padding: 0;
+  }
+}
+
+/* Large screen optimizations */
+@media (min-width: 1200px) {
+  .PR_headermenuwrp .nav-link {
+    font-size: 17px;
+    padding: 12px 20px;
+  }
+  
+  .PR_headermenuwrp .PR_createacc_btn,
+  .PR_headermenuwrp .PR_signbtn {
+    padding: 12px 24px;
+  }
+}
+
+/* Accessibility improvements */
+.PR_headermenuwrp .nav-link:focus,
+.PR_headermenuwrp .PR_createacc_btn:focus,
+.PR_headermenuwrp .PR_signbtn:focus {
+  outline: 3px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling and transitions */
+.PR_headertop {
+  transition: all 0.3s ease;
+}
+
+.PR_headertop.PR_stickyheader {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Fix for any potential logo duplication */
+.PR_logowrp {
+  overflow: hidden;
+}
+
+.PR_logowrp img:not(:first-child) {
+  display: none !important;
+}
+
+/* Ensure proper spacing and alignment */
+.PR_headertop .container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.PR_headertop .row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 0;
+}
+
+.PR_headertop .col-lg-2,
+.PR_headertop .col-sm-5,
+.PR_headertop .col-5 {
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+}
+
+.PR_headertop .col-lg-10,
+.PR_headertop .col-sm-7,
+.PR_headertop .col-7 {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 15px;
+}
