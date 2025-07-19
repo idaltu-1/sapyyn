@@ -2,7 +2,7 @@
 # Complete routing configuration for all pages
 
 [build]
-  command = "echo 'Building Sapyyn application...' && cp -r static/* ."
+  command = "echo 'Building Sapyyn application...' && if [ -d static ]; then rsync -av static/ . --exclude node_modules --exclude .git; fi"
   publish = "."
 
 # ===========================
