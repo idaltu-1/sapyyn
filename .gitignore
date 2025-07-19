@@ -141,3 +141,5 @@ patient-referral/*
 secrets.txt
 .secrets
 config.local.py
+# Local Netlify folder
+.netlify

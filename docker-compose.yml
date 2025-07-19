@@ -6,10 +6,26 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "5001:5000"
     environment:
-      - NODE_ENV=production
+      - FLASK_ENV=production
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/sapyyn_db
+      - SECRET_KEY=${SECRET_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - NOCODEBACKEND_SECRET_KEY=${NOCODEBACKEND_SECRET_KEY}
+      - NOCODEBACKEND_REFERRAL_INSTANCE=${NOCODEBACKEND_REFERRAL_INSTANCE}
+      - NOCODEBACKEND_UPLOADS_INSTANCE=${NOCODEBACKEND_UPLOADS_INSTANCE}
+      - MAIL_SERVER=${MAIL_SERVER}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_USE_TLS=${MAIL_USE_TLS}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_DEFAULT_SENDER=${MAIL_DEFAULT_SENDER}
+      - GA4_MEASUREMENT_ID=${GA4_MEASUREMENT_ID}
+      - GTM_CONTAINER_ID=${GTM_CONTAINER_ID}
+      - HOTJAR_SITE_ID=${HOTJAR_SITE_ID}
+      - ENABLE_ANALYTICS=${ENABLE_ANALYTICS}
     depends_on:
       - postgres
     restart: unless-stopped
