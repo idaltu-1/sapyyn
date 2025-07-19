@@ -2,8 +2,9 @@
 # Complete routing configuration for all pages
 
 [build]
-  command = "echo 'Building Sapyyn application...' && cp -r static/* ."
+  command = "echo 'Building Sapyyn application...' && if [ -d static ]; then cp -r static/* .; fi"
   publish = "."
+  environment = { PYTHON_VERSION = "3.12" }
 
 # ===========================
 # MAIN PAGES & ROUTING
