@@ -1,1 +1,1375 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="shortcut icon" href="/favicon.png"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#17c1e8"/><link rel="apple-touch-icon" sizes="76x76" href="/apple-icon.png"/><link rel="manifest" href="/manifest.json"/><title>Patient Referrral Admin</title><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"/><link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/><link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp" rel="stylesheet"/><script async defer="defer" src="https://buttons.github.io/buttons.js"></script><script defer="defer" src="/static/js/main.1311e9a8.js"></script><link href="/static/css/main.4605a13b.css" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rewards Program - Sapyyn</title>
+    <meta name="description" content="Earn rewards for every dental referral. Join Sapyyn's loyalty program and unlock exclusive benefits, cash rewards, and tier-based incentives.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="./favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --secondary-blue: #3B82F6;
+            --light-blue: #DBEAFE;
+            --accent-yellow: #FCD34D;
+            --warning-yellow: #F59E0B;
+            --white: #FFFFFF;
+            --light-grey: #F8FAFC;
+            --medium-grey: #64748B;
+            --dark-grey: #334155;
+            --black: #0F172A;
+            --success: #10B981;
+            --danger: #EF4444;
+            --glass: rgba(255, 255, 255, 0.25);
+            --shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+            --shadow-hover: 0 16px 64px rgba(37, 99, 235, 0.15);
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            --gradient-gold: linear-gradient(135deg, #FFD700, #FFA500);
+            --gradient-silver: linear-gradient(135deg, #C0C0C0, #808080);
+            --gradient-bronze: linear-gradient(135deg, #CD7F32, #8B4513);
+            --gradient-platinum: linear-gradient(135deg, #E5E4E2, #B2B1AE);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--black);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        }
+        
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(37, 99, 235, 0.1), rgba(252, 211, 77, 0.05));
+            animation: float 20s infinite ease-in-out;
+        }
+        
+        .floating-element:nth-child(1) {
+            width: 120px;
+            height: 120px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .floating-element:nth-child(2) {
+            width: 80px;
+            height: 80px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 7s;
+        }
+        
+        .floating-element:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            bottom: 20%;
+            left: 60%;
+            animation-delay: 14s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translateY(-80px) rotate(180deg);
+                opacity: 0.6;
+            }
+        }
+        
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--light-blue);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--primary-blue);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo img {
+            height: 45px;
+            margin-right: 12px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+            gap: 2.5rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-grey);
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-links a:hover {
+            color: var(--secondary-blue);
+            background: var(--light-blue);
+            transform: translateY(-2px);
+        }
+        
+        .nav-links a:hover::after {
+            width: 80%;
+        }
+        
+        .nav-links a.active {
+            color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+        
+        .nav-links a.active::after {
+            width: 80%;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-toggle:hover {
+            background: var(--light-blue);
+            transform: scale(1.1);
+        }
+        
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background: var(--gradient-primary);
+        }
+        
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 5%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--white);
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .hero-title .highlight {
+            background: linear-gradient(135deg, var(--accent-yellow), var(--warning-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.4rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2.5rem;
+            line-height: 1.7;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+        
+        .hero-stat {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            min-width: 180px;
+        }
+        
+        .hero-stat:hover {
+            transform: translateY(-5px) scale(1.05);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .hero-stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--white);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .hero-stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            margin-top: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        /* How It Works Section */
+        .how-it-works {
+            padding: 6rem 5%;
+            background: var(--white);
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.3rem;
+            color: var(--medium-grey);
+            margin-bottom: 4rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .steps-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .step-card {
+            background: var(--white);
+            padding: 3rem 2rem;
+            border-radius: 24px;
+            border: 1px solid var(--light-blue);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.1), transparent);
+            transition: left 0.6s;
+        }
+        
+        .step-card:hover::before {
+            left: 100%;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--secondary-blue);
+        }
+        
+        .step-number {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 2rem;
+            font-weight: 900;
+            color: white;
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.3);
+        }
+        
+        .step-card h3 {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .step-card p {
+            color: var(--medium-grey);
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+        
+        /* Tier System Section */
+        .tier-system {
+            padding: 6rem 5%;
+            background: var(--light-grey);
+        }
+        
+        .tiers-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .tier-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border: 3px solid transparent;
+        }
+        
+        .tier-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .tier-card.bronze {
+            border-color: #CD7F32;
+        }
+        
+        .tier-card.bronze:hover {
+            box-shadow: 0 20px 60px rgba(205, 127, 50, 0.2);
+        }
+        
+        .tier-card.silver {
+            border-color: #C0C0C0;
+        }
+        
+        .tier-card.silver:hover {
+            box-shadow: 0 20px 60px rgba(192, 192, 192, 0.2);
+        }
+        
+        .tier-card.gold {
+            border-color: #FFD700;
+            position: relative;
+        }
+        
+        .tier-card.gold::after {
+            content: 'Most Popular';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gradient-gold);
+            color: var(--black);
+            padding: 0.5rem 2rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .tier-card.gold:hover {
+            box-shadow: 0 20px 60px rgba(255, 215, 0, 0.3);
+        }
+        
+        .tier-card.platinum {
+            border-color: #E5E4E2;
+        }
+        
+        .tier-card.platinum:hover {
+            box-shadow: 0 20px 60px rgba(229, 228, 226, 0.2);
+        }
+        
+        .tier-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 3rem;
+            color: white;
+            position: relative;
+        }
+        
+        .tier-card.bronze .tier-icon {
+            background: var(--gradient-bronze);
+        }
+        
+        .tier-card.silver .tier-icon {
+            background: var(--gradient-silver);
+        }
+        
+        .tier-card.gold .tier-icon {
+            background: var(--gradient-gold);
+            color: var(--black);
+        }
+        
+        .tier-card.platinum .tier-icon {
+            background: var(--gradient-platinum);
+            color: var(--black);
+        }
+        
+        .tier-name {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        
+        .tier-card.bronze .tier-name {
+            color: #CD7F32;
+        }
+        
+        .tier-card.silver .tier-name {
+            color: #808080;
+        }
+        
+        .tier-card.gold .tier-name {
+            color: #FFD700;
+        }
+        
+        .tier-card.platinum .tier-name {
+            color: #B2B1AE;
+        }
+        
+        .tier-requirement {
+            background: var(--light-blue);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+        
+        .tier-benefits {
+            list-style: none;
+            text-align: left;
+        }
+        
+        .tier-benefits li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            color: var(--dark-grey);
+        }
+        
+        .tier-benefits li i {
+            color: var(--success);
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        /* Points Calculator */
+        .points-calculator {
+            padding: 6rem 5%;
+            background: var(--white);
+        }
+        
+        .calculator-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--light-grey);
+            padding: 3rem;
+            border-radius: 24px;
+            border: 1px solid var(--light-blue);
+        }
+        
+        .calculator-input {
+            margin-bottom: 2rem;
+        }
+        
+        .calculator-input label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary-blue);
+        }
+        
+        .calculator-input input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--light-blue);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .calculator-input input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.2);
+        }
+        
+        .calculator-result {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid var(--accent-yellow);
+        }
+        
+        .result-points {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-value {
+            font-size: 1.5rem;
+            color: var(--success);
+            font-weight: 700;
+        }
+        
+        /* Redemption Options */
+        .redemption-options {
+            padding: 6rem 5%;
+            background: var(--light-grey);
+        }
+        
+        .redemption-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .redemption-card {
+            background: var(--white);
+            padding: 2.5rem 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--light-blue);
+            transition: all 0.4s ease;
+            text-align: center;
+            cursor: pointer;
+        }
+        
+        .redemption-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--secondary-blue);
+        }
+        
+        .redemption-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+        }
+        
+        .redemption-card h3 {
+            font-size: 1.4rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .redemption-card p {
+            color: var(--medium-grey);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .points-required {
+            background: var(--accent-yellow);
+            color: var(--black);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 700;
+            display: inline-block;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 6rem 5%;
+            background: var(--gradient-primary);
+            text-align: center;
+            color: white;
+        }
+        
+        .cta-content h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .cta-content p {
+            font-size: 1.3rem;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-yellow {
+            background: linear-gradient(135deg, var(--accent-yellow), var(--warning-yellow));
+            color: var(--black);
+            font-weight: 700;
+        }
+        
+        .btn-yellow:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(252, 211, 77, 0.4);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn-outline:hover {
+            background: white;
+            color: var(--primary-blue);
+            transform: translateY(-3px) scale(1.05);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--black);
+            color: white;
+            padding: 3rem 5% 1rem;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+        }
+        
+        /* Success Message */
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .success-message.show {
+            transform: translateX(0);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 2rem;
+                box-shadow: var(--shadow);
+                border-radius: 0 0 16px 16px;
+            }
+            
+            .nav-links.show {
+                display: flex;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .hero-title {
+                font-size: 2.8rem;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: 1.5rem;
+                align-items: center;
+            }
+            
+            .hero-stat {
+                min-width: auto;
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            
+            .section-title {
+                font-size: 2.2rem;
+            }
+            
+            .tier-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .calculator-container {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <nav>
+            <a href="./index.html" class="logo">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMyNTYzRUIiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI4IiB5PSI4Ij4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+" alt="Sapyyn">
+                Sapyyn
+            </a>
+            <ul class="nav-links">
+                <li><a href="./index.html">Home</a></li>
+                <li><a href="./referrals_page.html">Referrals</a></li>
+                <li><a href="./about_page.html">About</a></li>
+                <li><a href="./pricing.html">Pricing</a></li>
+                <li><a href="./resources.html">Resources</a></li>
+                <li><a href="#" class="active">Rewards</a></li>
+                <li><a href="./contact.html">Contact</a></li>
+            </ul>
+            <div class="cta-buttons">
+                <a href="/login" class="btn btn-secondary">Sign In</a>
+                <a href="/register" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i> Get Started
+                </a>
+            </div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                Earn <span class="highlight">Rewards</span> for Every Referral
+            </h1>
+            <p class="hero-subtitle">
+                Join thousands of dental professionals earning points, cash rewards, and exclusive benefits through our comprehensive loyalty program. Every referral counts towards your next reward tier.
+            </p>
+            
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-number">25</div>
+                    <div class="hero-stat-label">Points Per Referral</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number">$500K</div>
+                    <div class="hero-stat-label">Rewards Distributed</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number">2,500+</div>
+                    <div class="hero-stat-label">Active Participants</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+        <h2 class="section-title">How Our Rewards Program Works</h2>
+        <p class="section-subtitle">
+            Start earning rewards in three simple steps. Our automated system tracks all your referrals and credits your account instantly.
+        </p>
+        
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Make Referrals</h3>
+                <p>Refer patients to specialists through our platform using QR codes, text messages, or direct referrals. Each successful referral earns you points.</p>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Earn Points</h3>
+                <p>Receive 25 points for each successful referral, plus bonus points for specialist feedback, patient follow-ups, and quality metrics.</p>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>Redeem Rewards</h3>
+                <p>Use your points for cash rewards, practice credits, premium features, or exclusive benefits. The more you refer, the more you earn.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tier System Section -->
+    <section class="tier-system">
+        <h2 class="section-title">Loyalty Tier System</h2>
+        <p class="section-subtitle">
+            Advance through our tier system to unlock better rewards, higher point multipliers, and exclusive benefits.
+        </p>
+        
+        <div class="tiers-grid">
+            <div class="tier-card bronze">
+                <div class="tier-icon">
+                    <i class="fas fa-medal"></i>
+                </div>
+                <h3 class="tier-name">Bronze</h3>
+                <div class="tier-requirement">0-99 Referrals</div>
+                <ul class="tier-benefits">
+                    <li><i class="fas fa-check-circle"></i> 25 points per referral</li>
+                    <li><i class="fas fa-check-circle"></i> Basic support</li>
+                    <li><i class="fas fa-check-circle"></i> Monthly newsletters</li>
+                    <li><i class="fas fa-check-circle"></i> Standard redemption rates</li>
+                </ul>
+            </div>
+            
+            <div class="tier-card silver">
+                <div class="tier-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h3 class="tier-name">Silver</h3>
+                <div class="tier-requirement">100-299 Referrals</div>
+                <ul class="tier-benefits">
+                    <li><i class="fas fa-check-circle"></i> 30 points per referral</li>
+                    <li><i class="fas fa-check-circle"></i> Priority support</li>
+                    <li><i class="fas fa-check-circle"></i> Quarterly bonuses</li>
+                    <li><i class="fas fa-check-circle"></i> 5% bonus on redemptions</li>
+                    <li><i class="fas fa-check-circle"></i> Exclusive webinars</li>
+                </ul>
+            </div>
+            
+            <div class="tier-card gold">
+                <div class="tier-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <h3 class="tier-name">Gold</h3>
+                <div class="tier-requirement">300-499 Referrals</div>
+                <ul class="tier-benefits">
+                    <li><i class="fas fa-check-circle"></i> 40 points per referral</li>
+                    <li><i class="fas fa-check-circle"></i> VIP support</li>
+                    <li><i class="fas fa-check-circle"></i> Monthly bonuses</li>
+                    <li><i class="fas fa-check-circle"></i> 10% bonus on redemptions</li>
+                    <li><i class="fas fa-check-circle"></i> Conference invitations</li>
+                    <li><i class="fas fa-check-circle"></i> Premium features access</li>
+                </ul>
+            </div>
+            
+            <div class="tier-card platinum">
+                <div class="tier-icon">
+                    <i class="fas fa-gem"></i>
+                </div>
+                <h3 class="tier-name">Platinum</h3>
+                <div class="tier-requirement">500+ Referrals</div>
+                <ul class="tier-benefits">
+                    <li><i class="fas fa-check-circle"></i> 50 points per referral</li>
+                    <li><i class="fas fa-check-circle"></i> Dedicated account manager</li>
+                    <li><i class="fas fa-check-circle"></i> Weekly bonuses</li>
+                    <li><i class="fas fa-check-circle"></i> 20% bonus on redemptions</li>
+                    <li><i class="fas fa-check-circle"></i> Exclusive events</li>
+                    <li><i class="fas fa-check-circle"></i> All premium features</li>
+                    <li><i class="fas fa-check-circle"></i> Custom practice marketing</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Points Calculator -->
+    <section class="points-calculator">
+        <h2 class="section-title">Rewards Calculator</h2>
+        <p class="section-subtitle">
+            Calculate your potential earnings based on your referral activity and current tier level.
+        </p>
+        
+        <div class="calculator-container">
+            <div class="calculator-input">
+                <label for="referrals">Number of Monthly Referrals:</label>
+                <input type="number" id="referrals" placeholder="Enter number of referrals" oninput="calculateRewards()" min="0">
+            </div>
+            
+            <div class="calculator-input">
+                <label for="tier">Select Your Tier:</label>
+                <select id="tier" onchange="calculateRewards()" style="width: 100%; padding: 1rem; border: 2px solid var(--light-blue); border-radius: 12px; font-size: 1.1rem;">
+                    <option value="25">Bronze (25 points/referral)</option>
+                    <option value="30">Silver (30 points/referral)</option>
+                    <option value="40">Gold (40 points/referral)</option>
+                    <option value="50">Platinum (50 points/referral)</option>
+                </select>
+            </div>
+            
+            <div class="calculator-result">
+                <div class="result-points" id="monthlyPoints">0</div>
+                <p>Monthly Points</p>
+                <div class="result-value" id="monthlyValue">$0</div>
+                <p>Estimated Monthly Value</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Redemption Options -->
+    <section class="redemption-options">
+        <h2 class="section-title">Redemption Options</h2>
+        <p class="section-subtitle">
+            Choose from various redemption options to maximize the value of your earned points.
+        </p>
+        
+        <div class="redemption-grid">
+            <div class="redemption-card" onclick="showRedemption('cash')">
+                <div class="redemption-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <h3>Cash Rewards</h3>
+                <p>Convert your points directly to cash and receive payments via direct deposit or check.</p>
+                <div class="points-required">100 Points = $10</div>
+            </div>
+            
+            <div class="redemption-card" onclick="showRedemption('credits')">
+                <div class="redemption-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <h3>Practice Credits</h3>
+                <p>Use points as credits towards platform fees, premium features, or additional services.</p>
+                <div class="points-required">50 Points = $10 Credit</div>
+            </div>
+            
+            <div class="redemption-card" onclick="showRedemption('equipment')">
+                <div class="redemption-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <h3>Equipment Discounts</h3>
+                <p>Redeem points for discounts on dental equipment and supplies from our partners.</p>
+                <div class="points-required">200 Points = 5% Discount</div>
+            </div>
+            
+            <div class="redemption-card" onclick="showRedemption('education')">
+                <div class="redemption-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3>CE Credits</h3>
+                <p>Access continuing education courses and certification programs with your points.</p>
+                <div class="points-required">150 Points = 1 CE Hour</div>
+            </div>
+            
+            <div class="redemption-card" onclick="showRedemption('conference')">
+                <div class="redemption-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3>Conference Tickets</h3>
+                <p>Use points towards dental conference tickets, including travel and accommodation.</p>
+                <div class="points-required">500 Points = Conference Pass</div>
+            </div>
+            
+            <div class="redemption-card" onclick="showRedemption('marketing')">
+                <div class="redemption-icon">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <h3>Marketing Services</h3>
+                <p>Invest points in professional marketing services to grow your practice.</p>
+                <div class="points-required">300 Points = Marketing Package</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Ready to Start Earning Rewards?</h2>
+            <p>Join thousands of dental professionals who are already benefiting from our rewards program. Start referring patients today and watch your rewards grow.</p>
+            
+            <div class="cta-buttons">
+                <a href="/register" class="btn btn-yellow">
+                    <i class="fas fa-star"></i> Join Rewards Program
+                </a>
+                <a href="./contact.html" class="btn btn-outline">
+                    <i class="fas fa-question-circle"></i> Learn More
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="./index.html">Home</a>
+                <a href="./about_page.html">About</a>
+                <a href="./pricing.html">Pricing</a>
+                <a href="./contact.html">Contact</a>
+                <a href="./privacy.html">Privacy Policy</a>
+                <a href="./terms.html">Terms of Service</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Sapyyn. All rights reserved. Empowering dental professionals with rewarding referrals.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Message -->
+    <div class="success-message" id="successMessage">
+        <i class="fas fa-check-circle"></i> Success!
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('show');
+        }
+
+        // Calculate rewards
+        function calculateRewards() {
+            const referrals = parseInt(document.getElementById('referrals').value) || 0;
+            const tierPoints = parseInt(document.getElementById('tier').value);
+            
+            const monthlyPoints = referrals * tierPoints;
+            const monthlyValue = Math.floor(monthlyPoints / 10); // 10 points = $1
+            
+            document.getElementById('monthlyPoints').textContent = monthlyPoints.toLocaleString();
+            document.getElementById('monthlyValue').textContent = '$' + monthlyValue.toLocaleString();
+        }
+
+        // Show redemption info
+        function showRedemption(type) {
+            const messages = {
+                cash: '💰 Cash rewards are processed monthly via direct deposit!',
+                credits: '💳 Practice credits never expire and can be used anytime!',
+                equipment: '🛠️ Equipment discounts are available from 50+ partners!',
+                education: '🎓 CE credits are accredited and count towards your requirements!',
+                conference: '📅 Conference tickets include major dental events worldwide!',
+                marketing: '📢 Marketing services include social media, SEO, and branding!'
+            };
+            
+            showSuccessMessage(messages[type] || '✨ Great choice! Contact us to learn more.');
+        }
+
+        // Success message display
+        function showSuccessMessage(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.innerHTML = '<i class="fas fa-check-circle"></i> ' + message;
+            successDiv.classList.add('show');
+            
+            setTimeout(() => {
+                successDiv.classList.remove('show');
+            }, 4000);
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+                header.style.backdropFilter = 'blur(25px)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(20px)';
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Auto-close mobile menu on window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 968) {
+                document.querySelector('.nav-links').classList.remove('show');
+            }
+        });
+
+        // Initialize page animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate tier cards
+            const tierCards = document.querySelectorAll('.tier-card');
+            tierCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 150);
+            });
+
+            // Animate step cards
+            const stepCards = document.querySelectorAll('.step-card');
+            stepCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100 + 500);
+            });
+
+            // Animate redemption cards
+            const redemptionCards = document.querySelectorAll('.redemption-card');
+            redemptionCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100 + 1000);
+            });
+
+            // Initialize calculator with default values
+            calculateRewards();
+        });
+
+        // Add interactive elements
+        document.querySelectorAll('.tier-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                showSuccessMessage('🎯 ' + card.querySelector('.tier-name').textContent + ' tier benefits highlighted!');
+            });
+        });
+
+        // Track CTA button clicks
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (btn.textContent.includes('Join Rewards')) {
+                    showSuccessMessage('🚀 Redirecting to registration with rewards program pre-selected!');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
