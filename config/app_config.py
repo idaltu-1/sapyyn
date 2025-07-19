@@ -5,6 +5,10 @@ Centralizes all configuration settings and removes hardcoded values
 import os
 import secrets
 from typing import Dict, Any
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 class Config:
     """Base configuration class"""

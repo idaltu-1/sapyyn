@@ -2,6 +2,10 @@
 NoCodeBackend utilities for Sapyyn application
 """
 
+from dotenv import load_dotenv
+# Load environment variables early to ensure they're available for client initialization
+load_dotenv()
+
 from services.nocodebackend_client import NoCodeBackendClient
 
 # Initialize clients
