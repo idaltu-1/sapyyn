@@ -1,34 +1,72 @@
-import os
-import sqlite3
-import stripe
-from datetime import datetime, timedelta
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, send_from_directory
+
+"""
+Sapyyn Patient Referral System - Main Application
+"""
+
+from flask import Flask, render_template, send_from_directory, redirect, url_for, request, session, flash, jsonify
+from flask_wtf.csrf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from routes.nocode_routes import nocode_api
+from controllers.nocodebackend_controller import nocodebackend_api
+from controllers.promotion_controller import promotions
+from controllers.admin_promotion_controller import admin_promotions
+from config.app_config import get_config, INITIAL_ADMIN, generate_secure_password
+from config.security import SecurityConfig
+import os
+import sqlite3
+import uuid
 import qrcode
-from io import BytesIO
 import base64
+from io import BytesIO
+from datetime import datetime, timedelta
+import stripe
+import bleach
+import re
+import logging
+from functools import wraps
+
+# Initialize Flask app
 
 app = Flask(__name__)
-app.secret_key = 'sapyyn-patient-referral-system-2025'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
+# Load configuration
+config_class = get_config()
+app.config.from_object(config_class)
+
+# Initialize security features
+csrf = CSRFProtect(app)
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"]
+)
+
+# Apply configuration settings
+app.secret_key = config_class.SECRET_KEY
+app.config['MAX_CONTENT_LENGTH'] = config_class.MAX_CONTENT_LENGTH
+
+# Initialize security configuration
+SecurityConfig.init_app(app)
 
 # Stripe configuration
-stripe.api_key = os.environ.get('STRIPE_SECRET_KEY', 'sk_test_...')  # Replace with your Stripe secret key
-STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', 'pk_test_...')  # Replace with your Stripe publishable key
+stripe.api_key = config_class.STRIPE_SECRET_KEY
+STRIPE_PUBLISHABLE_KEY = config_class.STRIPE_PUBLISHABLE_KEY
 
 # Analytics configuration
 ANALYTICS_CONFIG = {
-    'GA4_MEASUREMENT_ID': os.environ.get('GA4_MEASUREMENT_ID', 'G-XXXXXXXXXX'),
-    'GTM_CONTAINER_ID': os.environ.get('GTM_CONTAINER_ID', 'GTM-XXXXXXX'),
-    'HOTJAR_SITE_ID': os.environ.get('HOTJAR_SITE_ID', '3842847'),
-    'ENABLE_ANALYTICS': os.environ.get('ENABLE_ANALYTICS', 'true').lower() == 'true',
-    'ENVIRONMENT': os.environ.get('FLASK_ENV', 'development')
+    'GA4_MEASUREMENT_ID': config_class.GA4_MEASUREMENT_ID,
+    'GTM_CONTAINER_ID': config_class.GTM_CONTAINER_ID,
+    'HOTJAR_SITE_ID': config_class.HOTJAR_SITE_ID,
+    'ENABLE_ANALYTICS': config_class.ENABLE_ANALYTICS,
+    'ENVIRONMENT': config_class.FLASK_ENV
 }
 
 # Configuration
-UPLOAD_FOLDER = 'patient-referral'
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'xls', 'xlsx'}
+UPLOAD_FOLDER = config_class.UPLOAD_FOLDER
+ALLOWED_EXTENSIONS = config_class.ALLOWED_EXTENSIONS
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -38,7 +76,8 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # Database initialization
 def init_db():
     """Initialize the SQLite database"""
-    conn = sqlite3.connect('sapyyn.db')
+    config_class = get_config()
+    conn = sqlite3.connect(config_class.DATABASE_NAME)
     cursor = conn.cursor()
     
     # Users table
@@ -50,6 +89,10 @@ def init_db():
             password_hash TEXT NOT NULL,
             full_name TEXT NOT NULL,
             role TEXT DEFAULT 'patient',
+            is_verified BOOLEAN DEFAULT FALSE,
+            fraud_score DECIMAL(5,2) DEFAULT 0.0,
+            is_paused BOOLEAN DEFAULT FALSE,
+            device_fingerprint TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -66,6 +109,14 @@ def init_db():
             medical_condition TEXT,
             urgency_level TEXT DEFAULT 'normal',
             status TEXT DEFAULT 'pending',
+            case_status TEXT DEFAULT 'pending',
+            consultation_date TIMESTAMP,
+            case_accepted_date TIMESTAMP,
+            treatment_start_date TIMESTAMP,
+            treatment_complete_date TIMESTAMP,
+            rejection_reason TEXT,
+            estimated_value DECIMAL(10,2),
+            actual_value DECIMAL(10,2),
             notes TEXT,
             qr_code TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -73,47 +124,6 @@ def init_db():
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
     ''')
-    
-    # Add case acceptance tracking columns to referrals if they don't exist
-    try:
-        cursor.execute('ALTER TABLE referrals ADD COLUMN case_status TEXT DEFAULT "pending"')
-    except sqlite3.OperationalError:
-        pass  # Column already exists
-    
-    try:
-        cursor.execute('ALTER TABLE referrals ADD COLUMN consultation_date TIMESTAMP')
-    except sqlite3.OperationalError:
-        pass
-    
-    try:
-        cursor.execute('ALTER TABLE referrals ADD COLUMN case_accepted_date TIMESTAMP')
-    except sqlite3.OperationalError:
-        pass
-    
-    try:
-        cursor.execute('ALTER TABLE referrals ADD COLUMN treatment_start_date TIMESTAMP')
-    except sqlite3.OperationalError:
-        pass
-    
-    try:
-        cursor.execute('ALTER TABLE referrals ADD COLUMN treatment_complete_date TIMESTAMP')
-    except sqlite3.OperationalError:
-        pass
-    
-    try:
-        cursor.execute('ALTER TABLE referrals ADD COLUMN rejection_reason TEXT')
-    except sqlite3.OperationalError:
-        pass
-    
-    try:
-        cursor.execute('ALTER TABLE referrals ADD COLUMN estimated_value DECIMAL(10,2)')
-    except sqlite3.OperationalError:
-        pass
-    
-    try:
-        cursor.execute('ALTER TABLE referrals ADD COLUMN actual_value DECIMAL(10,2)')
-    except sqlite3.OperationalError:
-        pass
     
     # Documents table
     cursor.execute('''
@@ -131,142 +141,7 @@ def init_db():
         )
     ''')
     
-    # Reward Programs table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS reward_programs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            description TEXT,
-            program_type TEXT DEFAULT 'referral',
-            status TEXT DEFAULT 'active',
-            start_date TIMESTAMP,
-            end_date TIMESTAMP,
-            created_by INTEGER,
-            compliance_notes TEXT,
-            legal_language TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (created_by) REFERENCES users (id)
-        )
-    ''')
-    
-    # Reward Tiers table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS reward_tiers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            program_id INTEGER,
-            tier_name TEXT NOT NULL,
-            tier_level INTEGER DEFAULT 1,
-            referrals_required INTEGER DEFAULT 1,
-            reward_type TEXT DEFAULT 'points',
-            reward_value DECIMAL(10,2),
-            reward_description TEXT,
-            fulfillment_type TEXT DEFAULT 'manual',
-            fulfillment_config TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (program_id) REFERENCES reward_programs (id)
-        )
-    ''')
-    
-    # User Rewards table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS user_rewards (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            program_id INTEGER,
-            tier_id INTEGER,
-            referral_id INTEGER,
-            points_earned DECIMAL(10,2) DEFAULT 0,
-            reward_status TEXT DEFAULT 'pending',
-            earned_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            redeemed_date TIMESTAMP,
-            fulfillment_status TEXT DEFAULT 'pending',
-            fulfillment_notes TEXT,
-            compliance_verified BOOLEAN DEFAULT FALSE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users (id),
-            FOREIGN KEY (program_id) REFERENCES reward_programs (id),
-            FOREIGN KEY (tier_id) REFERENCES reward_tiers (id),
-            FOREIGN KEY (referral_id) REFERENCES referrals (id)
-        )
-    ''')
-    
-    # Reward Triggers table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS reward_triggers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            program_id INTEGER,
-            trigger_type TEXT NOT NULL,
-            trigger_condition TEXT,
-            trigger_value TEXT,
-            points_awarded DECIMAL(10,2),
-            tier_advancement BOOLEAN DEFAULT FALSE,
-            is_active BOOLEAN DEFAULT TRUE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (program_id) REFERENCES reward_programs (id)
-        )
-    ''')
-    
-    # Reward Notifications table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS reward_notifications (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            notification_type TEXT,
-            title TEXT,
-            message TEXT,
-            is_read BOOLEAN DEFAULT FALSE,
-            sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users (id)
-        )
-    ''')
-    
-    # Compliance Audit Trail table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS compliance_audit_trail (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            action_type TEXT,
-            entity_type TEXT,
-            entity_id INTEGER,
-            action_details TEXT,
-            ip_address TEXT,
-            user_agent TEXT,
-            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users (id)
-        )
-    ''')
-    
-    # Gamification Achievements table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS achievements (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            description TEXT,
-            icon TEXT,
-            achievement_type TEXT,
-            requirement_value INTEGER,
-            points_value DECIMAL(10,2),
-            is_active BOOLEAN DEFAULT TRUE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # User Achievements table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS user_achievements (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            achievement_id INTEGER,
-            earned_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            progress INTEGER DEFAULT 0,
-            FOREIGN KEY (user_id) REFERENCES users (id),
-            FOREIGN KEY (achievement_id) REFERENCES achievements (id)
-        )
-    ''')
-    
-    # Provider Codes table for 4-digit system
+    # Provider Codes table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS provider_codes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -282,214 +157,7 @@ def init_db():
         )
     ''')
     
-    # Messages table for portal messaging
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS messages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            sender_id INTEGER NOT NULL,
-            recipient_id INTEGER NOT NULL,
-            subject TEXT NOT NULL,
-            content TEXT NOT NULL,
-            message_type TEXT DEFAULT 'general',
-            referral_id INTEGER,
-            is_read BOOLEAN DEFAULT FALSE,
-            is_deleted_by_sender BOOLEAN DEFAULT FALSE,
-            is_deleted_by_recipient BOOLEAN DEFAULT FALSE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            read_at TIMESTAMP,
-            FOREIGN KEY (sender_id) REFERENCES users (id),
-            FOREIGN KEY (recipient_id) REFERENCES users (id),
-            FOREIGN KEY (referral_id) REFERENCES referrals (id)
-        )
-    ''')
-    
-    # Subscription Plans table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS subscription_plans (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            plan_name TEXT NOT NULL,
-            plan_type TEXT NOT NULL,
-            price_monthly DECIMAL(10,2),
-            price_annual DECIMAL(10,2),
-            features TEXT,
-            max_referrals INTEGER,
-            max_users INTEGER,
-            storage_gb INTEGER,
-            support_level TEXT,
-            is_active BOOLEAN DEFAULT TRUE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # User Subscriptions table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS user_subscriptions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            plan_id INTEGER,
-            subscription_status TEXT DEFAULT 'active',
-            billing_cycle TEXT DEFAULT 'monthly',
-            start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            end_date TIMESTAMP,
-            auto_renew BOOLEAN DEFAULT TRUE,
-            payment_method TEXT,
-            stripe_customer_id TEXT,
-            stripe_subscription_id TEXT,
-            stripe_payment_method_id TEXT,
-            trial_end_date TIMESTAMP,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users (id),
-            FOREIGN KEY (plan_id) REFERENCES subscription_plans (id)
-        )
-    ''')
-    
-    # Practice Management table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS practices (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            practice_name TEXT NOT NULL,
-            practice_type TEXT,
-            address TEXT,
-            phone TEXT,
-            email TEXT,
-            website TEXT,
-            admin_user_id INTEGER,
-            subscription_id INTEGER,
-            is_verified BOOLEAN DEFAULT FALSE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (admin_user_id) REFERENCES users (id),
-            FOREIGN KEY (subscription_id) REFERENCES user_subscriptions (id)
-        )
-    ''')
-    
-    # Practice Members table (for multi-user practices)
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS practice_members (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            practice_id INTEGER,
-            user_id INTEGER,
-            role TEXT,
-            permissions TEXT,
-            status TEXT DEFAULT 'active',
-            invited_by INTEGER,
-            joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (practice_id) REFERENCES practices (id),
-            FOREIGN KEY (user_id) REFERENCES users (id),
-            FOREIGN KEY (invited_by) REFERENCES users (id)
-        )
-    ''')
-    
-    # Insert default subscription plans
-    cursor.execute('''
-        INSERT OR IGNORE INTO subscription_plans 
-        (plan_name, plan_type, price_monthly, price_annual, features, max_referrals, max_users, storage_gb, support_level)
-        VALUES 
-        ('Basic', 'free', 0.00, 0.00, 'Up to 5 referrals/month, Basic messaging, Limited network access', 5, 1, 1, 'email'),
-        ('Professional', 'practice', 49.99, 499.99, 'Unlimited referrals, Priority support, Full network access, QR codes, CE credits', -1, 3, 10, 'priority'),
-        ('Enterprise', 'enterprise', 149.99, 1499.99, 'Everything in Professional, Multi-practice management, Advanced analytics, API access', -1, -1, 50, 'phone')
-    ''')
-    
-    # User Profiles table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS user_profiles (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER UNIQUE NOT NULL,
-            phone TEXT,
-            license_number TEXT,
-            specialization TEXT,
-            practice_name TEXT,
-            practice_address TEXT,
-            years_experience TEXT,
-            website TEXT,
-            bio TEXT,
-            account_type TEXT,
-            avatar_url TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users (id)
-        )
-    ''')
-    
-    # User Preferences table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS user_preferences (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            preference_key TEXT NOT NULL,
-            preference_value TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users (id),
-            UNIQUE(user_id, preference_key)
-        )
-    ''')
-    
-    # Add is_verified column to users table if it doesn't exist
-    try:
-        cursor.execute('''
-            ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT FALSE
-        ''')
-    except sqlite3.OperationalError:
-        # Column already exists, skip
-        pass
-
-    # Referring Doctor Profiles table for relationship management
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS referring_doctors (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT,
-            phone TEXT,
-            practice_name TEXT,
-            specialty TEXT,
-            address TEXT,
-            city TEXT,
-            state TEXT,
-            zip_code TEXT,
-            referral_count INTEGER DEFAULT 0,
-            conversion_rate DECIMAL(5,2) DEFAULT 0.0,
-            avg_case_value DECIMAL(10,2) DEFAULT 0.0,
-            relationship_score INTEGER DEFAULT 0,
-            last_referral_date TIMESTAMP,
-            communication_preference TEXT DEFAULT 'email',
-            notes TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # Case Conversion Tracking table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS case_conversions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            referral_id TEXT NOT NULL,
-            stage TEXT NOT NULL,
-            stage_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            notes TEXT,
-            assigned_to TEXT,
-            response_time_hours INTEGER,
-            created_by INTEGER,
-            FOREIGN KEY (created_by) REFERENCES users (id)
-        )
-    ''')
-    
-    # Team Productivity Metrics table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS team_metrics (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            date DATE DEFAULT CURRENT_DATE,
-            referrals_processed INTEGER DEFAULT 0,
-            consultations_completed INTEGER DEFAULT 0,
-            cases_accepted INTEGER DEFAULT 0,
-            avg_response_time_hours DECIMAL(10,2) DEFAULT 0.0,
-            revenue_generated DECIMAL(10,2) DEFAULT 0.0,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users (id)
-        )
-    ''')
-    
-    # Appointments table for portal functionality
+    # Appointments table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS appointments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -516,106 +184,8 @@ def init_db():
             FOREIGN KEY (created_by) REFERENCES users (id)
         )
     ''')
-
-    # Fraud Detection tables
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS fraud_scores (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            ip_address TEXT,
-            email TEXT,
-            device_fingerprint TEXT,
-            fraud_score DECIMAL(5,2) DEFAULT 0.0,
-            risk_level TEXT DEFAULT 'low',
-            is_paused BOOLEAN DEFAULT FALSE,
-            reasons TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users (id)
-        )
-    ''')
     
-    # Device Fingerprints table for deduplication
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS device_fingerprints (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            fingerprint_hash TEXT UNIQUE NOT NULL,
-            user_agent TEXT,
-            screen_resolution TEXT,
-            timezone TEXT,
-            language TEXT,
-            plugins TEXT,
-            canvas_fingerprint TEXT,
-            first_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            user_count INTEGER DEFAULT 0
-        )
-    ''')
-    
-    # Duplicate Detection Log
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS duplicate_detections (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            detection_type TEXT NOT NULL,
-            original_user_id INTEGER,
-            duplicate_user_id INTEGER,
-            matching_field TEXT,
-            matching_value TEXT,
-            action_taken TEXT,
-            detected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (original_user_id) REFERENCES users (id),
-            FOREIGN KEY (duplicate_user_id) REFERENCES users (id)
-        )
-    ''')
-    
-    # Add fraud score to users table if it doesn't exist
-    try:
-        cursor.execute('ALTER TABLE users ADD COLUMN fraud_score DECIMAL(5,2) DEFAULT 0.0')
-    except sqlite3.OperationalError:
-        pass
-    
-    try:
-        cursor.execute('ALTER TABLE users ADD COLUMN is_paused BOOLEAN DEFAULT FALSE')
-    except sqlite3.OperationalError:
-        pass
-    
-    try:
-        cursor.execute('ALTER TABLE users ADD COLUMN device_fingerprint TEXT')
-    except sqlite3.OperationalError:
-        pass
-
-    # ---------------------------------------------------------------------------
-    # Appointments table
-    #
-    # Create a dedicated table to store appointment bookings between patients and
-    # providers. This table references the users table twice (once for the
-    # patient and once for the provider) and stores the scheduled datetime,
-    # optional appointment type, notes, status and timestamps. If the table
-    # already exists this statement will be ignored. Keeping this DDL close to
-    # other schema alterations ensures the database is ready before any routes
-    # interact with appointments.
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS appointments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            provider_id INTEGER NOT NULL,
-            appointment_date_time TIMESTAMP NOT NULL,
-            appointment_type TEXT,
-            notes TEXT,
-            status TEXT DEFAULT 'scheduled',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users (id),
-            FOREIGN KEY (provider_id) REFERENCES users (id)
-        )
-    ''')
-
-    # ---------------------------------------------------------------------------
-    # Promotions table for campaign management
-    #
-    # Create a table to store promotional campaigns that dental practices can run
-    # to attract referrals. Includes campaign details, image uploads, date ranges,
-    # status controls, and real-time tracking of impressions and clicks.
+    # Promotions table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS promotions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -638,42 +208,66 @@ def init_db():
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
     ''')
-
-    # Promotion Stats table for real-time tracking
+    
+    # User Feedback table
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS promotion_stats (
+        CREATE TABLE IF NOT EXISTS user_feedback (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            promotion_id INTEGER NOT NULL,
-            event_type TEXT NOT NULL,
-            event_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            user_id INTEGER,
+            visit_purpose TEXT,
+            ease_of_use TEXT,
+            confusion_feedback TEXT,
+            nps_score INTEGER,
+            additional_comments TEXT,
+            contact_email TEXT,
+            page_url TEXT,
+            page_title TEXT,
+            timestamp TEXT,
+            server_timestamp TEXT,
             ip_address TEXT,
             user_agent TEXT,
-            referrer TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (promotion_id) REFERENCES promotions (id)
+            screen_resolution TEXT,
+            session_duration INTEGER,
+            user_role TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-
-    # -----------------------------------------------------------------------
-    # Seed a default super administrator account if one does not already exist.
-    # This ensures the system has at least one user with full privileges after
-    # database initialization.  The credentials are pulled from the user's
-    # configuration: email wgray@stloralsurgery.com and a strong password.  If
-    # the email already exists, no action is taken.
-    cursor.execute("SELECT id FROM users WHERE email = ?", ("wgray@stloralsurgery.com",))
+    
+    # Fraud Detection tables
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS fraud_scores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            ip_address TEXT,
+            email TEXT,
+            device_fingerprint TEXT,
+            fraud_score DECIMAL(5,2) DEFAULT 0.0,
+            risk_level TEXT DEFAULT 'low',
+            is_paused BOOLEAN DEFAULT FALSE,
+            reasons TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+    
+    # Seed initial admin user
+    cursor.execute("SELECT id FROM users WHERE email = ?", (INITIAL_ADMIN['email'],))
     if cursor.fetchone() is None:
-        from werkzeug.security import generate_password_hash
-        password_hash = generate_password_hash('P@$sW0rD54321$')
+        password_hash = generate_password_hash(generate_secure_password())
         cursor.execute('''
-            INSERT INTO users (username, email, password_hash, full_name, role, created_at, is_verified)
-            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, 1)
+            INSERT INTO users (username, email, password_hash, full_name, role, is_verified)
+            VALUES (?, ?, ?, ?, ?, TRUE)
         ''', (
-            'wgray@stloralsurgery.com',
-            'wgray@stloralsurgery.com',
+            INITIAL_ADMIN['username'],
+            INITIAL_ADMIN['email'],
             password_hash,
-            'Super Admin',
-            'admin'
+            INITIAL_ADMIN['full_name'],
+            INITIAL_ADMIN['role']
         ))
+    
+    conn.commit()
+    conn.close()
 
     # Referral campaigns table
     cursor.execute('''
@@ -4610,548 +4204,95 @@ def analytics_dashboard():
     if 'user_id' not in session or session.get('role') not in ['admin', 'dentist_admin', 'specialist_admin']:
         flash('Access denied. Administrator privileges required.', 'error')
         return redirect(url_for('login'))
+
     
-    return render_template('analytics_dashboard.html')
-
-
-@app.route('/analytics/referrals')
-@require_roles(['admin', 'dentist_admin', 'specialist_admin'])
-def analytics_referrals():
-    """Display referral conversion metrics and cost‑per‑acquisition.
-
-    Administrators can access this endpoint to see high level statistics
-    summarising referral performance.  Conversions are defined as referrals
-    that have been accepted or completed.  The cost per acquisition (CPA) is
-    calculated as the total actual value of converted referrals divided by the
-    number of conversions.  If no conversions exist the CPA is zero.  The
-    results are passed to a dedicated template for display.
-    """
-    conn = sqlite3.connect('sapyyn.db')
-    cursor = conn.cursor()
-    # Total number of referrals
-    cursor.execute('SELECT COUNT(*) FROM referrals')
-    total_referrals = cursor.fetchone()[0] or 0
-    # Count of converted referrals (accepted or completed)
-    cursor.execute("SELECT COUNT(*) FROM referrals WHERE status IN ('accepted', 'completed')")
-    conversions = cursor.fetchone()[0] or 0
-    # Sum of actual_value for converted referrals
-    cursor.execute("SELECT SUM(COALESCE(actual_value, 0)) FROM referrals WHERE status IN ('accepted', 'completed')")
-    total_value = cursor.fetchone()[0] or 0.0
-    conn.close()
-    # Compute CPA
-    cpa = (total_value / conversions) if conversions else 0.0
-    return render_template('analytics_referrals.html',
-                           total_referrals=total_referrals,
-                           conversions=conversions,
-                           total_value=total_value,
-                           cpa=cpa)
-
-@app.route('/api/feedback/<int:feedback_id>')
-def get_feedback_detail(feedback_id):
-    """Get detailed feedback information"""
-    if 'user_id' not in session or session.get('role') not in ['admin', 'dentist_admin', 'specialist_admin']:
-        return jsonify({'error': 'Unauthorized'}), 403
+    chars = config_class.PROVIDER_CODE_CHARS
+    length = config_class.PROVIDER_CODE_LENGTH
     
-    try:
-        conn = sqlite3.connect('sapyyn.db')
+    while True:
+        code = ''.join(random.choices(chars, k=length))
+        conn = sqlite3.connect(config_class.DATABASE_NAME)
         cursor = conn.cursor()
-        
-        cursor.execute('''
-            SELECT * FROM user_feedback WHERE id = ?
-        ''', (feedback_id,))
-        
-        feedback = cursor.fetchone()
-        conn.close()
-        
-        if not feedback:
-            return jsonify({'error': 'Feedback not found'}), 404
-        
-        # Convert to dictionary
-        columns = [description[0] for description in cursor.description]
-        feedback_dict = dict(zip(columns, feedback))
-        
-        return jsonify(feedback_dict)
-        
-    except Exception as e:
-        app.logger.error(f'Error getting feedback detail: {str(e)}')
-        return jsonify({'error': 'Internal server error'}), 500
-
-@app.route('/api/feedback/export')
-def export_feedback():
-    """Export feedback data as CSV"""
-    if 'user_id' not in session or session.get('role') not in ['admin', 'dentist_admin', 'specialist_admin']:
-        return jsonify({'error': 'Unauthorized'}), 403
-    
-    try:
-        days = request.args.get('days', 30, type=int)
-        
-        conn = sqlite3.connect('sapyyn.db')
-        cursor = conn.cursor()
-        
-        cursor.execute('''
-            SELECT * FROM user_feedback 
-            WHERE created_at >= date('now', '-{} days')
-            ORDER BY created_at DESC
-        '''.format(days))
-        
-        feedback_data = cursor.fetchall()
-        columns = [description[0] for description in cursor.description]
-        conn.close()
-        
-        # Create CSV response
-        from io import StringIO
-        import csv
-        
-        output = StringIO()
-        writer = csv.writer(output)
-        
-        # Write header
-        writer.writerow(columns)
-        
-        # Write data
-        for row in feedback_data:
-            writer.writerow(row)
-        
-        output.seek(0)
-        
-        from flask import Response
-        return Response(
-            output.getvalue(),
-            mimetype='text/csv',
-            headers={'Content-Disposition': f'attachment; filename=feedback_export_{days}days.csv'}
-        )
-        
-    except Exception as e:
-        app.logger.error(f'Error exporting feedback: {str(e)}')
-        return jsonify({'error': 'Internal server error'}), 500
-
-@app.errorhandler(404)
-def page_not_found(e):
-    """Render custom 404 page"""
-    return render_template('404.html'), 404
-
-
-# ---------------------------------------------------------------------------
-# Appointments Portal
-#
-# These routes power the appointments functionality of the portal.  Patients can
-# create new appointments with providers, providers can manage appointments
-# scheduled with them, and administrators have a global view.  The route
-# '/portal/appointments' handles listing and creation.  Additional endpoints
-# support updating and deleting appointments.  Access control is enforced via
-# the require_roles decorator and additional checks within each handler.
-
-@app.route('/portal/appointments', methods=['GET', 'POST'])
-@require_roles(['patient', 'dentist', 'specialist', 'dentist_admin', 'specialist_admin', 'admin'])
-def portal_appointments():
-    """List appointments and handle creation of new appointments.
-
-    - Patients can view their upcoming and past appointments and schedule
-      additional ones with a chosen provider.
-    - Providers (dentists and specialists) see appointments where they are the
-      provider.
-    - Administrators see all appointments.
-
-    For POST requests, only patients are allowed to create new appointments.
-    The form must provide 'provider_id', 'appointment_date_time', optional
-    'type' and 'notes'.  Upon successful creation an email notification is
-    logged via send_email().
-    """
-    user_id = session.get('user_id')
-    user_role = session.get('role')
-
-    conn = sqlite3.connect('sapyyn.db')
-    cursor = conn.cursor()
-    # Make results return tuples instead of Row objects for simplicity
-    # (if row_factory is set globally, this can be removed).
-
-    # Handle creation
-    if request.method == 'POST':
-        action = request.form.get('action', 'create')
-        # Only allow patients to create appointments
-        if action == 'create' and user_role == 'patient':
-            provider_id = request.form.get('provider_id')
-            appointment_dt = request.form.get('appointment_date_time')
-            appointment_type = request.form.get('type')
-            notes = request.form.get('notes')
-            if not provider_id or not appointment_dt:
-                flash('Provider and appointment date/time are required.', 'error')
-            else:
-                try:
-                    cursor.execute('''
-                        INSERT INTO appointments (user_id, provider_id, appointment_date_time, appointment_type, notes, status)
-                        VALUES (?, ?, ?, ?, ?, 'scheduled')
-                    ''', (user_id, provider_id, appointment_dt, appointment_type, notes))
-                    conn.commit()
-                    # Notify provider and admin via email (stubbed)
-                    try:
-                        # Fetch provider email
-                        cursor.execute('SELECT email, full_name FROM users WHERE id = ?', (provider_id,))
-                        provider_info = cursor.fetchone()
-                        provider_email = provider_info[0] if provider_info else None
-                        provider_name = provider_info[1] if provider_info else 'Provider'
-                        patient_name = session.get('full_name', 'Patient')
-                        email_subject = 'New Appointment Scheduled'
-                        email_message = f"An appointment has been scheduled by {patient_name} with you on {appointment_dt}."
-                        if provider_email:
-                            send_email(provider_email, email_subject, email_message)
-                        # Also notify administrators (all dentist_admin, specialist_admin and admin users)
-                        cursor.execute("SELECT email FROM users WHERE role IN ('admin','dentist_admin','specialist_admin')")
-                        admin_emails = cursor.fetchall()
-                        for admin_email in admin_emails:
-                            send_email(admin_email[0], email_subject, f"{patient_name} booked an appointment with {provider_name} on {appointment_dt}.")
-                    except Exception as e:
-                        app.logger.warning(f'Could not send appointment notification: {e}')
-                    flash('Appointment scheduled successfully!', 'success')
-                    return redirect(url_for('portal_appointments'))
-                except Exception as e:
-                    conn.rollback()
-                    app.logger.error(f'Error scheduling appointment: {e}')
-                    flash('An error occurred while scheduling the appointment.', 'error')
-        else:
-            flash('You are not authorized to perform this action.', 'error')
-            return redirect(url_for('portal_appointments'))
-
-    # GET request: fetch appointments based on role
-    appointments = []
-    providers = []
-    try:
-        if user_role == 'patient':
-            # List appointments for the patient
-            cursor.execute('''
-                SELECT a.id, a.appointment_date_time, a.appointment_type, a.notes, a.status, u.full_name AS provider_name
-                FROM appointments a
-                JOIN users u ON a.provider_id = u.id
-                WHERE a.user_id = ?
-                ORDER BY a.appointment_date_time DESC
-            ''', (user_id,))
-            appointments = cursor.fetchall()
-            # Providers list for booking
-            cursor.execute("SELECT id, full_name FROM users WHERE role IN ('dentist','specialist','dentist_admin','specialist_admin')")
-            providers = cursor.fetchall()
-            template = 'portal/appointments_patient.html'
-        elif user_role in ['dentist', 'specialist', 'dentist_admin', 'specialist_admin']:
-            # Provider view: show appointments where this user is the provider
-            cursor.execute('''
-                SELECT a.id, a.appointment_date_time, a.appointment_type, a.notes, a.status, u.full_name AS patient_name
-                FROM appointments a
-                JOIN users u ON a.user_id = u.id
-                WHERE a.provider_id = ?
-                ORDER BY a.appointment_date_time DESC
-            ''', (user_id,))
-            appointments = cursor.fetchall()
-            template = 'portal/appointments_dentist.html'
-        else:
-            # Admin view: show all appointments
-            cursor.execute('''
-                SELECT a.id, a.appointment_date_time, a.appointment_type, a.notes, a.status,
-                       p.full_name AS patient_name, d.full_name AS provider_name
-                FROM appointments a
-                JOIN users p ON a.user_id = p.id
-                JOIN users d ON a.provider_id = d.id
-                ORDER BY a.appointment_date_time DESC
-            ''')
-            appointments = cursor.fetchall()
-            template = 'portal/appointments_admin.html'
-    except Exception as e:
-        app.logger.error(f'Error loading appointments: {e}')
-        flash('An error occurred while loading appointments.', 'error')
-    finally:
-        # Still open connection here? connection is closed after we compute unread notifications below
-        pass
-
-    # Determine unread notifications for the logged-in user
-    try:
-        # Re-open connection if closed earlier
-        if conn:
-            pass
-    except NameError:
-        # Shouldn't happen
-        conn = sqlite3.connect('sapyyn.db')
-        cursor = conn.cursor()
-    try:
-        cursor.execute('''
-            SELECT COUNT(*) FROM messages
-            WHERE recipient_id = ? AND is_read = 0 AND is_deleted_by_recipient = 0
-        ''', (user_id,))
-        unread_count = cursor.fetchone()[0] or 0
-        unread_notifications = True if unread_count > 0 else False
-    except Exception:
-        unread_notifications = False
-    finally:
-        try:
-            conn.close()
-        except Exception:
-            pass
-
-    # Render the appropriate template with active nav and notifications
-    return render_template(template, appointments=appointments, providers=providers,
-                           active='appointments', unread_notifications=unread_notifications)
-
-
-@app.route('/portal/appointments/<int:appointment_id>/update', methods=['POST'])
-@require_roles(['dentist', 'specialist', 'dentist_admin', 'specialist_admin', 'admin'])
-
-
-def update_appointment_portal(appointment_id: int):
-    """Update an existing appointment's status or notes.
-
-    Providers and administrators can update the status and notes of an
-    appointment.  The form should submit a 'status' value and optionally
-    'notes'.  After updating the record the user is redirected back to
-    the appointments page.
-    """
-    new_status = request.form.get('status')
-    new_notes = request.form.get('notes')
-    if not new_status and not new_notes:
-        flash('No changes submitted.', 'info')
-        return redirect(url_for('portal_appointments'))
-
-    conn = sqlite3.connect('sapyyn.db')
-    cursor = conn.cursor()
-    try:
-        # Only allow update on appointments where the logged‑in user is the provider,
-        # or the user is an administrator
-        user_id = session.get('user_id')
-        user_role = session.get('role')
-        if user_role not in ['admin', 'dentist_admin', 'specialist_admin']:
-            cursor.execute('SELECT provider_id FROM appointments WHERE id = ?', (appointment_id,))
-            row = cursor.fetchone()
-            if not row or row[0] != user_id:
-                conn.close()
-                flash('You do not have permission to update this appointment.', 'error')
-                return redirect(url_for('portal_appointments'))
-        # Build the update statement dynamically
-        fields = []
-        params = []
-        if new_status:
-            fields.append('status = ?')
-            params.append(new_status)
-        if new_notes is not None:
-            fields.append('notes = ?')
-            params.append(new_notes)
-        params.append(appointment_id)
-        cursor.execute(f"UPDATE appointments SET {', '.join(fields)}, updated_at = CURRENT_TIMESTAMP WHERE id = ?", params)
-        conn.commit()
-        flash('Appointment updated successfully.', 'success')
-    except Exception as e:
-        conn.rollback()
-        app.logger.error(f'Error updating appointment: {e}')
-        flash('An error occurred while updating the appointment.', 'error')
-    finally:
-        conn.close()
-    return redirect(url_for('portal_appointments'))
-
-
-@app.route('/portal/appointments/<int:appointment_id>/delete', methods=['POST'])
-@require_roles(['patient', 'admin', 'dentist_admin', 'specialist_admin'])
-
-
-def delete_appointment_portal(appointment_id: int):
-    """Delete (cancel) an appointment.
-
-    Patients can cancel their own appointments; administrators can delete any
-    appointment.  If a patient attempts to delete an appointment that they do
-    not own, an error is shown.  After deletion the user is redirected
-    back to the appointments page.
-    """
-    conn = sqlite3.connect('sapyyn.db')
-    cursor = conn.cursor()
-    try:
-        user_id = session.get('user_id')
-        user_role = session.get('role')
-        if user_role not in ['admin', 'dentist_admin', 'specialist_admin']:
-            # Ensure the appointment belongs to the patient
-            cursor.execute('SELECT user_id FROM appointments WHERE id = ?', (appointment_id,))
-            row = cursor.fetchone()
-            if not row or row[0] != user_id:
-                conn.close()
-                flash('You do not have permission to cancel this appointment.', 'error')
-                return redirect(url_for('portal_appointments'))
-        cursor.execute('DELETE FROM appointments WHERE id = ?', (appointment_id,))
-        conn.commit()
-        flash('Appointment cancelled successfully.', 'success')
-    except Exception as e:
-        conn.rollback()
-        app.logger.error(f'Error deleting appointment: {e}')
-        flash('An error occurred while cancelling the appointment.', 'error')
-    finally:
-        conn.close()
-    return redirect(url_for('portal_appointments'))
-
-
-# Promotion Management Admin Routes
-@app.route('/admin/promotions')
-@require_roles(['admin'])
-def admin_promotions():
-    """Admin page for managing promotions"""
-    conn = sqlite3.connect('sapyyn.db')
-    cursor = conn.cursor()
-    
-    # Get all promotions
-    cursor.execute('''
-        SELECT id, title, content, promotion_type, location, weight, is_active, 
-               start_date, end_date, click_count, impression_count, link_url, 
-               partner_name, created_at
-        FROM promotions 
-        ORDER BY is_active DESC, promotion_type DESC, created_at DESC
-    ''')
-    promotions = cursor.fetchall()
-    
-    # Get stats
-    cursor.execute('''
-        SELECT 
-            COUNT(*) as total,
-            COUNT(CASE WHEN is_active = 1 THEN 1 END) as active,
-            COUNT(CASE WHEN promotion_type = 'partner' THEN 1 END) as partner,
-            COUNT(CASE WHEN promotion_type = 'house' THEN 1 END) as house,
-            SUM(impression_count) as total_impressions,
-            SUM(click_count) as total_clicks
-        FROM promotions
-    ''')
-    stats = cursor.fetchone()
-    
-    conn.close()
-    
-    return render_template('admin_promotions.html', 
-                         promotions=promotions, 
-                         stats=stats)
-
-@app.route('/admin/promotions/new', methods=['GET', 'POST'])
-@require_roles(['admin'])
-def new_promotion():
-    """Create a new promotion"""
-    if request.method == 'POST':
-        title = request.form['title']
-        content = request.form['content']
-        promotion_type = request.form['promotion_type']
-        location = request.form['location']
-        weight = int(request.form['weight'])
-        link_url = request.form.get('link_url', '')
-        image_url = request.form.get('image_url', '')
-        partner_name = request.form.get('partner_name', '')
-        start_date = request.form.get('start_date', '')
-        end_date = request.form.get('end_date', '')
         
         try:
-            conn = sqlite3.connect('sapyyn.db')
-            cursor = conn.cursor()
-            
             cursor.execute('''
-                INSERT INTO promotions 
-                (title, content, promotion_type, location, weight, is_active,
-                 link_url, image_url, partner_name, start_date, end_date, created_by)
-                VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?)
-            ''', (title, content, promotion_type, location, weight, 
-                  link_url or None, image_url or None, partner_name or None,
-                  start_date or None, end_date or None, session['user_id']))
-            
+                INSERT INTO provider_codes (user_id, provider_code, provider_type, practice_name, specialization)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (user_id, code, provider_type, practice_name, specialization))
             conn.commit()
             conn.close()
-            
-            flash('Promotion created successfully!', 'success')
-            return redirect(url_for('admin_promotions'))
-            
-        except Exception as e:
-            flash(f'Error creating promotion: {str(e)}', 'error')
-    
-    return render_template('new_promotion.html')
+            return code
+        except sqlite3.IntegrityError:
+            conn.close()
+            continue
 
-@app.route('/admin/promotions/<int:promotion_id>/toggle', methods=['POST'])
-@require_roles(['admin'])
-def toggle_promotion(promotion_id):
-    """Toggle promotion active status"""
-    conn = sqlite3.connect('sapyyn.db')
-    cursor = conn.cursor()
-    
-    try:
-        cursor.execute('''
-            UPDATE promotions 
-            SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END
-            WHERE id = ?
-        ''', (promotion_id,))
+# Routes
+@app.route('/')
+def index():
+    """Home page"""
+    return render_template('index.html', analytics_config=ANALYTICS_CONFIG)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """User login"""
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
         
-        conn.commit()
-        flash('Promotion status updated successfully!', 'success')
-        
-    except Exception as e:
-        flash(f'Error updating promotion: {str(e)}', 'error')
-    finally:
+        conn = sqlite3.connect(config_class.DATABASE_NAME)
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
+        user = cursor.fetchone()
         conn.close()
-    
-    return redirect(url_for('admin_promotions'))
-
-
-def create_demo_users_if_needed():
-    """Create demo users if they don't exist"""
-    conn = sqlite3.connect('sapyyn.db')
-    cursor = conn.cursor()
-    
-    # Check if demo users already exist
-    cursor.execute('SELECT COUNT(*) FROM users WHERE username IN (?, ?, ?, ?)', 
-                   ('dentist1', 'specialist1', 'patient1', 'admin1'))
-    existing_count = cursor.fetchone()[0]
-    
-    if existing_count == 0:
-        # Demo users don't exist, create them
-        demo_users = [
-            {
-                'username': 'dentist1',
-                'email': 'dentist@sapyyn.com',
-                'password': 'password123',
-                'full_name': 'Dr. Sarah Johnson',
-                'role': 'dentist'
-            },
-            {
-                'username': 'specialist1',
-                'email': 'specialist@sapyyn.com',
-                'password': 'password123',
-                'full_name': 'Dr. Michael Chen',
-                'role': 'specialist'
-            },
-            {
-                'username': 'patient1',
-                'email': 'patient@sapyyn.com',
-                'password': 'password123',
-                'full_name': 'John Smith',
-                'role': 'patient'
-            },
-            {
-                'username': 'admin1',
-                'email': 'admin@sapyyn.com',
-                'password': 'password123',
-                'full_name': 'Admin User',
-                'role': 'dentist_admin'
-            }
-        ]
         
-        for user in demo_users:
-            try:
-                password_hash = generate_password_hash(user['password'])
-                cursor.execute('''
-                    INSERT OR IGNORE INTO users (username, email, password_hash, full_name, role, is_verified)
-                    VALUES (?, ?, ?, ?, ?, TRUE)
-                ''', (user['username'], user['email'], password_hash, user['full_name'], user['role']))
+        if user and check_password_hash(user[3], password):
+            if user[6]:  # is_paused
+                flash('Your account has been suspended. Please contact support.', 'error')
+                return redirect(url_for('login'))
                 
-                user_id = cursor.lastrowid
-                
-                # Create provider codes for dentists and specialists
-                if user['role'] in ['dentist', 'specialist', 'dentist_admin', 'specialist_admin']:
-                    try:
-                        provider_code = create_provider_code(
-                            user_id, 
-                            user['role'],
-                            f"{user['full_name']} Practice",
-                            'General' if user['role'].startswith('dentist') else 'Specialty Care'
-                        )
-                        print(f"Created demo user: {user['username']} ({user['role']}) - Provider Code: {provider_code}")
-                    except Exception as e:
-                        print(f"Warning: Could not create provider code for {user['username']}: {e}")
-                else:
-                    print(f"Created demo user: {user['username']} ({user['role']})")
-                    
-            except Exception as e:
-                print(f"Error creating demo user {user['username']}: {e}")
+            session['user_id'] = user[0]
+            session['username'] = user[1]
+            session['full_name'] = user[4]
+            session['role'] = user[5]
+            
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid username or password', 'error')
+    
+    return render_template('login.html', analytics_config=ANALYTICS_CONFIG)
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    """User registration"""
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        full_name = request.form['full_name']
+        role = request.form.get('role', 'patient')
+        
+        conn = sqlite3.connect(config_class.DATABASE_NAME)
+        cursor = conn.cursor()
+        
+        # Check if user exists
+        cursor.execute('SELECT id FROM users WHERE username = ? OR email = ?', (username, email))
+        if cursor.fetchone():
+            flash('Username or email already exists', 'error')
+            conn.close()
+            return redirect(url_for('register'))
+        
+        # Create user
+        password_hash = generate_password_hash(password)
+        cursor.execute('''
+            INSERT INTO users (username, email, password_hash, full_name, role)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (username, email, password_hash, full_name, role))
+        
+        user_id = cursor.lastrowid
+        
+        # Create provider code for dentists/specialists
+        if role in ['dentist', 'specialist', 'dentist_admin', 'specialist_admin']:
+            create_provider_code(user_id, role, f"{full_name} Practice", 'General')
         
         conn.commit()
         print("Demo users created successfully!")
@@ -5205,35 +4346,29 @@ def profile():
 def edit_profile():
     """Edit user profile page"""
     if 'user_id' not in session:
-        return redirect(url_for('login'))
-    return render_template('edit_profile.html')
 
-@app.route('/change-password', methods=['POST'])
-def change_password():
-    """Change user password"""
+     
+   
+        return redirect(url_for('login'))
+    
+    return render_template('register.html', analytics_config=ANALYTICS_CONFIG)
+
+@app.route('/dashboard')
+def dashboard():
+    """User dashboard"""
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
-    current_password = request.form['current_password']
-    new_password = request.form['new_password']
-    
-    conn = sqlite3.connect('sapyyn.db')
+    conn = sqlite3.connect(config_class.DATABASE_NAME)
     cursor = conn.cursor()
     
-    # Verify current password
-    cursor.execute('SELECT password_hash FROM users WHERE id = ?', (session['user_id'],))
-    user = cursor.fetchone()
+    # Get user stats
+    cursor.execute('SELECT COUNT(*) FROM referrals WHERE user_id = ?', (session['user_id'],))
+    total_referrals = cursor.fetchone()[0]
     
-    if not user or not check_password_hash(user[0], current_password):
-        flash('Current password is incorrect.', 'error')
-        conn.close()
-        return redirect(url_for('settings'))
+    cursor.execute('SELECT COUNT(*) FROM referrals WHERE user_id = ? AND status = "pending"', (session['user_id'],))
+    pending_referrals = cursor.fetchone()[0]
     
-    # Update password
-    new_password_hash = generate_password_hash(new_password)
-    cursor.execute('UPDATE users SET password_hash = ? WHERE id = ?', (new_password_hash, session['user_id']))
-    
-    conn.commit()
     conn.close()
     
     flash('Password changed successfully!', 'success')
@@ -5296,15 +4431,18 @@ def new_reward_program():
     """Create new reward program"""
     return render_template('rewards/new_program.html')
 
-@app.route('/rewards/edit-program/<int:program_id>')
-@require_roles(['admin', 'dentist_admin', 'specialist_admin'])
-def edit_reward_program(program_id):
-    """Edit reward program"""
-    return render_template('rewards/edit_program.html', program_id=program_id)
 
-@app.route('/rewards/leaderboard')
-def rewards_leaderboard():
-    """Rewards leaderboard"""
+@app.route('/logout')
+def logout():
+    """User logout"""
+    session.clear()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('index'))
+
+# API Routes
+@app.route('/api/referrals', methods=['GET'])
+def get_referrals():
+    """Get user referrals"""
     if 'user_id' not in session:
         return redirect(url_for('login'))
     return render_template('rewards/leaderboard.html')
@@ -5379,24 +4517,21 @@ def serve_static_page_dup(filename):
     static_file_path = os.path.join('static', f'{filename}.html')
     if not os.path.exists(static_file_path):
         return render_template('404.html'), 404
-    
-    # Apply access control
-    if filename in admin_pages:
-        if 'user_id' not in session or session.get('role') not in ['admin', 'dentist_admin', 'specialist_admin']:
-            flash('Access denied. Administrator privileges required.', 'error')
-            return redirect(url_for('login'))
-    elif filename in portal_pages:
-        if 'user_id' not in session:
-            flash('Please log in to access portal pages.', 'error')
-            return redirect(url_for('login'))
-    
-    return send_from_directory('static', f'{filename}.html')
 
-# Promotion Routes
-@app.route('/promotions')
-def promotions_list():
-    """List promotions"""
-    return render_template('promotions/list.html')
+    
+    conn = sqlite3.connect(config_class.DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM referrals WHERE user_id = ? ORDER BY created_at DESC', (session['user_id'],))
+    referrals = cursor.fetchall()
+    conn.close()
+    
+    return jsonify([{
+        'id': r[0],
+        'referral_id': r[2],
+        'patient_name': r[3],
+        'status': r[9],
+        'created_at': r[15]
+    } for r in referrals])
 
 @app.route('/promotions/create')
 @require_roles(['admin', 'dentist_admin', 'specialist_admin'])
@@ -5431,11 +4566,15 @@ def start_free_trial_dup():
     return redirect(url_for('dashboard'))
 
 
+# Register blueprints
+app.register_blueprint(nocode_api, url_prefix='/api/nocode')
+app.register_blueprint(nocodebackend_api, url_prefix='/api/nocodebackend')
+app.register_blueprint(promotions, url_prefix='/promotions')
+app.register_blueprint(admin_promotions, url_prefix='/admin/promotions')
+
 if __name__ == '__main__':
     # Initialize database
     init_db()
     
-    # Create demo users if needed
-    create_demo_users_if_needed()
-    
-    app.run(debug=True)
+    # Run application
+    app.run(debug=config_class.DEBUG, host='0.0.0.0', port=5000)

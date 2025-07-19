@@ -1,37 +1,23 @@
-FROM node:18-alpine AS builder
+# Use an official Python runtime as a parent image
+FROM python:3.9-slim
 
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy package files and install dependencies
-COPY package*.json ./
-RUN npm ci
+# Copy the dependencies file to the working directory
+COPY requirements.txt .
 
-# Copy source code
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application's code to the working directory
 COPY . .
 
-# Build the application
-RUN npm run build
+# Make port 5000 available to the world outside this container
+EXPOSE 5000
 
-# Production image
-FROM node:18-alpine AS production
+# Define environment variable
+ENV FLASK_APP app.py
 
-WORKDIR /app
-
-# Copy package files and install production dependencies only
-COPY package*.json ./
-RUN npm ci --only=production
-
-# Copy built app from builder stage
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/static ./static
-COPY --from=builder /app/templates ./templates
-
-# Set environment variables
-ENV NODE_ENV=production
-ENV PORT=3000
-
-# Expose the port
-EXPOSE 3000
-
-# Start the application
-CMD ["node", "dist/app.js"]
+# Run the command to start the server
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
