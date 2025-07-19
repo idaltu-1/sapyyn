@@ -1,3 +1,14 @@
+import os
+import sqlite3
+import stripe
+from datetime import datetime, timedelta
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, send_from_directory
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+import qrcode
+from io import BytesIO
+import base64
+
 app = Flask(__name__)
 app.secret_key = 'sapyyn-patient-referral-system-2025'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -826,7 +837,13 @@ def init_db():
     try:
         cursor.execute('ALTER TABLE referrals ADD COLUMN case_status TEXT DEFAULT "pending"')
     except sqlite3.OperationalError:
-=======
+        pass  # Column already exists
+    
+    # Continue with the rest of the database setup...
+    conn.commit()
+    conn.close()
+
+# Flask app initialization
 app = Flask(__name__)
 app.secret_key = 'sapyyn-patient-referral-system-2025'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -2514,65 +2531,25 @@ def check_subscription():
         WHERE us.user_id = ? AND us.subscription_status IN ('active', 'trial')
         ORDER BY us.created_at DESC LIMIT 1
     ''', (session['user_id'],))
->>>>>>> 089bcb1771f43e5ded380d1d377a3687562bf186
     
-    # Configure the app
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///sapyyn.db')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    
-    # Initialize database
-    from models import db
-    db.init_app(app)
-    
-    # Register blueprints
-    app.register_blueprint(nocode_api)
-    app.register_blueprint(nocodebackend_api)
-    app.register_blueprint(promotions)
-    app.register_blueprint(admin_promotions)
-    
-    # Example route
-    @app.route('/')
-    def index():
-        return render_template('index.html')
-    
-    @app.route('/login')
-    def login():
-        return send_from_directory('static', 'Login.html')
-    
-    @app.route('/rewards')
-    def rewards():
-        return render_template('rewards.html')
-    
-<<<<<<< HEAD
-    return app
-=======
-    conn = sqlite3.connect('sapyyn.db')
-    cursor = conn.cursor()
-    
-    # Verify current password
-    cursor.execute('''
-        SELECT password_hash FROM users WHERE id = ?
-    ''', (session['user_id'],))
-    
-    user = cursor.fetchone()
-    
-    if not user or not check_password_hash(user[0], current_password):
-        flash('Current password is incorrect.', 'error')
-        conn.close()
-        return redirect(url_for('settings'))
-    
-    # Update password
-    new_password_hash = generate_password_hash(new_password)
-    cursor.execute('''
-        UPDATE users SET password_hash = ? WHERE id = ?
-    ''', (new_password_hash, session['user_id']))
-    
-    conn.commit()
+    subscription = cursor.fetchone()
     conn.close()
     
-    flash('Password changed successfully!', 'success')
-    return redirect(url_for('settings'))
+    if subscription:
+        status, trial_end, plan_name = subscription
+        if status == 'trial' and trial_end:
+            from datetime import datetime
+            trial_end_date = datetime.fromisoformat(trial_end)
+            if datetime.now() > trial_end_date:
+                return jsonify({'has_subscription': False, 'message': 'Trial expired'})
+        
+        return jsonify({
+            'has_subscription': True, 
+            'plan_name': plan_name,
+            'status': status
+        })
+    
+    return jsonify({'has_subscription': False, 'message': 'No active subscription'})
 
 def generate_provider_code():
     """Generate a unique 6-character alphanumeric provider code"""
@@ -5203,7 +5180,7 @@ def my_referrals():
 
 # Missing Core Routes
 @app.route('/get-started')
-def get_started_page():
+def get_started_page_alt():
     """Get started onboarding page"""
     return send_from_directory('static', 'getstarted_page.html')
 
@@ -5270,7 +5247,7 @@ def settings():
     return render_template('settings.html')
 
 @app.route('/documents')
-def view_documents():
+def view_documents_alt():
     """View user documents (alias for existing documents route)"""
     return documents()
 
