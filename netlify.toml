@@ -5,6 +5,9 @@
   command = "echo 'Building Sapyyn application...' && cp -r static/* ."
   publish = "."
 
+[build.environment]
+  PYTHON_VERSION = "3.12"
+
 # ===========================
 # MAIN PAGES & ROUTING
 # ===========================
