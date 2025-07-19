@@ -97,6 +97,16 @@
         .login-form-container {
             padding: 1.5rem;
         }
+        @media (max-width: 575.98px) {
+            .login-form-container {
+                padding: 1rem;
+            }
+            .login-form-section {
+                min-height: 100vh;
+                padding-top: 2rem;
+                padding-bottom: 2rem;
+            }
+        }
     }
 </style>
 {% endblock %}
@@ -113,7 +123,7 @@
                             <i class="bi bi-hospital-fill display-1 mb-3"></i>
                             <h1 class="fw-bold">Streamline Your Referrals</h1>
                             <p class="lead mb-4">Instant, secure and HIPAA‑compliant platform for managing referrals, documents, appointments and rewards.</p>
-                            <a href="{{ url_for('register') }}" class="btn btn-warning btn-lg px-4 py-2 fw-bold shadow-sm">
+                            <a href="{{ url_for('get_started_page') }}" class="btn btn-warning btn-lg px-4 py-2 fw-bold shadow-sm">
                                 <i class="bi bi-person-plus me-2"></i>Start Your Free Trial
                             </a>
                         </div>
@@ -148,6 +158,18 @@
                             
                             <h2 class="fw-bold mb-2">Welcome Back</h2>
                             <p class="text-muted">Sign in to your Sapyyn account</p>
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                              {% if messages %}
+                                <div class="mb-3">
+                                  {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                      {{ message }}
+                                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                  {% endfor %}
+                                </div>
+                              {% endif %}
+                            {% endwith %}
                         </div>
                         
                         <form method="POST" class="login-form" id="loginForm">
@@ -157,11 +179,11 @@
                                        class="form-control form-control-lg" 
                                        id="username" 
                                        name="username" 
-                                       placeholder="Username" 
+                                       placeholder="Email or Username"
                                        required>
-                                <label for="username">
-                                    <i class="bi bi-person me-2"></i>Username
-                                </label>
+                                       <label for="username">
+                                           <i class="bi bi-person me-2"></i>Email or Username
+                                       </label>
                             </div>
                             
                             <!-- Password Field -->
@@ -191,14 +213,14 @@
                                         Remember me
                                     </label>
                                 </div>
-                                <a href="#" class="text-decoration-none">
+                                <a href="{{ url_for('forgot_password') }}" class="text-decoration-none">
                                     Forgot password?
                                 </a>
                             </div>
                             
                             <!-- Login Button -->
                             <div class="d-grid mb-4">
-                                <button type="button" id="loginButton" class="btn btn-primary btn-lg">
+                                <button type="submit" id="loginButton" class="btn btn-primary btn-lg">
                                     <i class="bi bi-box-arrow-in-right me-2"></i>
                                     Sign In
                                 </button>
@@ -260,45 +282,11 @@
 
 {% block extra_scripts %}
 <script>
-// Password toggle functionality is handled by main.js UIEnhancements
-function submitLoginForm() {
-    const form = document.getElementById('loginForm');
-    const username = form.querySelector('input[name="username"]').value.trim();
-    const password = form.querySelector('input[name="password"]').value.trim();
-    
-    // Basic validation
-    if (!username || !password) {
-        alert('Please enter both username and password');
-        return false;
-    }
-    
-    // Submit the form programmatically
-    console.log('Submitting form for user:', username);
-    form.submit();
-}
-
-// Proper event listeners
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('loginForm');
-    const loginButton = document.getElementById('loginButton');
-    
-    // Add click event listener to the login button
-    if (loginButton) {
-        loginButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            submitLoginForm();
-        });
-    }
-    
-    // Handle Enter key press in form fields
-    if (form) {
-        form.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                submitLoginForm();
-            }
-        });
-    }
-});
+    // Password toggle functionality is handled by main.js UIEnhancements
+    // The form now uses type="submit" for accessibility.
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('loginForm');
+        // Optionally, add client-side validation here if desired.
+    });
 </script>
 {% endblock %}

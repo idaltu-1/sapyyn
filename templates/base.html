@@ -155,7 +155,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm" id="mainNavbar">
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('index') }}">
-                <img src="{{ url_for('static', filename='images/sapyyn-icon-only.png') }}" alt="Sapyyn Logo" class="me-2 navbar-logo" style="height: 40px; width: auto;">
+                <img src="{{ url_for('static', filename='images/sapyyn-icon-only.png') }}" alt="Sapyyn Logo" class="me-2 navbar-logo align-middle" style="height: 44px; width: auto; vertical-align: middle; margin-top: -4px; margin-bottom: -4px;">
             </a>
             
             <button class="navbar-toggler border-0 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -363,7 +363,7 @@
                     </li>
                     <!-- Primary CTA - Get Started (emphasized) -->
                     <li class="nav-item">
-                        <a class="btn btn-warning btn-sm ms-2 px-3 shadow-sm fw-bold" href="{{ url_for('register') }}" id="stickySignUpBtn">
+                        <a class="btn btn-warning btn-sm ms-2 px-3 shadow-sm fw-bold" href="{{ url_for('get_started_page') }}" id="stickySignUpBtn">
                             <i class="bi bi-person-plus me-1"></i>Start Free Trial
                         </a>
                     </li>
