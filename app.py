@@ -5978,8 +5978,9 @@ def track_promotion_event(promotion_id):
         conn.commit()
         conn.close()
         
-  
-except Exception as e:
+        return jsonify({'status': 'success'}), 200
+        
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/nocodebackend/referrals', methods=['POST'])
