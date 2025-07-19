@@ -795,7 +795,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Database initialization
-def init_db():
+def init_db_dup2():
     """Initialize the SQLite database"""
     conn = sqlite3.connect('sapyyn.db')
     cursor = conn.cursor()
@@ -871,7 +871,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Database initialization
-def init_db():
+def init_db_dup3():
     """Initialize the SQLite database"""
     conn = sqlite3.connect('sapyyn.db')
     cursor = conn.cursor()
@@ -5267,12 +5267,12 @@ def track_referral():
 
 # Portal Route Aliases
 @app.route('/portal/appointments')
-def portal_appointments():
+def portal_appointments_dup():
     """Portal appointments page (alias)"""
     return appointments_portal()
 
 @app.route('/portal/messages')
-def messages_portal():
+def messages_portal_dup():
     """Portal messages page (alias)"""
     return messages_portal()
 
@@ -5317,34 +5317,34 @@ def compliance_audit():
 
 # Static Page Routes
 @app.route('/about')
-def about():
+def about_dup():
     """About page"""
     return render_template('about.html')
 
 @app.route('/blog')
-def blog():
+def blog_dup():
     """Blog page"""
     return send_from_directory('static', 'blog.html')
 
 @app.route('/surgical-instructions')
-def surgical_instruction():
+def surgical_instruction_dup():
     """Surgical instructions page"""
     return send_from_directory('static', 'surgical-instruction-page.html')
 
 @app.route('/how-to-guides')
-def how_to_guides():
+def how_to_guides_dup():
     """How-to guides page"""
     return render_template('how_to_guides.html')
 
 # Admin Routes
 @app.route('/admin')
 @require_roles(['admin', 'dentist_admin', 'specialist_admin'])
-def admin_panel():
+def admin_panel_dup():
     """Admin panel redirect"""
     return redirect(url_for('admin_portal'))
 
 @app.route('/static-pages/<path:filename>')
-def serve_static_page(filename):
+def serve_static_page_dup(filename):
     """Serve static HTML pages with authentication checks"""
     from urllib.parse import unquote
     filename = unquote(filename)
@@ -5412,7 +5412,7 @@ def promotions_edit(promotion_id):
 
 # Subscription Routes
 @app.route('/subscribe/<plan_name>')
-def subscribe(plan_name):
+def subscribe_dup(plan_name):
     """Subscribe to a plan"""
     if 'user_id' not in session:
         flash('Please log in to subscribe.', 'error')
@@ -5420,7 +5420,7 @@ def subscribe(plan_name):
     return render_template('subscribe.html', plan_name=plan_name)
 
 @app.route('/start-free-trial')
-def start_free_trial():
+def start_free_trial_dup():
     """Start free trial"""
     if 'user_id' not in session:
         flash('Please log in to start your free trial.', 'error')
