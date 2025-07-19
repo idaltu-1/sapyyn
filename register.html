@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Started - Sapyyn Portal Setup</title>
+    <meta name="description" content="Set up your Sapyyn account and customize your professional dental platform">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --secondary-blue: #3B82F6;
+            --light-blue: #DBEAFE;
+            --accent-yellow: #FCD34D;
+            --warning-yellow: #F59E0B;
+            --white: #FFFFFF;
+            --light-grey: #F8FAFC;
+            --medium-grey: #64748B;
+            --dark-grey: #334155;
+            --black: #0F172A;
+            --success: #10B981;
+            --danger: #EF4444;
+            --purple: #8B5CF6;
+            --glass: rgba(255, 255, 255, 0.25);
+            --shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+            --shadow-hover: 0 16px 64px rgba(37, 99, 235, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+            color: var(--black);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--light-blue);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--primary-blue);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo img {
+            height: 45px;
+            margin-right: 12px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .nav-progress {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--medium-grey);
+            font-weight: 600;
+        }
+        
+        .progress-text {
+            font-size: 0.9rem;
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--primary-blue);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--primary-blue);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .nav-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        .nav-btn.primary:hover {
+            background: var(--secondary-blue);
+        }
+        
+        /* Main Container */
+        .onboarding-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 5%;
+            min-height: calc(100vh - 80px);
+        }
+        
+        /* Progress Indicator */
+        .progress-indicator {
+            margin-bottom: 3rem;
+        }
+        
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--light-blue);
+            border-radius: 2px;
+            z-index: 1;
+        }
+        
+        .progress-bar {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 2px;
+            z-index: 2;
+            transition: width 0.5s ease;
+            transform: translateY(-50%);
+        }
+        
+        .step {
+            background: var(--white);
+            border: 4px solid var(--light-blue);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--medium-grey);
+            position: relative;
+            z-index: 3;
+            transition: all 0.3s ease;
+        }
+        
+        .step.completed {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+        
+        .step.active {
+            background: var(--primary-blue);
+            border-color: var(--primary-blue);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+        }
+        
+        .step-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        
+        .step-label {
+            text-align: center;
+            font-weight: 600;
+            color: var(--medium-grey);
+            font-size: 0.9rem;
+            width: 120px;
+        }
+        
+        .step-label.active {
+            color: var(--primary-blue);
+        }
+        
+        .step-label.completed {
+            color: var(--success);
+        }
+        
+        /* Step Content */
+        .step-content {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--light-blue);
+            margin-bottom: 2rem;
+            display: none;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        .step-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .step-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        
+        .step-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-subtitle {
+            font-size: 1.2rem;
+            color: var(--medium-grey);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Account Type Selection */
+        .account-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .account-type {
+            background: var(--light-grey);
+            border: 3px solid var(--light-blue);
+            border-radius: 16px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .account-type::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.1), transparent);
+            transition: left 0.6s;
+        }
+        
+        .account-type:hover::before {
+            left: 100%;
+        }
+        
+        .account-type:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-blue);
+        }
+        
+        .account-type.selected {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-color: var(--primary-blue);
+            color: white;
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .account-type-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--accent-yellow), var(--warning-yellow));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--black);
+            transition: all 0.3s ease;
+        }
+        
+        .account-type.selected .account-type-icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .account-type-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+        
+        .account-type-description {
+            font-size: 1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .account-type.selected .account-type-description {
+            opacity: 1;
+        }
+        
+        /* Profile Form */
+        .profile-form {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .form-section.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: var(--dark-grey);
+            font-size: 0.95rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 1rem;
+            border: 2px solid var(--light-blue);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .avatar-upload {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            box-shadow: var(--shadow);
+        }
+        
+        .avatar-upload-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--light-grey);
+            border: 2px solid var(--light-blue);
+            border-radius: 12px;
+            color: var(--primary-blue);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .avatar-upload-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* Preferences */
+        .preferences-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .preference-card {
+            background: var(--light-grey);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .preference-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+        
+        .preference-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .preference-card .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .preference-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .preference-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: var(--white);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .preference-option:hover {
+            background: var(--light-blue);
+        }
+        
+        .preference-option input[type="checkbox"],
+        .preference-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary-blue);
+        }
+        
+        .preference-option label {
+            flex: 1;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        /* Features Overview */
+        .features-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-preview {
+            background: var(--light-grey);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .feature-preview:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+            background: var(--white);
+        }
+        
+        .feature-preview.highlighted {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--accent-yellow), var(--warning-yellow));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--black);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-preview.highlighted .feature-icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+        
+        .feature-description {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        /* Navigation Buttons */
+        .step-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3rem;
+        }
+        
+        .nav-button {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .nav-button:hover::before {
+            left: 100%;
+        }
+        
+        .nav-button.back {
+            background: var(--light-grey);
+            color: var(--medium-grey);
+            border: 2px solid var(--light-blue);
+        }
+        
+        .nav-button.back:hover {
+            background: var(--white);
+            color: var(--primary-blue);
+            border-color: var(--primary-blue);
+            transform: translateY(-3px);
+        }
+        
+        .nav-button.next {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+        }
+        
+        .nav-button.next:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(37, 99, 235, 0.4);
+        }
+        
+        .nav-button.complete {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+        
+        .nav-button.complete:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+        }
+        
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        /* Success Animation */
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .success-message.show {
+            transform: translateX(0);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 968px) {
+            .onboarding-container {
+                padding: 1rem 5%;
+            }
+            
+            .step-title {
+                font-size: 2rem;
+            }
+            
+            .account-types {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-form {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .preferences-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .features-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            .step-navigation {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .progress-steps {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .step {
+                width: 50px;
+                height: 50px;
+                font-size: 1rem;
+            }
+            
+            .step-labels {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .step-label {
+                width: 100px;
+                font-size: 0.8rem;
+            }
+            
+            .step-content {
+                padding: 2rem 1.5rem;
+            }
+            
+            .avatar-upload {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="#" class="logo">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDUiIGhlaWdodD0iNDUiIHZpZXdCb3g9IjAgMCA0NSA0NSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjIuNSIgY3k9IjIyLjUiIHI9IjIyLjUiIGZpbGw9IiMyNTYzRUIiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIxMC41IiB5PSIxMC41Ij4KPHN2ZyBpZD0ic3RhciIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMjQgMjQiPgo8cGF0aCBkPSJNMTIgMkwxNS4wOSA4LjI2TDIyIDlMMTYgMTVMMTcuMTggMjJMMTIgMTguMjdMNi44MiAyMkw4IDE1TDIgOUw4LjkxIDguMjZMMTIgMloiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo8L3N2Zz4KPC9zdmc+" alt="Sapyyn">
+                Sapyyn Setup
+            </a>
+            
+            <div class="nav-progress">
+                <span class="progress-text">Step <span id="currentStepNum">1</span> of 4</span>
+            </div>
+            
+            <div class="nav-actions">
+                <a href="#" class="nav-btn" onclick="skipSetup()">Skip Setup</a>
+                <a href="#" class="nav-btn primary" onclick="saveProgress()">Save Progress</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Onboarding Container -->
+    <main class="onboarding-container">
+        <!-- Progress Indicator -->
+        <div class="progress-indicator">
+            <div class="progress-steps">
+                <div class="progress-bar" id="progressBar" style="width: 25%;"></div>
+                <div class="step active" id="step1">1</div>
+                <div class="step" id="step2">2</div>
+                <div class="step" id="step3">3</div>
+                <div class="step" id="step4">4</div>
+            </div>
+            <div class="step-labels">
+                <div class="step-label active">Account Type</div>
+                <div class="step-label">Profile Setup</div>
+                <div class="step-label">Preferences</div>
+                <div class="step-label">Complete</div>
+            </div>
+        </div>
+
+        <!-- Step 1: Account Type Selection -->
+        <div class="step-content active" id="stepContent1">
+            <div class="step-header">
+                <h1 class="step-title">Choose Your Account Type</h1>
+                <p class="step-subtitle">Select the option that best describes your role in the dental industry to customize your Sapyyn experience.</p>
+            </div>
+
+            <div class="account-types">
+                <div class="account-type" onclick="selectAccountType(this, 'dentist')">
+                    <div class="account-type-icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h3 class="account-type-title">General Dentist</h3>
+                    <p class="account-type-description">Comprehensive dental care provider focused on preventive care, restorations, and patient referrals to specialists.</p>
+                </div>
+
+                <div class="account-type" onclick="selectAccountType(this, 'specialist')">
+                    <div class="account-type-icon">
+                        <i class="fas fa-stethoscope"></i>
+                    </div>
+                    <h3 class="account-type-title">Dental Specialist</h3>
+                    <p class="account-type-description">Specialized practitioner (Orthodontist, Periodontist, Oral Surgeon, etc.) receiving referrals and providing specialized treatments.</p>
+                </div>
+
+                <div class="account-type" onclick="selectAccountType(this, 'hygienist')">
+                    <div class="account-type-icon">
+                        <i class="fas fa-tooth"></i>
+                    </div>
+                    <h3 class="account-type-title">Dental Hygienist</h3>
+                    <p class="account-type-description">Licensed dental professional focused on preventive care, cleanings, and patient education within a dental practice.</p>
+                </div>
+
+                <div class="account-type" onclick="selectAccountType(this, 'practice-manager')">
+                    <div class="account-type-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3 class="account-type-title">Practice Manager</h3>
+                    <p class="account-type-description">Administrative professional managing dental practice operations, staff coordination, and patient communications.</p>
+                </div>
+
+                <div class="account-type" onclick="selectAccountType(this, 'assistant')">
+                    <div class="account-type-icon">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <h3 class="account-type-title">Dental Assistant</h3>
+                    <p class="account-type-description">Support professional assisting with patient care, chairside assistance, and administrative tasks within dental practice.</p>
+                </div>
+
+                <div class="account-type" onclick="selectAccountType(this, 'student')">
+                    <div class="account-type-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="account-type-title">Student</h3>
+                    <p class="account-type-description">Dental student or continuing education participant seeking to learn and connect with dental professionals.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Profile Setup -->
+        <div class="step-content" id="stepContent2">
+            <div class="step-header">
+                <h1 class="step-title">Complete Your Profile</h1>
+                <p class="step-subtitle">Help us personalize your Sapyyn experience with some basic information about you and your practice.</p>
+            </div>
+
+            <form class="profile-form" id="profileForm">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="firstName">First Name *</label>
+                        <input type="text" id="firstName" name="firstName" placeholder="Enter your first name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Last Name *</label>
+                        <input type="text" id="lastName" name="lastName" placeholder="Enter your last name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" placeholder="(555) 123-4567">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="licenseNumber">License Number</label>
+                        <input type="text" id="licenseNumber" name="licenseNumber" placeholder="Professional license number">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="specialization">Specialization</label>
+                        <select id="specialization" name="specialization">
+                            <option value="">Select specialization</option>
+                            <option value="general">General Dentistry</option>
+                            <option value="orthodontics">Orthodontics</option>
+                            <option value="periodontics">Periodontics</option>
+                            <option value="oral-surgery">Oral Surgery</option>
+                            <option value="endodontics">Endodontics</option>
+                            <option value="prosthodontics">Prosthodontics</option>
+                            <option value="pediatric">Pediatric Dentistry</option>
+                            <option value="pathology">Oral Pathology</option>
+                            <option value="radiology">Oral Radiology</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="practiceName">Practice Name</label>
+                        <input type="text" id="practiceName" name="practiceName" placeholder="Your practice or clinic name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="practiceAddress">Practice Address</label>
+                        <input type="text" id="practiceAddress" name="practiceAddress" placeholder="123 Main St, City, State 12345">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="yearsExperience">Years of Experience</label>
+                        <select id="yearsExperience" name="yearsExperience">
+                            <option value="">Select experience level</option>
+                            <option value="0-2">0-2 years</option>
+                            <option value="3-5">3-5 years</option>
+                            <option value="6-10">6-10 years</option>
+                            <option value="11-15">11-15 years</option>
+                            <option value="16-20">16-20 years</option>
+                            <option value="20+">20+ years</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="website">Website/LinkedIn</label>
+                        <input type="url" id="website" name="website" placeholder="https://yourpractice.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="referralCode">Referral Code (Optional)</label>
+                        <input type="text" id="referralCode" name="referralCode" placeholder="Enter referral code if you have one">
+                    </div>
+                </div>
+
+                <div class="form-section full-width">
+                    <div class="form-group">
+                        <label>Profile Photo</label>
+                        <div class="avatar-upload">
+                            <div class="avatar-preview" id="avatarPreview">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <button type="button" class="avatar-upload-btn" onclick="uploadAvatar()">
+                                <i class="fas fa-camera"></i> Upload Photo
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bio">Professional Bio (Optional)</label>
+                        <textarea id="bio" name="bio" placeholder="Tell us about your professional background, interests, and what you're looking to achieve with Sapyyn..."></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Step 3: Preferences -->
+        <div class="step-content" id="stepContent3">
+            <div class="step-header">
+                <h1 class="step-title">Customize Your Experience</h1>
+                <p class="step-subtitle">Set your preferences to make Sapyyn work best for you and your practice needs.</p>
+            </div>
+
+            <div class="preferences-grid">
+                <div class="preference-card">
+                    <h3>
+                        <div class="icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        Notifications
+                    </h3>
+                    <div class="preference-options">
+                        <div class="preference-option">
+                            <input type="checkbox" id="emailNotifications" checked>
+                            <label for="emailNotifications">Email notifications for new messages</label>
+                        </div>
+                        <div class="preference-option">
+                            <input type="checkbox" id="referralNotifications" checked>
+                            <label for="referralNotifications">Notifications for new patient referrals</label>
+                        </div>
+                        <div class="preference-option">
+                            <input type="checkbox" id="educationNotifications">
+                            <label for="educationNotifications">Educational content and course updates</label>
+                        </div>
+                        <div class="preference-option">
+                            <input type="checkbox" id="newsletterNotifications" checked>
+                            <label for="newsletterNotifications">Weekly industry newsletter</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preference-card">
+                    <h3>
+                        <div class="icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        Privacy Settings
+                    </h3>
+                    <div class="preference-options">
+                        <div class="preference-option">
+                            <input type="radio" id="publicProfile" name="profileVisibility" value="public">
+                            <label for="publicProfile">Public profile (visible to all Sapyyn users)</label>
+                        </div>
+                        <div class="preference-option">
+                            <input type="radio" id="professionalProfile" name="profileVisibility" value="professional" checked>
+                            <label for="professionalProfile">Professional network only</label>
+                        </div>
+                        <div class="preference-option">
+                            <input type="radio" id="privateProfile" name="profileVisibility" value="private">
+                            <label for="privateProfile">Private profile (contacts only)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preference-card">
+                    <h3>
+                        <div class="icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        Communication
+                    </h3>
+                    <div class="preference-options">
+                        <div class="preference-option">
+                            <input type="checkbox" id="instantMessaging" checked>
+                            <label for="instantMessaging">Enable instant messaging</label>
+                        </div>
+                        <div class="preference-option">
+                            <input type="checkbox" id="videoCalls" checked>
+                            <label for="videoCalls">Allow video call requests</label>
+                        </div>
+                        <div class="preference-option">
+                            <input type="checkbox" id="fileSharing" checked>
+                            <label for="fileSharing">Enable secure file sharing</label>
+                        </div>
+                        <div class="preference-option">
+                            <input type="checkbox" id="groupChats">
+                            <label for="groupChats">Participate in professional group chats</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preference-card">
+                    <h3>
+                        <div class="icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        Rewards Program
+                    </h3>
+                    <div class="preference-options">
+                        <div class="preference-option">
+                            <input type="checkbox" id="joinRewards" checked>
+                            <label for="joinRewards">Join Sapyyn Rewards Program</label>
+                        </div>
+                        <div class="preference-option">
+                            <input type="checkbox" id="referralRewards" checked>
+                            <label for="referralRewards">Earn points for successful referrals</label>
+                        </div>
+                        <div class="preference-option">
+                            <input type="checkbox" id="educationRewards">
+                            <label for="educationRewards">Earn rewards for course completion</label>
+                        </div>
+                        <div class="preference-option">
+                            <input type="checkbox" id="rewardsEmails">
+                            <label for="rewardsEmails">Receive exclusive rewards offers</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Complete Setup -->
+        <div class="step-content" id="stepContent4">
+            <div class="step-header">
+                <h1 class="step-title">🎉 Welcome to Sapyyn!</h1>
+                <p class="step-subtitle">Your account is ready! Explore these powerful features to transform your dental practice.</p>
+            </div>
+
+            <div class="features-overview">
+                <div class="feature-preview" onclick="highlightFeature(this)">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3 class="feature-title">Secure Messaging</h3>
+                    <p class="feature-description">Connect instantly with colleagues, share patient information securely, and collaborate on complex cases.</p>
+                </div>
+
+                <div class="feature-preview" onclick="highlightFeature(this)">
+                    <div class="feature-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3 class="feature-title">File Sharing</h3>
+                    <p class="feature-description">Upload, organize, and share patient records, X-rays, and treatment plans with HIPAA-compliant security.</p>
+                </div>
+
+                <div class="feature-preview" onclick="highlightFeature(this)">
+                    <div class="feature-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="feature-title">Continuing Education</h3>
+                    <p class="feature-description">Access professional courses, earn CE credits, and stay current with the latest dental techniques and research.</p>
+                </div>
+
+                <div class="feature-preview" onclick="highlightFeature(this)">
+                    <div class="feature-icon">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                    <h3 class="feature-title">Industry Newsletter</h3>
+                    <p class="feature-description">Stay informed with curated dental industry news, research updates, and professional insights delivered weekly.</p>
+                </div>
+
+                <div class="feature-preview" onclick="highlightFeature(this)">
+                    <div class="feature-icon">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <h3 class="feature-title">Quick Referrals</h3>
+                    <p class="feature-description">Instantly refer patients using QR codes, text messages, or digital forms with automated tracking.</p>
+                </div>
+
+                <div class="feature-preview" onclick="highlightFeature(this)">
+                    <div class="feature-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3 class="feature-title">Rewards Program</h3>
+                    <p class="feature-description">Earn points for referrals, course completion, and platform engagement. Redeem for cash, credits, and benefits.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="step-navigation">
+            <button class="nav-button back" id="backBtn" onclick="previousStep()" style="visibility: hidden;">
+                <i class="fas fa-arrow-left"></i>
+                Back
+            </button>
+            
+            <button class="nav-button next" id="nextBtn" onclick="nextStep()" disabled>
+                Next
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </main>
+
+    <!-- Success Message -->
+    <div class="success-message" id="successMessage">
+        <i class="fas fa-check-circle"></i>
+        <span id="successText">Success!</span>
+    </div>
+
+    <script>
+        // Global state
+        let currentStep = 1;
+        let selectedAccountType = null;
+        let onboardingData = {};
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            showSuccessMessage('👋 Welcome! Let\'s set up your Sapyyn account in just a few steps.');
+        });
+
+        // Success message display
+        function showSuccessMessage(message) {
+            const successDiv = document.getElementById('successMessage');
+            const successText = document.getElementById('successText');
+            successText.textContent = message;
+            successDiv.classList.add('show');
+            
+            setTimeout(() => {
+                successDiv.classList.remove('show');
+            }, 3000);
+        }
+
+        // Account type selection
+        function selectAccountType(element, type) {
+            // Remove selection from all account types
+            document.querySelectorAll('.account-type').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Select the clicked account type
+            element.classList.add('selected');
+            selectedAccountType = type;
+            
+            // Enable next button
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = false;
+            
+            showSuccessMessage(`✅ Selected: ${element.querySelector('.account-type-title').textContent}`);
+        }
+
+        // Avatar upload
+        function uploadAvatar() {
+            showSuccessMessage('📸 Avatar upload functionality would open here');
+            
+            // Simulate avatar upload
+            const avatarPreview = document.getElementById('avatarPreview');
+            const firstName = document.getElementById('firstName').value || 'User';
+            avatarPreview.innerHTML = firstName.charAt(0).toUpperCase();
+        }
+
+        // Feature highlighting
+        function highlightFeature(element) {
+            // Remove highlight from all features
+            document.querySelectorAll('.feature-preview').forEach(item => {
+                item.classList.remove('highlighted');
+            });
+            
+            // Highlight selected feature
+            element.classList.add('highlighted');
+            
+            const featureTitle = element.querySelector('.feature-title').textContent;
+            showSuccessMessage(`✨ ${featureTitle} feature highlighted!`);
+        }
+
+        // Navigation functions
+        function nextStep() {
+            if (currentStep < 4) {
+                // Validate current step
+                if (!validateCurrentStep()) {
+                    return;
+                }
+                
+                // Hide current step
+                document.getElementById(`stepContent${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}`).classList.add('completed');
+                document.querySelector(`.step-labels .step-label:nth-child(${currentStep})`).classList.remove('active');
+                document.querySelector(`.step-labels .step-label:nth-child(${currentStep})`).classList.add('completed');
+                
+                // Move to next step
+                currentStep++;
+                
+                // Show next step
+                document.getElementById(`stepContent${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.querySelector(`.step-labels .step-label:nth-child(${currentStep})`).classList.add('active');
+                
+                // Update progress bar
+                const progressBar = document.getElementById('progressBar');
+                progressBar.style.width = `${(currentStep / 4) * 100}%`;
+                
+                // Update navigation
+                updateNavigation();
+                
+                // Update step counter
+                document.getElementById('currentStepNum').textContent = currentStep;
+                
+                showSuccessMessage(`🎯 Step ${currentStep} of 4 - Keep going!`);
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                // Hide current step
+                document.getElementById(`stepContent${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.querySelector(`.step-labels .step-label:nth-child(${currentStep})`).classList.remove('active');
+                
+                // Move to previous step
+                currentStep--;
+                
+                // Show previous step
+                document.getElementById(`stepContent${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep}`).classList.remove('completed');
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.querySelector(`.step-labels .step-label:nth-child(${currentStep})`).classList.remove('completed');
+                document.querySelector(`.step-labels .step-label:nth-child(${currentStep})`).classList.add('active');
+                
+                // Update progress bar
+                const progressBar = document.getElementById('progressBar');
+                progressBar.style.width = `${(currentStep / 4) * 100}%`;
+                
+                // Update navigation
+                updateNavigation();
+                
+                // Update step counter
+                document.getElementById('currentStepNum').textContent = currentStep;
+                
+                showSuccessMessage(`⬅️ Back to Step ${currentStep}`);
+            }
+        }
+
+        function updateNavigation() {
+            const backBtn = document.getElementById('backBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            // Back button visibility
+            backBtn.style.visibility = currentStep > 1 ? 'visible' : 'hidden';
+            
+            // Next button state
+            if (currentStep === 4) {
+                nextBtn.textContent = 'Enter Portal';
+                nextBtn.className = 'nav-button complete';
+                nextBtn.innerHTML = '<i class="fas fa-rocket"></i> Enter Portal';
+                nextBtn.onclick = completeSetup;
+                nextBtn.disabled = false;
+            } else {
+                nextBtn.textContent = 'Next';
+                nextBtn.className = 'nav-button next';
+                nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+                nextBtn.onclick = nextStep;
+                nextBtn.disabled = !validateCurrentStep();
+            }
+        }
+
+        function validateCurrentStep() {
+            switch (currentStep) {
+                case 1:
+                    return selectedAccountType !== null;
+                case 2:
+                    const firstName = document.getElementById('firstName').value;
+                    const lastName = document.getElementById('lastName').value;
+                    const email = document.getElementById('email').value;
+                    return firstName && lastName && email;
+                case 3:
+                    return true; // Preferences are optional
+                case 4:
+                    return true; // Final step is just informational
+                default:
+                    return false;
+            }
+        }
+
+        function completeSetup() {
+            // Collect all form data
+            const formData = new FormData(document.getElementById('profileForm'));
+            onboardingData = Object.fromEntries(formData.entries());
+            onboardingData.accountType = selectedAccountType;
+            
+            showSuccessMessage('🎉 Setup complete! Redirecting to your Sapyyn Portal...');
+            
+            // Simulate redirect to portal
+            setTimeout(() => {
+                showSuccessMessage('🚀 Welcome to your Sapyyn Portal! You\'re all set to start connecting with dental professionals.');
+                // In a real app, this would redirect to the main portal
+            }, 2000);
+        }
+
+        function saveProgress() {
+            showSuccessMessage('💾 Progress saved! You can continue setup later.');
+        }
+
+        function skipSetup() {
+            if (confirm('Are you sure you want to skip the setup? You can complete it later in your profile settings.')) {
+                showSuccessMessage('⏭️ Setup skipped. Taking you to the portal with default settings...');
+                setTimeout(() => {
+                    completeSetup();
+                }, 1500);
+            }
+        }
+
+        // Form validation and real-time feedback
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input[required]');
+            
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    updateNavigation();
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (this.type === 'email' && this.value) {
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!emailRegex.test(this.value)) {
+                            this.style.borderColor = 'var(--danger)';
+                            showSuccessMessage('⚠️ Please enter a valid email address');
+                        } else {
+                            this.style.borderColor = 'var(--success)';
+                        }
+                    }
+                });
+            });
+        });
+
+        // Auto-generate avatar initials
+        document.getElementById('firstName').addEventListener('input', updateAvatar);
+        document.getElementById('lastName').addEventListener('input', updateAvatar);
+
+        function updateAvatar() {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const avatarPreview = document.getElementById('avatarPreview');
+            
+            if (firstName || lastName) {
+                const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+                avatarPreview.innerHTML = initials || firstName.charAt(0).toUpperCase();
+            } else {
+                avatarPreview.innerHTML = '<i class="fas fa-user"></i>';
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Enter key to proceed to next step
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                if (!document.getElementById('nextBtn').disabled) {
+                    nextStep();
+                }
+            }
+            
+            // Escape key to go back
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                if (currentStep > 1) {
+                    previousStep();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
