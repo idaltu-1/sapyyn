@@ -121,10 +121,10 @@
             ga4MeasurementId: '{{ ga4_id }}',
             hotjarSiteId: '{{ hotjar_id }}',
             gtmContainerId: '{{ gtm_id }}',
-            environment: '{{ analytics_config.ENVIRONMENT }}',
+            environment: '{{ analytics_config.ENVIRONMENT if analytics_config else "production" }}',
             userId: {% if session.user_id %}'{{ session.user_id }}'{% else %}null{% endif %},
             userRole: {% if session.role %}'{{ session.role }}'{% else %}null{% endif %},
-            enableDebug: {{ 'true' if analytics_config.ENVIRONMENT == 'development' else 'false' }}
+            enableDebug: {{ 'true' if (analytics_config and analytics_config.ENVIRONMENT == 'development') else 'false' }}
         };
     </script>
     {% endif %}
@@ -138,6 +138,8 @@
     <link href="{{ url_for('static', filename='css/bootstrap-icons.css') }}" rel="stylesheet" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css'">
     <!-- Custom CSS -->
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <!-- Modern Enhanced Styles -->
+    <link href="{{ url_for('static', filename='css/modern-styles.css') }}" rel="stylesheet">
 
     <!-- Portal-specific custom styles defining colour palette and quick actions -->
     <link href="{{ url_for('static', filename='css/portal_custom.css') }}" rel="stylesheet">
@@ -470,6 +472,15 @@
     
     <!-- User Feedback System -->
     <script src="{{ url_for('static', filename='js/feedback.js') }}"></script>
+    
+    <!-- Enhanced UI JavaScript -->
+    <script src="{{ url_for('static', filename='js/enhanced-ui.js') }}"></script>
+    
+    <!-- Advanced Animations -->
+    <script src="{{ url_for('static', filename='js/advanced-animations.js') }}"></script>
+    
+    <!-- Link Security and Vulnerability Protection -->
+    <script src="{{ url_for('static', filename='js/link-security.js') }}"></script>
     
     <!-- Custom JS -->
     <!-- Custom scripts for base functionality -->

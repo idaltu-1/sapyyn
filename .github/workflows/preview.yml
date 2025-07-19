@@ -1,0 +1,42 @@
+name: Preview Deployment
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Railway CLI
+        run: npm i -g @railway/cli
+      
+      - name: Deploy to Railway Preview Environment
+        uses: railway/railway-action@v1
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          command: up --detach
+        env:
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+      
+      - name: Get Preview URL
+        id: get-url
+        run: |
+          PREVIEW_URL=$(railway variables get RAILWAY_PUBLIC_DOMAIN --service ${{ secrets.RAILWAY_SERVICE_NAME }})
+          echo "PREVIEW_URL=https://$PREVIEW_URL" >> $GITHUB_ENV
+      
+      - name: Comment on PR with Preview URL
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { issue: { number: issue_number }, repo: { owner, repo } } = context;
+            github.rest.issues.createComment({
+              issue_number,
+              owner,
+              repo,
+              body: `🚀 Preview environment deployed at: ${process.env.PREVIEW_URL}`
+            });
