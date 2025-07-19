@@ -30,7 +30,7 @@ selenium==4.15.2
 
 # Production
 gunicorn==21.2.0
-gevent==23.9.1
+gevent==22.10.2
 
 # Monitoring
 sentry-sdk[flask]==1.38.0
