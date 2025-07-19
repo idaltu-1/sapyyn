@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Emergency Protocol - Sapyyn</title>
+    <meta name="description" content="BLS protocols, medication administration, and emergency contact procedures for dental emergencies.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --secondary-blue: #3B82F6;
+            --light-blue: #DBEAFE;
+            --accent-yellow: #FCD34D;
+            --warning-yellow: #F59E0B;
+            --white: #FFFFFF;
+            --light-grey: #F8FAFC;
+            --medium-grey: #64748B;
+            --dark-grey: #334155;
+            --black: #0F172A;
+            --success: #10B981;
+            --danger: #EF4444;
+            --shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+            --shadow-hover: 0 16px 64px rgba(37, 99, 235, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--black);
+            line-height: 1.6;
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        }
+        
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--light-blue);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--primary-blue);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo img {
+            height: 45px;
+            margin-right: 12px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+            gap: 2.5rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-grey);
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-links a.active {
+            color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+        
+        .nav-links a:hover {
+            color: var(--secondary-blue);
+            background: var(--light-blue);
+            transform: translateY(-2px);
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        /* Page Header */
+        .page-header {
+            margin-top: 80px;
+            padding: 6rem 5% 4rem;
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .page-header p {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        
+        .breadcrumb {
+            background: var(--light-grey);
+            padding: 1rem 5%;
+            border-bottom: 1px solid var(--light-blue);
+        }
+        
+        .breadcrumb-nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .breadcrumb a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .breadcrumb-separator {
+            color: var(--medium-grey);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 6rem 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .protocol-section {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            border: 2px solid var(--light-blue);
+            box-shadow: var(--shadow);
+        }
+        
+        .protocol-section h2 {
+            color: var(--danger);
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            font-weight: 800;
+            border-bottom: 3px solid rgba(239, 68, 68, 0.2);
+            padding-bottom: 1rem;
+        }
+        
+        .emergency-steps {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+        
+        .emergency-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(239, 68, 68, 0.05);
+            border-radius: 12px;
+            border-left: 4px solid var(--danger);
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        
+        .step-content h3 {
+            color: var(--danger);
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .step-content p {
+            color: var(--medium-grey);
+            line-height: 1.7;
+        }
+        
+        .critical-warning {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            border-left: 4px solid #dc2626;
+        }
+        
+        .critical-warning h3 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .contact-card {
+            background: var(--light-blue);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid var(--secondary-blue);
+        }
+        
+        .contact-card h4 {
+            color: var(--danger);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .contact-card p {
+            color: var(--medium-grey);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .contact-number {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--danger);
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-toggle:hover {
+            background: var(--light-blue);
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 2rem;
+                box-shadow: var(--shadow);
+                border-radius: 0 0 16px 16px;
+            }
+            
+            .nav-links.show {
+                display: flex;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .page-header h1 {
+                font-size: 2.5rem;
+                flex-direction: column;
+            }
+            
+            .protocol-section {
+                padding: 2rem;
+            }
+            
+            .emergency-step {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <a href="../index.html" class="logo">
+                <img src="../assets/logo.svg" alt="Sapyyn">
+                Sapyyn
+            </a>
+            <ul class="nav-links">
+                <li><a href="../referrals.html">Referrals</a></li>
+                <li><a href="../about.html">About</a></li>
+                <li><a href="../pricing.html">Pricing</a></li>
+                <li><a href="../resources.html">Resources</a></li>
+                <li><a href="../surgical-instruction-page.html" class="active">Surgical Instruction</a></li>
+                <li><a href="../contact.html">Contact</a></li>
+            </ul>
+            <div class="cta-buttons">
+                <a href="../sapyyn-portal.html" class="btn btn-secondary">Sign In</a>
+                <a href="../portal-signup.html" class="btn btn-primary">Get Started</a>
+            </div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <nav class="breadcrumb-nav">
+            <a href="../index.html">Home</a>
+            <span class="breadcrumb-separator">></span>
+            <a href="../surgical-instruction-page.html">Surgical Instructions</a>
+            <span class="breadcrumb-separator">></span>
+            <span>Medical Emergency Protocol</span>
+        </nav>
+    </div>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <h1><i class="fas fa-heartbeat"></i> Medical Emergency Protocol</h1>
+        <p>Critical emergency procedures for immediate response to medical emergencies in dental practice.</p>
+    </section>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Emergency Response Overview -->
+        <div class="protocol-section">
+            <h2>Emergency Response Overview</h2>
+            <div class="contact-grid">
+                <div class="contact-card">
+                    <h4>Emergency Services</h4>
+                    <p>Life-threatening emergencies</p>
+                    <div class="contact-number">911</div>
+                </div>
+                <div class="contact-card">
+                    <h4>Poison Control</h4>
+                    <p>Toxic exposures and overdoses</p>
+                    <div class="contact-number">1-800-222-1222</div>
+                </div>
+                <div class="contact-card">
+                    <h4>Emergency Consultation</h4>
+                    <p>24/7 medical consultation</p>
+                    <div class="contact-number">1-800-SAPYYN-1</div>
+                </div>
+            </div>
+            
+            <div class="critical-warning">
+                <h3><i class="fas fa-exclamation-triangle"></i> Critical: Call 911 Immediately</h3>
+                <p>For any life-threatening emergency including cardiac arrest, respiratory distress, severe allergic reactions, or loss of consciousness - activate emergency medical services immediately.</p>
+            </div>
+        </div>
+
+        <!-- BLS Protocol -->
+        <div class="protocol-section">
+            <h2>Basic Life Support (BLS) Protocol</h2>
+            <ol class="emergency-steps">
+                <li class="emergency-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Check Responsiveness</h3>
+                        <p>Tap shoulders firmly and shout "Are you okay?" If no response, call for help and activate emergency response system (911). Get AED if available.</p>
+                    </div>
+                </li>
+                <li class="emergency-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Check Pulse and Breathing</h3>
+                        <p>Check carotid pulse for no more than 10 seconds. Look for normal breathing. If no pulse or abnormal breathing, begin CPR immediately.</p>
+                    </div>
+                </li>
+                <li class="emergency-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Position Patient</h3>
+                        <p>Place patient on firm, flat surface. Tilt head back, lift chin to open airway. Remove any visible foreign objects from mouth.</p>
+                    </div>
+                </li>
+                <li class="emergency-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Begin Chest Compressions</h3>
+                        <p>Place heel of hand on lower half of breastbone. Compress hard and fast at least 2 inches deep at rate of 100-120/min. Allow complete recoil between compressions.</p>
+                    </div>
+                </li>
+                <li class="emergency-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Provide Rescue Breathing</h3>
+                        <p>Give 2 breaths after every 30 compressions. Each breath should last 1 second and make chest rise. Use bag-mask if available.</p>
+                    </div>
+                </li>
+                <li class="emergency-step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h3>Continue CPR</h3>
+                        <p>Continue 30:2 compression to ventilation ratio until EMS arrives, AED becomes available, or patient shows signs of life. Switch compressors every 2 minutes to prevent fatigue.</p>
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+        <!-- Common Medical Emergencies -->
+        <div class="protocol-section">
+            <h2>Common Medical Emergencies</h2>
+            <ol class="emergency-steps">
+                <li class="emergency-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Syncope (Fainting)</h3>
+                        <p>Position patient supine with legs elevated. Ensure airway is clear. Administer oxygen if available. Monitor vital signs. If patient doesn't recover within 2-3 minutes, call 911.</p>
+                    </div>
+                </li>
+                <li class="emergency-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Allergic Reaction/Anaphylaxis</h3>
+                        <p>Remove allergen if known. For mild reactions: antihistamine. For severe reactions: epinephrine auto-injector (EpiPen), call 911, administer oxygen, IV fluids if available.</p>
+                    </div>
+                </li>
+                <li class="emergency-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Seizures</h3>
+                        <p>Clear area of hazards. Do NOT restrain patient or put objects in mouth. Time seizure duration. Position on side when convulsions stop. Call 911 if seizure lasts >5 minutes or patient has no history of seizures.</p>
+                    </div>
+                </li>
+                <li class="emergency-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Chest Pain/Heart Attack</h3>
+                        <p>Call 911 immediately. Give aspirin 325mg (if not allergic). Position patient comfortably, usually sitting up. Administer oxygen. Monitor vital signs. Prepare for possible cardiac arrest.</p>
+                    </div>
+                </li>
+                <li class="emergency-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Respiratory Distress</h3>
+                        <p>Position patient upright or in position of comfort. Administer high-flow oxygen. Remove any foreign objects if visible. For asthma: bronchial inhaler. Call 911 for severe distress.</p>
+                    </div>
+                </li>
+                <li class="emergency-step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h3>Diabetic Emergency</h3>
+                        <p>If conscious: give oral glucose/sugar if hypoglycemic. If unconscious: call 911, administer glucagon if available and trained. Monitor airway and breathing. Do not give oral fluids to unconscious patient.</p>
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+        <!-- Emergency Medications -->
+        <div class="protocol-section">
+            <h2>Emergency Medications</h2>
+            <div class="critical-warning">
+                <h3><i class="fas fa-pills"></i> Emergency Drug Kit</h3>
+                <p><strong>Essential medications to have available:</strong> Epinephrine, Albuterol inhaler, Nitroglycerin, Aspirin, Glucose gel, Diphenhydramine, Hydrocortisone, Atropine</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('show');
+        }
+
+        // Auto-close mobile menu on window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 968) {
+                document.querySelector('.nav-links').classList.remove('show');
+            }
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+                header.style.backdropFilter = 'blur(25px)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(20px)';
+            }
+        });
+    </script>
+</body>
+</html>

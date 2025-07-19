@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wisdom Tooth Extraction Protocol - Sapyyn</title>
+    <meta name="description" content="Comprehensive protocol for third molar removal including pre-operative assessment, surgical techniques, and post-operative care.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --secondary-blue: #3B82F6;
+            --light-blue: #DBEAFE;
+            --accent-yellow: #FCD34D;
+            --warning-yellow: #F59E0B;
+            --white: #FFFFFF;
+            --light-grey: #F8FAFC;
+            --medium-grey: #64748B;
+            --dark-grey: #334155;
+            --black: #0F172A;
+            --success: #10B981;
+            --danger: #EF4444;
+            --shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+            --shadow-hover: 0 16px 64px rgba(37, 99, 235, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--black);
+            line-height: 1.6;
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        }
+        
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--light-blue);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--primary-blue);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo img {
+            height: 45px;
+            margin-right: 12px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+            gap: 2.5rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-grey);
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-links a.active {
+            color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+        
+        .nav-links a:hover {
+            color: var(--secondary-blue);
+            background: var(--light-blue);
+            transform: translateY(-2px);
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        /* Page Header */
+        .page-header {
+            margin-top: 80px;
+            padding: 6rem 5% 4rem;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .page-header p {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        
+        .breadcrumb {
+            background: var(--light-grey);
+            padding: 1rem 5%;
+            border-bottom: 1px solid var(--light-blue);
+        }
+        
+        .breadcrumb-nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .breadcrumb a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .breadcrumb-separator {
+            color: var(--medium-grey);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 6rem 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .protocol-section {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            border: 2px solid var(--light-blue);
+            box-shadow: var(--shadow);
+        }
+        
+        .protocol-section h2 {
+            color: var(--primary-blue);
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            font-weight: 800;
+            border-bottom: 3px solid var(--light-blue);
+            padding-bottom: 1rem;
+        }
+        
+        .steps-list {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--light-grey);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-blue);
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        
+        .step-content h3 {
+            color: var(--primary-blue);
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .step-content p {
+            color: var(--medium-grey);
+            line-height: 1.7;
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, var(--warning-yellow), var(--accent-yellow));
+            color: var(--black);
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            border-left: 4px solid var(--warning-yellow);
+        }
+        
+        .warning-box h3 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .info-card {
+            background: var(--light-blue);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .info-card h4 {
+            color: var(--primary-blue);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-card p {
+            color: var(--medium-grey);
+            font-size: 0.9rem;
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-toggle:hover {
+            background: var(--light-blue);
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 2rem;
+                box-shadow: var(--shadow);
+                border-radius: 0 0 16px 16px;
+            }
+            
+            .nav-links.show {
+                display: flex;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .protocol-section {
+                padding: 2rem;
+            }
+            
+            .step-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <a href="../index.html" class="logo">
+                <img src="../assets/logo.svg" alt="Sapyyn">
+                Sapyyn
+            </a>
+            <ul class="nav-links">
+                <li><a href="../referrals.html">Referrals</a></li>
+                <li><a href="../about.html">About</a></li>
+                <li><a href="../pricing.html">Pricing</a></li>
+                <li><a href="../resources.html">Resources</a></li>
+                <li><a href="../surgical-instruction-page.html" class="active">Surgical Instruction</a></li>
+                <li><a href="../contact.html">Contact</a></li>
+            </ul>
+            <div class="cta-buttons">
+                <a href="../sapyyn-portal.html" class="btn btn-secondary">Sign In</a>
+                <a href="../portal-signup.html" class="btn btn-primary">Get Started</a>
+            </div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <nav class="breadcrumb-nav">
+            <a href="../index.html">Home</a>
+            <span class="breadcrumb-separator">></span>
+            <a href="../surgical-instruction-page.html">Surgical Instructions</a>
+            <span class="breadcrumb-separator">></span>
+            <a href="../specialties/oral-surgery.html">Oral Surgery</a>
+            <span class="breadcrumb-separator">></span>
+            <span>Wisdom Tooth Extraction</span>
+        </nav>
+    </div>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <h1>Wisdom Tooth Extraction Protocol</h1>
+        <p>Comprehensive surgical protocol for safe and effective third molar removal with optimal patient outcomes.</p>
+    </section>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Overview -->
+        <div class="protocol-section">
+            <h2>Procedure Overview</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Duration</h4>
+                    <p>45-90 minutes depending on complexity</p>
+                </div>
+                <div class="info-card">
+                    <h4>Anesthesia</h4>
+                    <p>Local anesthesia with optional sedation</p>
+                </div>
+                <div class="info-card">
+                    <h4>Difficulty Level</h4>
+                    <p>Moderate to Advanced</p>
+                </div>
+                <div class="info-card">
+                    <h4>Recovery Time</h4>
+                    <p>7-14 days for complete healing</p>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <h3><i class="fas fa-exclamation-triangle"></i> Important Considerations</h3>
+                <p>Always assess radiographs for proximity to inferior alveolar nerve, maxillary sinus, and adjacent teeth. Consider patient's medical history and contraindications before proceeding.</p>
+            </div>
+        </div>
+
+        <!-- Pre-operative Protocol -->
+        <div class="protocol-section">
+            <h2>Pre-operative Assessment</h2>
+            <ol class="steps-list">
+                <li class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Medical History Review</h3>
+                        <p>Complete medical and dental history including current medications, allergies, bleeding disorders, and previous surgical complications. Assess ASA classification and obtain medical clearance if necessary.</p>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Radiographic Evaluation</h3>
+                        <p>Review panoramic radiograph and consider CBCT for complex cases. Assess tooth position, root morphology, proximity to vital structures (IAN, maxillary sinus), and bone density.</p>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Clinical Examination</h3>
+                        <p>Evaluate mouth opening, periodontal status, adjacent teeth, and soft tissue conditions. Document any signs of infection, cysts, or pathology.</p>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Informed Consent</h3>
+                        <p>Discuss procedure details, risks (nerve injury, dry socket, bleeding, infection), benefits, alternatives, and post-operative instructions. Obtain written consent.</p>
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+        <!-- Surgical Protocol -->
+        <div class="protocol-section">
+            <h2>Surgical Procedure</h2>
+            <ol class="steps-list">
+                <li class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Patient Preparation</h3>
+                        <p>Position patient comfortably, drape surgical site, and establish IV access if sedation is planned. Confirm emergency equipment availability.</p>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Anesthesia Administration</h3>
+                        <p>Administer appropriate local anesthetic (2% lidocaine with 1:100,000 epinephrine). For mandibular third molars: IAN block, long buccal, and lingual infiltration. For maxillary: posterior superior alveolar and greater palatine blocks.</p>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Soft Tissue Management</h3>
+                        <p>Design appropriate flap (envelope or triangular) based on tooth position and access requirements. Make clean incisions with sharp blade, reflect full-thickness mucoperiosteal flap.</p>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Bone Removal</h3>
+                        <p>Remove bone using high-speed bur with copious irrigation. Create adequate access while preserving maximum bone. Remove bone around crown and cervical area as needed.</p>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Tooth Sectioning (if required)</h3>
+                        <p>Section multi-rooted teeth or impacted teeth as necessary. Divide crown from roots or separate roots using high-speed bur with irrigation. Remove sections carefully.</p>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h3>Tooth Removal</h3>
+                        <p>Elevate tooth/root segments using appropriate elevators and forceps. Apply controlled force in proper direction. Avoid excessive force that could fracture adjacent teeth or alveolar bone.</p>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">7</div>
+                    <div class="step-content">
+                        <h3>Socket Management</h3>
+                        <p>Irrigate socket thoroughly, remove debris and granulation tissue. Smooth sharp bone edges, achieve hemostasis. Inspect for complete tooth removal and foreign bodies.</p>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">8</div>
+                    <div class="step-content">
+                        <h3>Wound Closure</h3>
+                        <p>Reposition flap and suture with 3-0 or 4-0 silk or vicryl. Ensure primary closure without tension. Place horizontal mattress or simple interrupted sutures as appropriate.</p>
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+        <!-- Post-operative Care -->
+        <div class="protocol-section">
+            <h2>Post-operative Management</h2>
+            <ol class="steps-list">
+                <li class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Immediate Post-op</h3>
+                        <p>Apply pressure with gauze for 30-45 minutes. Provide ice pack for first 24 hours (20 minutes on, 20 minutes off). Monitor for bleeding and ensure patient is stable before discharge.</p>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Pain Management</h3>
+                        <p>Prescribe appropriate analgesics: Ibuprofen 600mg q6h + acetaminophen 650mg q6h. Consider stronger opioids for severe pain. Provide clear instructions for medication use.</p>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Infection Prevention</h3>
+                        <p>Consider antibiotic prophylaxis if indicated (immunocompromised, extensive surgery, signs of infection). Typical regimen: Amoxicillin 500mg TID for 7 days or Clindamycin 300mg QID if penicillin allergic.</p>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Follow-up Care</h3>
+                        <p>Schedule follow-up at 1 week for suture removal and healing assessment. Earlier if complications arise. Provide emergency contact information and clear instructions for urgent care.</p>
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+        <!-- Complications -->
+        <div class="protocol-section">
+            <h2>Potential Complications & Management</h2>
+            <div class="warning-box">
+                <h3><i class="fas fa-exclamation-circle"></i> Common Complications</h3>
+                <ul style="margin-left: 1rem; margin-top: 1rem;">
+                    <li><strong>Dry Socket (Alveolar Osteitis):</strong> Irrigate gently, place medicated dressing, prescribe pain medication</li>
+                    <li><strong>Nerve Injury:</strong> Document extent, refer to oral surgeon if permanent, consider steroid therapy</li>
+                    <li><strong>Excessive Bleeding:</strong> Apply pressure, suture if necessary, consider hemostatic agents</li>
+                    <li><strong>Infection:</strong> Drainage, antibiotic therapy, warm saltwater rinses</li>
+                    <li><strong>Sinus Communication:</strong> Evaluate size, primary closure vs. sinus precautions</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('show');
+        }
+
+        // Auto-close mobile menu on window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 968) {
+                document.querySelector('.nav-links').classList.remove('show');
+            }
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+                header.style.backdropFilter = 'blur(25px)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(20px)';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prosthodontics - Surgical Instructions - Sapyyn</title>
+    <meta name="description" content="Implant placement, crown procedures, and complex restorative surgery protocols.">
+    <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary-blue: #2563EB; --secondary-blue: #3B82F6; --light-blue: #DBEAFE; --accent-yellow: #FCD34D; --warning-yellow: #F59E0B; --white: #FFFFFF; --light-grey: #F8FAFC; --medium-grey: #64748B; --dark-grey: #334155; --black: #0F172A; --success: #10B981; --danger: #EF4444; --shadow: 0 8px 32px rgba(37, 99, 235, 0.1); --shadow-hover: 0 16px 64px rgba(37, 99, 235, 0.15); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; color: var(--black); line-height: 1.6; background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%); }
+        header { position: fixed; top: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--light-blue); z-index: 1000; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; max-width: 1400px; margin: 0 auto; }
+        .logo { display: flex; align-items: center; font-size: 1.75rem; font-weight: 900; color: var(--primary-blue); text-decoration: none; transition: all 0.3s ease; }
+        .logo:hover { transform: scale(1.05); }
+        .logo img { height: 45px; margin-right: 12px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); }
+        .nav-links { display: flex; list-style: none; align-items: center; gap: 2.5rem; }
+        .nav-links a { text-decoration: none; color: var(--dark-grey); font-weight: 600; font-size: 1rem; position: relative; padding: 0.5rem 1rem; border-radius: 8px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-links a.active { color: var(--primary-blue); background: var(--light-blue); }
+        .nav-links a:hover { color: var(--secondary-blue); background: var(--light-blue); transform: translateY(-2px); }
+        .cta-buttons { display: flex; gap: 1rem; align-items: center; }
+        .btn { padding: 0.75rem 1.5rem; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 1rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); color: white; box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3); }
+        .btn-primary:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4); }
+        .btn-secondary { background: var(--white); color: var(--primary-blue); border: 2px solid var(--primary-blue); }
+        .btn-secondary:hover { background: var(--primary-blue); color: white; transform: translateY(-3px) scale(1.05); box-shadow: var(--shadow-hover); }
+        .page-header { margin-top: 80px; padding: 6rem 5% 4rem; background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%); color: white; text-align: center; }
+        .page-header h1 { font-size: 3.5rem; font-weight: 900; margin-bottom: 1.5rem; text-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .page-header p { font-size: 1.4rem; opacity: 0.9; max-width: 800px; margin: 0 auto; line-height: 1.7; }
+        .breadcrumb { background: var(--light-grey); padding: 1rem 5%; border-bottom: 1px solid var(--light-blue); }
+        .breadcrumb-nav { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; }
+        .breadcrumb a { color: var(--primary-blue); text-decoration: none; font-weight: 600; }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .breadcrumb-separator { color: var(--medium-grey); }
+        .main-content { padding: 6rem 5%; max-width: 1400px; margin: 0 auto; }
+        .procedures-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; margin-bottom: 4rem; }
+        .procedure-card { background: var(--white); border-radius: 16px; overflow: hidden; border: 2px solid var(--light-blue); transition: all 0.3s ease; cursor: pointer; }
+        .procedure-card:hover { transform: translateY(-8px); border-color: var(--secondary-blue); box-shadow: var(--shadow-hover); }
+        .procedure-header { background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); color: white; padding: 2rem; position: relative; }
+        .procedure-type { background: rgba(255, 255, 255, 0.2); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; margin-bottom: 1rem; }
+        .procedure-header h3 { font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 700; }
+        .procedure-header p { opacity: 0.9; font-size: 1rem; }
+        .procedure-content { padding: 2rem; }
+        .procedure-meta { display: flex; gap: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        .meta-item { background: var(--light-blue); color: var(--primary-blue); padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; }
+        .procedure-description { color: var(--medium-grey); margin-bottom: 2rem; line-height: 1.6; }
+        .view-protocol-btn { background: var(--primary-blue); color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; width: 100%; justify-content: center; }
+        .view-protocol-btn:hover { background: var(--secondary-blue); transform: translateY(-2px); }
+        .mobile-menu-toggle { display: none; background: none; border: none; font-size: 1.5rem; color: var(--primary-blue); cursor: pointer; padding: 0.5rem; border-radius: 8px; transition: all 0.3s ease; }
+        .mobile-menu-toggle:hover { background: var(--light-blue); }
+        @media (max-width: 968px) { .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); flex-direction: column; padding: 2rem; box-shadow: var(--shadow); border-radius: 0 0 16px 16px; } .nav-links.show { display: flex; } .mobile-menu-toggle { display: block; } .page-header h1 { font-size: 2.5rem; } .procedures-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="../index.html" class="logo">
+                <img src="../assets/logo.svg" alt="Sapyyn">
+                Sapyyn
+            </a>
+            <ul class="nav-links">
+                <li><a href="../referrals.html">Referrals</a></li>
+                <li><a href="../about.html">About</a></li>
+                <li><a href="../pricing.html">Pricing</a></li>
+                <li><a href="../resources.html">Resources</a></li>
+                <li><a href="../surgical-instruction-page.html" class="active">Surgical Instruction</a></li>
+                <li><a href="../contact.html">Contact</a></li>
+            </ul>
+            <div class="cta-buttons">
+                <a href="/login" class="btn btn-secondary">Sign In</a>
+                <a href="/register" class="btn btn-primary">Get Started</a>
+            </div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <div class="breadcrumb">
+        <nav class="breadcrumb-nav">
+            <a href="../index.html">Home</a>
+            <span class="breadcrumb-separator">></span>
+            <a href="../surgical-instruction-page.html">Surgical Instructions</a>
+            <span class="breadcrumb-separator">></span>
+            <span>Prosthodontics</span>
+        </nav>
+    </div>
+
+    <section class="page-header">
+        <h1>Prosthodontics</h1>
+        <p>Implant placement, crown procedures, and complex restorative surgery for comprehensive prosthodontic treatment.</p>
+    </section>
+
+    <div class="main-content">
+        <div class="procedures-grid">
+            <div class="procedure-card" onclick="location.href='../procedures/crown-preparation.html'">
+                <div class="procedure-header">
+                    <span class="procedure-type">Restorative</span>
+                    <h3>Crown Preparation</h3>
+                    <p>Full coverage crown preparation</p>
+                </div>
+                <div class="procedure-content">
+                    <div class="procedure-meta">
+                        <span class="meta-item">Duration: 45-90 min</span>
+                        <span class="meta-item">Difficulty: Moderate</span>
+                    </div>
+                    <div class="procedure-description">
+                        Comprehensive crown preparation protocols including margin design, reduction guidelines, and impression techniques for optimal restorative outcomes.
+                    </div>
+                    <a href="../procedures/crown-preparation.html" class="view-protocol-btn">
+                        <i class="fas fa-eye"></i> View Complete Protocol
+                    </a>
+                </div>
+            </div>
+
+            <div class="procedure-card" onclick="location.href='../procedures/bridge-preparation.html'">
+                <div class="procedure-header">
+                    <span class="procedure-type">Fixed Prosthetics</span>
+                    <h3>Bridge Preparation</h3>
+                    <p>Fixed partial denture preparation</p>
+                </div>
+                <div class="procedure-content">
+                    <div class="procedure-meta">
+                        <span class="meta-item">Duration: 90-150 min</span>
+                        <span class="meta-item">Difficulty: Advanced</span>
+                    </div>
+                    <div class="procedure-description">
+                        Multi-unit bridge preparation including abutment tooth preparation, parallel path of insertion, and provisional restoration protocols.
+                    </div>
+                    <a href="../procedures/bridge-preparation.html" class="view-protocol-btn">
+                        <i class="fas fa-eye"></i> View Complete Protocol
+                    </a>
+                </div>
+            </div>
+
+            <div class="procedure-card" onclick="location.href='../procedures/veneer-preparation.html'">
+                <div class="procedure-header">
+                    <span class="procedure-type">Cosmetic</span>
+                    <h3>Veneer Preparation</h3>
+                    <p>Porcelain veneer preparation</p>
+                </div>
+                <div class="procedure-content">
+                    <div class="procedure-meta">
+                        <span class="meta-item">Duration: 60-120 min</span>
+                        <span class="meta-item">Difficulty: Advanced</span>
+                    </div>
+                    <div class="procedure-description">
+                        Conservative veneer preparation techniques including enamel preservation, margin placement, and aesthetic considerations for optimal results.
+                    </div>
+                    <a href="../procedures/veneer-preparation.html" class="view-protocol-btn">
+                        <i class="fas fa-eye"></i> View Complete Protocol
+                    </a>
+                </div>
+            </div>
+
+            <div class="procedure-card" onclick="location.href='../procedures/full-mouth-reconstruction.html'">
+                <div class="procedure-header">
+                    <span class="procedure-type">Complex</span>
+                    <h3>Full Mouth Reconstruction</h3>
+                    <p>Comprehensive oral rehabilitation</p>
+                </div>
+                <div class="procedure-content">
+                    <div class="procedure-meta">
+                        <span class="meta-item">Duration: 480-720 min</span>
+                        <span class="meta-item">Difficulty: Expert</span>
+                    </div>
+                    <div class="procedure-description">
+                        Complex full mouth rehabilitation protocols including treatment planning, vertical dimension establishment, and staged reconstruction procedures.
+                    </div>
+                    <a href="../procedures/full-mouth-reconstruction.html" class="view-protocol-btn">
+                        <i class="fas fa-eye"></i> View Complete Protocol
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('show');
+        }
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 968) {
+                document.querySelector('.nav-links').classList.remove('show');
+            }
+        });
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+                header.style.backdropFilter = 'blur(25px)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(20px)';
+            }
+        });
+    </script>
+</body>
+</html>
