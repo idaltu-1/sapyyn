@@ -39,8 +39,8 @@ app.config.from_object(config_class)
 # Initialize security features
 csrf = CSRFProtect(app)
 limiter = Limiter(
-    app,
     key_func=get_remote_address,
+    app=app,
     default_limits=["200 per day", "50 per hour"]
 )
 
@@ -61,7 +61,7 @@ ANALYTICS_CONFIG = {
     'GTM_CONTAINER_ID': config_class.GTM_CONTAINER_ID,
     'HOTJAR_SITE_ID': config_class.HOTJAR_SITE_ID,
     'ENABLE_ANALYTICS': config_class.ENABLE_ANALYTICS,
-    'ENVIRONMENT': config_class.FLASK_ENV
+    'ENVIRONMENT': os.environ.get('FLASK_ENV', 'development')
 }
 
 # Configuration

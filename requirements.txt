@@ -7,6 +7,7 @@ Flask-Mail==0.9.1
 
 # Database
 # sqlite3 is a built-in Python module, no need to install via pip
+Flask-SQLAlchemy==3.0.5
 
 
 # Payment processing
@@ -50,6 +51,7 @@ pytest==7.4.3
 pytest-flask==1.2.0
 black==23.11.0
 flake8==6.1.0
+selenium==4.15.2
 
 # Production
 gunicorn==21.2.0
