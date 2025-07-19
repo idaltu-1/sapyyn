@@ -11,36 +11,11 @@ Flask-SQLAlchemy==3.0.5
 
 
 # Payment processing
+
 stripe==6.6.0
-
-# QR code generation
 qrcode[pil]==7.4.2
-
-# Environment configuration
 python-dotenv==1.0.0
-
-# Security
-bcrypt==4.0.1
-cryptography==41.0.7
-bleach==6.1.0
-python-jose[cryptography]==3.3.0
-passlib==1.7.4
-
-# Rate limiting
-redis==5.0.1
-
-# Analytics
-google-analytics-data==0.17.0
-google-auth==2.23.4
-
-# Image processing
-Pillow==10.1.0
-
-# Date/time handling
-python-dateutil==2.8.2
-pytz==2023.3
-
-# HTTP requests
+Pillow==10.4.0
 requests==2.31.0
 
 # JSON handling
