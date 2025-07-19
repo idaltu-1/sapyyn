@@ -64,7 +64,7 @@
     
     {% block structured_data %}{% endblock %}
     
-    {% if analytics_enabled %}
+    {% if analytics_enabled and ga4_id %}
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga4_id }}"></script>
     <script>
@@ -95,32 +95,38 @@
         });
         {% endif %}
     </script>
+    {% endif %}
     
+    {% if analytics_enabled and gtm_id %}
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','{{ gtm_id }}');</script>
+    {% endif %}
     
+    {% if analytics_enabled and hotjar_id %}
     <!-- Hotjar Tracking Code -->
     <script>
         (function(h,o,t,j,a,r){
             h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-            h._hjSettings={hjid:{{ hotjar_id }},hjsv:6};
+            h._hjSettings={hjid:parseInt('{{ hotjar_id }}'),hjsv:6};
             a=o.getElementsByTagName('head')[0];
             r=o.createElement('script');r.async=1;
             r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
             a.appendChild(r);
         })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
     </script>
+    {% endif %}
     
+    {% if analytics_enabled %}
     <!-- Analytics Configuration for JavaScript -->
     <script>
         window.ANALYTICS_CONFIG = {
-            ga4MeasurementId: '{{ ga4_id }}',
-            hotjarSiteId: '{{ hotjar_id }}',
-            gtmContainerId: '{{ gtm_id }}',
+            ga4MeasurementId: {% if ga4_id %}'{{ ga4_id }}'{% else %}null{% endif %},
+            hotjarSiteId: {% if hotjar_id %}'{{ hotjar_id }}'{% else %}null{% endif %},
+            gtmContainerId: {% if gtm_id %}'{{ gtm_id }}'{% else %}null{% endif %},
             environment: '{{ analytics_config.ENVIRONMENT if analytics_config else "production" }}',
             userId: {% if session.user_id %}'{{ session.user_id }}'{% else %}null{% endif %},
             userRole: {% if session.role %}'{{ session.role }}'{% else %}null{% endif %},
@@ -403,7 +409,7 @@
                     <h5 class="modal-title" id="demoModalLabel">
                         <i class="bi bi-play-circle me-2"></i>Watch Sapyyn Demo
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center p-4">
                     <div class="ratio ratio-16x9 mb-3">
