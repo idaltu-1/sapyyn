@@ -6,6 +6,7 @@ Flask-WTF==1.2.1
 Flask-Limiter==3.5.0
 Flask-Mail==0.9.1
 
+
 # Database
 # sqlite3 is a built-in Python module, no need to install via pip
 Flask-SQLAlchemy==3.0.5
@@ -14,8 +15,14 @@ Flask-SQLAlchemy==3.0.5
 # Payment processing
 
 stripe==6.6.0
+
+# Image processing and QR codes
 qrcode[pil]==7.4.2
+Pillow==11.0.0
+
+# Environment and configuration
 python-dotenv==1.0.0
+
 Pillow==10.4.0
 requests==2.31.0
 
