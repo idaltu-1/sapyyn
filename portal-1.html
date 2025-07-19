@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapyyn Portal - Your Dental Referral Dashboard</title>
+    <meta name="description" content="Access your dental referrals, appointments, and medical records securely">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #0A2463;
+            --secondary: #3E92CC;
+            --accent: #D8315B;
+            --success: #28A745;
+            --warning: #FFC107;
+            --info: #17A2B8;
+            --light: #F8F9FA;
+            --dark: #1E1B18;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+        
+        /* Portal Header */
+        .portal-header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .portal-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .portal-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .portal-logo img {
+            height: 40px;
+        }
+        
+        .portal-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .portal-menu a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .portal-menu a:hover {
+            color: var(--secondary);
+        }
+        
+        .portal-menu a.active {
+            color: var(--primary);
+        }
+        
+        .portal-menu a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1.5rem;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+        
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .notification-btn {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--gray);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .notification-btn:hover {
+            color: var(--primary);
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .user-profile:hover {
+            background: var(--light);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Dashboard Container */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Welcome Section */
+        .welcome-section {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .welcome-content h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome-content p {
+            opacity: 0.9;
+            font-size: 1.125rem;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .action-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--dark);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-color: var(--secondary);
+        }
+        
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .action-card h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .action-card p {
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+        
+        /* Main Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        /* Referral Status Card */
+        .referral-status {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .view-all-btn {
+            color: var(--secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .view-all-btn:hover {
+            color: var(--primary);
+        }
+        
+        .referral-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .referral-item {
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .referral-item:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        .referral-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .referral-info p {
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+        
+        .referral-status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+        }
+        
+        .status-pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-scheduled {
+            background: rgba(23, 162, 184, 0.1);
+            color: var(--info);
+        }
+        
+        /* Appointments Card */
+        .appointments-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .appointment-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .appointment-item:last-child {
+            border-bottom: none;
+        }
+        
+        .appointment-date {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .appointment-details {
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+        
+        /* Documents Section */
+        .documents-section {
+            grid-column: 1 / -1;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .document-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .document-card:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        .document-icon {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .document-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .document-date {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+        
+        /* Upload Button */
+        .upload-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .upload-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        /* Messages Widget */
+        .messages-widget {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-top: 2rem;
+        }
+        
+        .message-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .message-item:last-child {
+            border-bottom: none;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .message-content {
+            flex: 1;
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+        
+        .message-sender {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+        
+        .message-text {
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+        
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .portal-menu {
+                display: none;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .portal-nav {
+                padding: 1rem;
+            }
+            
+            .dashboard-container {
+                padding: 1rem;
+            }
+            
+            .welcome-content h1 {
+                font-size: 1.5rem;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .documents-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Portal Header -->
+    <header class="portal-header">
+        <nav class="portal-nav">
+            <a href="/portal" class="portal-logo">
+                <img src="/logo.svg" alt="Sapyyn">
+                <span>Portal</span>
+            </a>
+            
+            <ul class="portal-menu">
+                <li><a href="/portal/dashboard" class="active">Dashboard</a></li>
+                <li><a href="/portal/referrals">My Referrals</a></li>
+                <li><a href="/portal/appointments">Appointments</a></li>
+                <li><a href="/portal/documents">Documents</a></li>
+                <li><a href="/portal/messages">Messages</a></li>
+            </ul>
+            
+            <div class="user-controls">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-dot"></span>
+                </button>
+                <div class="user-profile">
+                    <div class="user-avatar">JD</div>
+                    <div class="user-info">
+                        <div style="font-weight: 600; font-size: 0.875rem;">John Doe</div>
+                        <div style="font-size: 0.75rem; color: var(--gray);">Patient #12345</div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="font-size: 0.75rem; color: var(--gray);"></i>
+                </div>
+            </div>
+            
+            <button class="mobile-menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Dashboard Content -->
+    <main class="dashboard-container">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <div class="welcome-content">
+                <h1>Welcome back, John!</h1>
+                <p>You have 2 upcoming appointments and 1 pending referral</p>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions">
+            <a href="/portal/new-referral" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <h3>New Referral</h3>
+                <p>Request a specialist referral</p>
+            </a>
+            <a href="/portal/find-provider" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>Find Provider</h3>
+                <p>Search our network</p>
+            </a>
+            <a href="/portal/upload-document" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <h3>Upload Document</h3>
+                <p>Share medical records</p>
+            </a>
+            <a href="/portal/schedule" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-calendar-plus"></i>
+                </div>
+                <h3>Schedule Visit</h3>
+                <p>Book an appointment</p>
+            </a>
+        </section>
+
+        <!-- Main Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Referral Status -->
+            <section class="referral-status">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Referrals</h2>
+                    <a href="/portal/referrals" class="view-all-btn">View All →</a>
+                </div>
+                <div class="referral-list">
+                    <div class="referral-item">
+                        <div class="referral-info">
+                            <h4>Orthodontic Consultation</h4>
+                            <p>Dr. Sarah Miller • Requested Dec 10, 2024</p>
+                        </div>
+                        <span class="referral-status-badge status-active">Active</span>
+                    </div>
+                    <div class="referral-item">
+                        <div class="referral-info">
+                            <h4>Root Canal Treatment</h4>
+                            <p>Dr. Michael Chen • Requested Dec 5, 2024</p>
+                        </div>
+                        <span class="referral-status-badge status-scheduled">Scheduled</span>
+                    </div>
+                    <div class="referral-item">
+                        <div class="referral-info">
+                            <h4>Periodontal Evaluation</h4>
+                            <p>Dr. James Wilson • Requested Nov 28, 2024</p>
+                        </div>
+                        <span class="referral-status-badge status-pending">Pending</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Appointments -->
+            <section class="appointments-card">
+                <div class="card-header">
+                    <h2 class="card-title">Upcoming Appointments</h2>
+                </div>
+                <div class="appointment-item">
+                    <div class="appointment-date">
+                        <i class="fas fa-calendar"></i>
+                        <span>Dec 18, 2024</span>
+                    </div>
+                    <div class="appointment-details">
+                        Dr. Sarah Miller<br>
+                        Orthodontic Consultation<br>
+                        2:30 PM
+                    </div>
+                </div>
+                <div class="appointment-item">
+                    <div class="appointment-date">
+                        <i class="fas fa-calendar"></i>
+                        <span>Dec 22, 2024</span>
+                    </div>
+                    <div class="appointment-details">
+                        Dr. Michael Chen<br>
+                        Root Canal - Session 1<br>
+                        10:00 AM
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Documents Section -->
+        <section class="documents-section">
+            <div class="card-header">
+                <h2 class="card-title">Recent Documents</h2>
+                <button class="upload-btn">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    Upload New
+                </button>
+            </div>
+            <div class="documents-grid">
+                <div class="document-card">
+                    <i class="fas fa-file-medical document-icon"></i>
+                    <div class="document-name">X-Ray Results</div>
+                    <div class="document-date">Dec 10, 2024</div>
+                </div>
+                <div class="document-card">
+                    <i class="fas fa-file-pdf document-icon"></i>
+                    <div class="document-name">Treatment Plan</div>
+                    <div class="document-date">Dec 8, 2024</div>
+                </div>
+                <div class="document-card">
+                    <i class="fas fa-file-invoice document-icon"></i>
+                    <div class="document-name">Insurance Claim</div>
+                    <div class="document-date">Dec 5, 2024</div>
+                </div>
+                <div class="document-card">
+                    <i class="fas fa-file-prescription document-icon"></i>
+                    <div class="document-name">Prescription</div>
+                    <div class="document-date">Nov 30, 2024</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Messages Widget -->
+        <section class="messages-widget">
+            <div class="card-header">
+                <h2 class="card-title">Recent Messages</h2>
+                <a href="/portal/messages" class="view-all-btn">View All →</a>
+            </div>
+            <div class="message-item">
+                <div class="message-avatar">SM</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-sender">Dr. Sarah Miller</span>
+                        <span class="message-time">2 hours ago</span>
+                    </div>
+                    <p class="message-text">Your orthodontic consultation has been confirmed for Dec 18 at 2:30 PM. Please arrive 15 minutes early.</p>
+                </div>
+            </div>
+            <div class="message-item">
+                <div class="message-avatar">SA</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-sender">Support Admin</span>
+                        <span class="message-time">1 day ago</span>
+                    </div>
+                    <p class="message-text">Your insurance verification has been completed. You're all set for your upcoming appointments.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+            const menu = document.querySelector('.portal-menu');
+            menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+            menu.style.position = 'absolute';
+            menu.style.top = '100%';
+            menu.style.left = '0';
+            menu.style.right = '0';
+            menu.style.background = 'white';
+            menu.style.flexDirection = 'column';
+            menu.style.padding = '1rem';
+            menu.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+        });
+
+        // Notification animation
+        const notificationDot = document.querySelector('.notification-dot');
+        if (notificationDot) {
+            setInterval(() => {
+                notificationDot.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    notificationDot.style.transform = 'scale(1)';
+                }, 200);
+            }, 3000);
+        }
+
+        // Add hover effects to cards
+        document.querySelectorAll('.action-card, .referral-item, .document-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>
+    

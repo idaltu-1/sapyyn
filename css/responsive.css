@@ -1,0 +1,121 @@
+/* Responsive styles for Sapyyn portal */
+
+/* Small devices (landscape phones, 576px and up) */
+@media (max-width: 767.98px) {
+    /* Adjust navbar spacing */
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    /* Make dropdown menus full width on mobile */
+    .dropdown-menu {
+        width: 100%;
+    }
+    
+    /* Adjust card padding */
+    .card-body {
+        padding: 1rem;
+    }
+    
+    /* Stack buttons on mobile */
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        border-radius: 0.25rem !important;
+        margin-bottom: 0.25rem;
+    }
+    
+    /* Adjust table display for small screens */
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    /* Make modal dialogs larger on mobile */
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: none;
+    }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    /* Adjust navbar spacing */
+    .navbar .nav-link {
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+    /* Enhance dropdown hover effect */
+    .navbar .nav-item:hover .dropdown-menu {
+        display: block;
+    }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+    /* Add some extra spacing in larger viewports */
+    .container-fluid {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    /* Only apply if site has dark mode support */
+    body.dark-mode-enabled {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+    
+    body.dark-mode-enabled .card {
+        background-color: #1e1e1e;
+        border-color: #333;
+    }
+    
+    body.dark-mode-enabled .bg-light {
+        background-color: #252525 !important;
+    }
+}
+
+/* Accessibility improvements */
+.visually-hidden:not(:focus):not(:active) {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+/* Focus styles for better keyboard navigation */
+a:focus, button:focus, input:focus, select:focus, textarea:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .container-fluid {
+        width: 100%;
+        padding: 0;
+    }
+    
+    body {
+        font-size: 12pt;
+    }
+    
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+}
