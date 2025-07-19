@@ -1,3 +1,4 @@
+
 # Core Flask dependencies
 Flask==2.3.3
 Werkzeug==2.3.7
@@ -5,10 +6,14 @@ Flask-WTF==1.2.1
 Flask-Limiter==3.5.0
 Flask-Mail==0.9.1
 
-# Database and caching
-redis==5.0.1
+
+# Database
+# sqlite3 is a built-in Python module, no need to install via pip
+Flask-SQLAlchemy==3.0.5
+
 
 # Payment processing
+
 stripe==6.6.0
 
 # Image processing and QR codes
@@ -18,19 +23,26 @@ Pillow==11.0.0
 # Environment and configuration
 python-dotenv==1.0.0
 
-# Security and authentication
-bcrypt==4.0.1
-cryptography==41.0.7
-bleach==6.1.0
-python-jose[cryptography]==3.3.0
-passlib==1.7.4
-
-# Google Analytics
-google-analytics-data==0.17.0
-google-auth==2.23.4
-
-# HTTP requests
+Pillow==10.4.0
 requests==2.31.0
 
-# Production server
+# JSON handling
+jsonschema==4.19.2
+
+# Development
+pytest==7.4.3
+pytest-flask==1.2.0
+black==23.11.0
+flake8==6.1.0
+selenium==4.15.2
+
+# Production
 gunicorn==21.2.0
+gevent==23.9.1
+
+# Monitoring
+sentry-sdk[flask]==1.38.0
+
+# Utilities
+# uuid, base64, io, datetime, os, random, string, hashlib are built-in Python modules
+
