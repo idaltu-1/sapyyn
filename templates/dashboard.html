@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from 'promotion_slot.html' import promotion_slot %}
 
 {% block title %}Dashboard - Sapyyn{% endblock %}
 
@@ -31,6 +32,15 @@
             </div>
         </div>
     </div>
+
+    <!-- PromotionSlot Component - DASHBOARD_TOP -->
+    {% if dashboard_promotion %}
+    <div class="row mb-4">
+        <div class="col-12">
+            {{ promotion_slot(dashboard_promotion, 'DASHBOARD_TOP') }}
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Statistics Cards -->
     <div class="row mb-4">

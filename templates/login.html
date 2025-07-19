@@ -2,6 +2,105 @@
 
 {% block title %}Login - Sapyyn{% endblock %}
 
+{% block extra_head %}
+<style>
+    .login-page-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .login-brand-section {
+        background: rgba(44, 90, 160, 0.9);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .login-brand-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('{{ url_for("static", filename="images/medical-pattern.png") }}') repeat;
+        opacity: 0.1;
+    }
+    
+    .login-form-section {
+        background: white;
+        position: relative;
+    }
+    
+    .login-form-container {
+        max-width: 400px;
+        width: 100%;
+        padding: 2rem;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+    
+    .divider {
+        position: relative;
+        text-align: center;
+        margin: 1.5rem 0;
+    }
+    
+    .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #dee2e6;
+    }
+    
+    .divider-text {
+        background: white;
+        padding: 0 1rem;
+        position: relative;
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: none;
+        z-index: 5;
+    }
+    
+    .form-floating {
+        position: relative;
+    }
+    
+    .demo-credentials {
+        border: 1px solid #e9ecef;
+    }
+    
+    .demo-user code {
+        font-size: 0.8rem;
+        display: block;
+        margin: 0.25rem 0;
+    }
+    
+    @media (max-width: 991.98px) {
+        .login-brand-section {
+            display: none !important;
+        }
+        
+        .login-form-container {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="login-page-wrapper">
     <div class="container-fluid">
@@ -51,7 +150,7 @@
                             <p class="text-muted">Sign in to your Sapyyn account</p>
                         </div>
                         
-                        <form method="POST" class="login-form">
+                        <form method="POST" class="login-form" id="loginForm">
                             <!-- Username Field -->
                             <div class="form-floating mb-3">
                                 <input type="text" 
@@ -99,7 +198,7 @@
                             
                             <!-- Login Button -->
                             <div class="d-grid mb-4">
-                                <button type="submit" class="btn btn-primary btn-lg">
+                                <button type="button" id="loginButton" class="btn btn-primary btn-lg">
                                     <i class="bi bi-box-arrow-in-right me-2"></i>
                                     Sign In
                                 </button>
@@ -162,5 +261,44 @@
 {% block extra_scripts %}
 <script>
 // Password toggle functionality is handled by main.js UIEnhancements
+function submitLoginForm() {
+    const form = document.getElementById('loginForm');
+    const username = form.querySelector('input[name="username"]').value.trim();
+    const password = form.querySelector('input[name="password"]').value.trim();
+    
+    // Basic validation
+    if (!username || !password) {
+        alert('Please enter both username and password');
+        return false;
+    }
+    
+    // Submit the form programmatically
+    console.log('Submitting form for user:', username);
+    form.submit();
+}
+
+// Proper event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('loginForm');
+    const loginButton = document.getElementById('loginButton');
+    
+    // Add click event listener to the login button
+    if (loginButton) {
+        loginButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            submitLoginForm();
+        });
+    }
+    
+    // Handle Enter key press in form fields
+    if (form) {
+        form.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                submitLoginForm();
+            }
+        });
+    }
+});
 </script>
 {% endblock %}

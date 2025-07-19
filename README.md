@@ -435,3 +435,59 @@ The Sapyyn platform includes a comprehensive referral rewards system designed to
 - **Regulatory Adherence**: Built-in HIPAA and Stark Law compliance
 
 For detailed information, see [REWARDS_SYSTEM_DOCUMENTATION.md](REWARDS_SYSTEM_DOCUMENTATION.md).
+
+## NoCodeBackend Integration
+
+This project integrates two NoCodeBackend database instances to store referrals and website uploads.
+
+### Setup
+
+1. Ensure you have environment variables configured in your `.env` file or deployment environment:
+
+```
+NOCODEBACKEND_SECRET_KEY=<your secret key>
+NOCODEBACKEND_REFERRAL_INSTANCE=35557_referralomsdb
+NOCODEBACKEND_UPLOADS_INSTANCE=35557_website_uploads
+```
+
+The secret key must **never** be committed to version control. Set it via GitHub repository secrets or your deployment platform's environment configuration.
+
+2. Install the Python dependencies (if running locally) and ensure `requests` is available.
+
+### Usage
+
+A helper module `nocodebackend_client.py` encapsulates interactions with the NoCodeBackend API. It uses the environment variables above to authenticate and send requests.
+
+Example usage:
+
+```python
+from nocodebackend_client import NoCodeBackendClient
+
+client = NoCodeBackendClient()
+
+# Create a referral record
+referral_data = {
+    "patient_name": "John Doe",
+    "contact": "john@example.com",
+    "procedure_type": "implant",
+    "notes": "Example referral"
+}
+client.create_referral(referral_data)
+
+# Create a website upload record
+upload_data = {
+    "file_name": "report.pdf",
+    "category": "Reports",
+    "notes": "Initial consultation report"
+}
+client.create_upload(upload_data)
+```
+
+The application also exposes an example Flask route at `/api/nocodebackend/referrals` which demonstrates how to create a referral via an HTTP POST request. You can extend this to handle uploads or other operations.
+
+For more details on the API endpoints, refer to the NoCodeBackend documentation for the relevant instances:
+
+- Referral database: https://api.nocodebackend.com/api-docs/?Instance=35557_referralomsdb
+- Website uploads database: https://api.nocodebackend.com/api-docs/?Instance=35557_website_uploads
+- Sapyyn referral database (sapyynreferral_db): https://api.nocodebackend.com/api-docs/?Instance=35557_sapyynreferral_db
+
