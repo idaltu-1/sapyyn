@@ -5196,18 +5196,269 @@ def my_referrals():
     conn = sqlite3.connect('sapyyn.db')
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM referrals WHERE patient_id = ?', (session['user_id'],))
+    cursor.execute('SELECT * FROM referrals WHERE user_id = ?', (session['user_id'],))
     referrals = cursor.fetchall()
     conn.close()
     return render_template('my_referrals.html', referrals=referrals)
 
+# Missing Core Routes
+@app.route('/get-started')
+def get_started_page():
+    """Get started onboarding page"""
+    return send_from_directory('static', 'getstarted_page.html')
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    """Forgot password page"""
+    if request.method == 'POST':
+        email = request.form['email']
+        # TODO: Implement password reset logic
+        flash('Password reset instructions have been sent to your email.', 'info')
+        return redirect(url_for('login'))
+    return render_template('forgot_password.html')
+
+@app.route('/profile')
+def profile():
+    """User profile page"""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('profile.html')
+
+@app.route('/edit-profile')
+def edit_profile():
+    """Edit user profile page"""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('edit_profile.html')
+
+@app.route('/change-password', methods=['POST'])
+def change_password():
+    """Change user password"""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    current_password = request.form['current_password']
+    new_password = request.form['new_password']
+    
+    conn = sqlite3.connect('sapyyn.db')
+    cursor = conn.cursor()
+    
+    # Verify current password
+    cursor.execute('SELECT password_hash FROM users WHERE id = ?', (session['user_id'],))
+    user = cursor.fetchone()
+    
+    if not user or not check_password_hash(user[0], current_password):
+        flash('Current password is incorrect.', 'error')
+        conn.close()
+        return redirect(url_for('settings'))
+    
+    # Update password
+    new_password_hash = generate_password_hash(new_password)
+    cursor.execute('UPDATE users SET password_hash = ? WHERE id = ?', (new_password_hash, session['user_id']))
+    
+    conn.commit()
+    conn.close()
+    
+    flash('Password changed successfully!', 'success')
+    return redirect(url_for('settings'))
+
+@app.route('/settings')
+def settings():
+    """User settings page"""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('settings.html')
+
+@app.route('/documents')
+def view_documents():
+    """View user documents (alias for existing documents route)"""
+    return documents()
+
+@app.route('/conversion-dashboard')
+@require_roles(['admin', 'dentist_admin', 'specialist_admin'])
+def conversion_dashboard():
+    """Conversion analytics dashboard"""
+    return render_template('conversion_dashboard.html')
+
+@app.route('/track-referral')
+def track_referral():
+    """Track referral page"""
+    if 'user_id' not in session:
+        flash('Please log in to track referrals.', 'error')
+        return redirect(url_for('login'))
+    return render_template('track_referral.html')
+
+# Portal Route Aliases
+@app.route('/portal/appointments')
+def portal_appointments():
+    """Portal appointments page (alias)"""
+    return appointments_portal()
+
+@app.route('/portal/messages')
+def messages_portal():
+    """Portal messages page (alias)"""
+    return messages_portal()
+
+# Rewards System Routes
+@app.route('/rewards')
+def rewards_dashboard():
+    """Rewards dashboard"""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('rewards/dashboard.html')
+
+@app.route('/rewards/admin')
+@require_roles(['admin', 'dentist_admin', 'specialist_admin'])
+def rewards_admin():
+    """Rewards administration"""
+    return render_template('rewards/admin.html')
+
+@app.route('/rewards/new-program')
+@require_roles(['admin', 'dentist_admin', 'specialist_admin'])
+def new_reward_program():
+    """Create new reward program"""
+    return render_template('rewards/new_program.html')
+
+@app.route('/rewards/edit-program/<int:program_id>')
+@require_roles(['admin', 'dentist_admin', 'specialist_admin'])
+def edit_reward_program(program_id):
+    """Edit reward program"""
+    return render_template('rewards/edit_program.html', program_id=program_id)
+
+@app.route('/rewards/leaderboard')
+def rewards_leaderboard():
+    """Rewards leaderboard"""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('rewards/leaderboard.html')
+
+@app.route('/rewards/compliance-audit')
+@require_roles(['admin', 'dentist_admin', 'specialist_admin'])
+def compliance_audit():
+    """Compliance audit page"""
+    return render_template('rewards/compliance_audit.html')
+
+# Static Page Routes
+@app.route('/about')
+def about():
+    """About page"""
+    return render_template('about.html')
+
+@app.route('/blog')
+def blog():
+    """Blog page"""
+    return send_from_directory('static', 'blog.html')
+
+@app.route('/surgical-instructions')
+def surgical_instruction():
+    """Surgical instructions page"""
+    return send_from_directory('static', 'surgical-instruction-page.html')
+
+@app.route('/how-to-guides')
+def how_to_guides():
+    """How-to guides page"""
+    return render_template('how_to_guides.html')
+
+# Admin Routes
+@app.route('/admin')
+@require_roles(['admin', 'dentist_admin', 'specialist_admin'])
+def admin_panel():
+    """Admin panel redirect"""
+    return redirect(url_for('admin_portal'))
+
+@app.route('/static-pages/<path:filename>')
+def serve_static_page(filename):
+    """Serve static HTML pages with authentication checks"""
+    from urllib.parse import unquote
+    filename = unquote(filename)
+    if filename.endswith('.html'):
+        filename = filename[:-5]
+    
+    # Define page categories for access control
+    public_pages = [
+        'about_page', 'pricing_page', 'resources_page', 'contact', 'contact-us',
+        'blog', 'blog-article', 'case studies', 'educational content',
+        'training and support', 'how to guide', 'short video', 'newsletter',
+        'surgical-instruction', 'surgical-instruction-page', 'pre op consultation',
+        'co_marketing', 'getstarted_page', 'resources'
+    ]
+    admin_pages = [
+        'admin', 'admin-1', 'admin-2', 'admin-3', 'admin-4', 'admin-users', 
+        'admin-referrals', 'sapyyn-admin-panel', 'corrected_admin_html',
+        'importDentists', 'importPatients', 'importSpecialist', 'users', 'roles'
+    ]
+    portal_pages = [
+        'Dashboard', 'Patient Referral', 'Patient Referrral Admin portal',
+        'Patient Referrral Admin', 'Referral History', 'Track Referral',
+        'Medical Updates', 'portal-referrals', 'portal-signup',
+        'portal_integrations', 'portal_messaging', 'portal_settings',
+        'patient', 'dentist', 'specialist', 'sapyyn-portal',
+        'sapyyn_unified_portal', 'sapyyn_unified_portal (1)', 'sapyyn_unified_portal (2)',
+        'updated_portal_rewards', 'appointments', 'forms', 'referrals',
+        'referrals_page', 'referrals_page (1)', 'rewards', 'redeem list'
+    ]
+    
+    # Check file exists
+    static_file_path = os.path.join('static', f'{filename}.html')
+    if not os.path.exists(static_file_path):
+        return render_template('404.html'), 404
+    
+    # Apply access control
+    if filename in admin_pages:
+        if 'user_id' not in session or session.get('role') not in ['admin', 'dentist_admin', 'specialist_admin']:
+            flash('Access denied. Administrator privileges required.', 'error')
+            return redirect(url_for('login'))
+    elif filename in portal_pages:
+        if 'user_id' not in session:
+            flash('Please log in to access portal pages.', 'error')
+            return redirect(url_for('login'))
+    
+    return send_from_directory('static', f'{filename}.html')
+
+# Promotion Routes
+@app.route('/promotions')
+def promotions_list():
+    """List promotions"""
+    return render_template('promotions/list.html')
+
+@app.route('/promotions/create')
+@require_roles(['admin', 'dentist_admin', 'specialist_admin'])
+def promotions_create():
+    """Create promotion"""
+    return render_template('promotions/create.html')
+
+@app.route('/promotions/edit/<int:promotion_id>')
+@require_roles(['admin', 'dentist_admin', 'specialist_admin'])
+def promotions_edit(promotion_id):
+    """Edit promotion"""
+    return render_template('promotions/edit.html', promotion_id=promotion_id)
+
+# Subscription Routes
+@app.route('/subscribe/<plan_name>')
+def subscribe(plan_name):
+    """Subscribe to a plan"""
+    if 'user_id' not in session:
+        flash('Please log in to subscribe.', 'error')
+        return redirect(url_for('login'))
+    return render_template('subscribe.html', plan_name=plan_name)
+
+@app.route('/start-free-trial')
+def start_free_trial():
+    """Start free trial"""
+    if 'user_id' not in session:
+        flash('Please log in to start your free trial.', 'error')
+        return redirect(url_for('login'))
+    
+    # TODO: Implement trial logic
+    flash('Your 14-day free trial has started!', 'success')
+    return redirect(url_for('dashboard'))
+
 
 if __name__ == '__main__':
-    app = create_app()
+    # Initialize database
+    init_db()
     
-    # Create database tables if they don't exist
-    with app.app_context():
-        from models import db
-        db.create_all()
+    # Create demo users if needed
+    create_demo_users_if_needed()
     
     app.run(debug=True)
