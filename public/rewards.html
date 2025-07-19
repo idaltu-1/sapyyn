@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sapyyn Rewards & Referral</title>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+  />
+</head>
+<body class="bg-gray-100 min-h-screen py-8">
+  <header class="bg-white shadow mb-6">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="/" class="text-xl font-bold">Sapyyn</a>
+      <nav class="space-x-4">
+        <a href="/login.html" class="text-blue-600 hover:underline">Login</a>
+        <a href="/rewards.html" class="text-blue-600 font-semibold">Rewards</a>
+      </nav>
+    </div>
+  </header>
+  <main class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
+    <h1 class="text-2xl font-bold mb-4">Referral Submission</h1>
+    <p class="mb-6 text-gray-700">
+      Use this form to submit a patient referral. You may optionally attach a file
+      (e.g. X‑ray or insurance document). All fields marked with * are
+      required.
+    </p>
+    <form id="referralForm" class="space-y-4">
+      <div>
+        <label for="patientName" class="block text-sm font-medium text-gray-700"
+          >Patient Name *</label
+        >
+        <input
+          type="text"
+          id="patientName"
+          required
+          class="mt-1 w-full border p-2 rounded"
+        />
+      </div>
+      <div>
+        <label for="contact" class="block text-sm font-medium text-gray-700"
+          >Contact (phone or email) *</label
+        >
+        <input
+          type="text"
+          id="contact"
+          required
+          class="mt-1 w-full border p-2 rounded"
+        />
+      </div>
+      <div>
+        <label for="procedureType" class="block text-sm font-medium text-gray-700"
+          >Procedure Type *</label
+        >
+        <select
+          id="procedureType"
+          required
+          class="mt-1 w-full border p-2 rounded"
+        >
+          <option value="">Select one</option>
+          <option value="Wisdom Teeth">Wisdom Teeth</option>
+          <option value="Implants">Implants</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label for="notes" class="block text-sm font-medium text-gray-700"
+          >Notes</label
+        >
+        <textarea
+          id="notes"
+          rows="3"
+          class="mt-1 w-full border p-2 rounded"
+        ></textarea>
+      </div>
+      <div>
+        <label for="file" class="block text-sm font-medium text-gray-700"
+          >Attachment (optional)</label
+        >
+        <input
+          type="file"
+          id="file"
+          class="mt-1 w-full border p-2 rounded"
+        />
+      </div>
+      <button
+        type="submit"
+        class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+      >
+        Submit Referral
+      </button>
+    </form>
+    <p id="referralStatus" class="mt-4 text-sm"></p>
+  </main>
+  <script>
+    document.getElementById('referralForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const patientName = document.getElementById('patientName').value.trim();
+      const contact = document.getElementById('contact').value.trim();
+      const procedureType = document.getElementById('procedureType').value;
+      const notes = document.getElementById('notes').value;
+      const fileInput = document.getElementById('file');
+      const formData = new FormData();
+      formData.append('patientName', patientName);
+      formData.append('contact', contact);
+      formData.append('procedureType', procedureType);
+      formData.append('notes', notes);
+      if (fileInput.files[0]) {
+        formData.append('file', fileInput.files[0]);
+      }
+      const res = await fetch('/api/referral', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      const statusEl = document.getElementById('referralStatus');
+      if (res.ok) {
+        statusEl.textContent = 'Referral submitted successfully!';
+        statusEl.className = 'text-green-600';
+        // Optionally reset the form
+        document.getElementById('referralForm').reset();
+      } else {
+        statusEl.textContent = data.error || 'Referral submission failed.';
+        statusEl.className = 'text-red-600';
+      }
+    });
+  </script>
+</body>
+</html>
