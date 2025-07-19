@@ -8,6 +8,7 @@ Flask-Mail==0.9.1
 # Database
 # sqlite3 is a built-in Python module, no need to install via pip
 
+
 # Payment processing
 stripe==6.6.0
 
@@ -59,3 +60,4 @@ sentry-sdk[flask]==1.38.0
 
 # Utilities
 # uuid, base64, io, datetime, os, random, string, hashlib are built-in Python modules
+
