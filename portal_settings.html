@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapyyn Portal - Settings Dashboard</title>
+    <meta name="description" content="Manage your account settings, preferences, and security options">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --secondary-blue: #3B82F6;
+            --light-blue: #DBEAFE;
+            --accent-yellow: #FCD34D;
+            --warning-yellow: #F59E0B;
+            --white: #FFFFFF;
+            --light-grey: #F8FAFC;
+            --medium-grey: #64748B;
+            --dark-grey: #334155;
+            --black: #0F172A;
+            --success: #10B981;
+            --danger: #EF4444;
+            --glass: rgba(255, 255, 255, 0.25);
+            --shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+            --shadow-hover: 0 16px 64px rgba(37, 99, 235, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+            color: var(--black);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Portal Header */
+        .portal-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--light-blue);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .portal-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .portal-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--primary-blue);
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+        
+        .portal-logo img {
+            height: 40px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .portal-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .portal-menu a {
+            text-decoration: none;
+            color: var(--dark-grey);
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .portal-menu a:hover {
+            color: var(--secondary-blue);
+            background: var(--light-blue);
+            transform: translateY(-2px);
+        }
+        
+        .portal-menu a.active {
+            color: var(--white);
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            box-shadow: var(--shadow);
+        }
+        
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .notification-btn {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--medium-grey);
+            cursor: pointer;
+            position: relative;
+            padding: 0.75rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .notification-btn:hover {
+            color: var(--primary-blue);
+            background: var(--light-blue);
+            transform: scale(1.1);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--light-blue);
+        }
+        
+        .user-profile:hover {
+            background: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        /* Dashboard Container */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Page Header */
+        .page-header {
+            margin-bottom: 3rem;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            font-size: 1.25rem;
+            color: var(--medium-grey);
+        }
+        
+        /* Settings Layout */
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+        
+        /* Settings Sidebar */
+        .settings-sidebar {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--light-blue);
+            height: fit-content;
+            position: sticky;
+            top: 120px;
+        }
+        
+        .settings-nav {
+            list-style: none;
+        }
+        
+        .settings-nav-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .settings-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--dark-grey);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-nav-link:hover {
+            background: var(--light-blue);
+            color: var(--secondary-blue);
+            transform: translateX(4px);
+        }
+        
+        .settings-nav-link.active {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: var(--white);
+            box-shadow: var(--shadow);
+        }
+        
+        /* Settings Content */
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .settings-section {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--light-blue);
+            transition: all 0.3s ease;
+        }
+        
+        .settings-section:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light-blue);
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+        
+        .section-description {
+            color: var(--medium-grey);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--dark-grey);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--light-blue);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--light-blue);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--medium-grey);
+            transition: 0.3s;
+            border-radius: 30px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--success);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+        
+        /* Setting Item */
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-info h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .setting-info p {
+            color: var(--medium-grey);
+            font-size: 0.9rem;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+        }
+        
+        /* Activity Log */
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        
+        .activity-icon.login {
+            background: var(--success);
+        }
+        
+        .activity-icon.settings {
+            background: var(--secondary-blue);
+        }
+        
+        .activity-icon.security {
+            background: var(--warning-yellow);
+            color: var(--black);
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-content p {
+            color: var(--medium-grey);
+            font-size: 0.9rem;
+        }
+        
+        .activity-time {
+            color: var(--medium-grey);
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 968px) {
+            .portal-menu {
+                display: none;
+            }
+            
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .settings-sidebar {
+                position: static;
+                order: 2;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .dashboard-container {
+                padding: 1rem;
+            }
+            
+            .settings-section {
+                padding: 1.5rem;
+            }
+            
+            .activity-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Portal Header -->
+    <header class="portal-header">
+        <nav class="portal-nav">
+            <a href="./sapyyn-portal.html" class="portal-logo">
+                <img src="./assets/logo.svg" alt="Sapyyn">
+                <span>Portal</span>
+            </a>
+            
+            <ul class="portal-menu">
+                <li><a href="./sapyyn-portal.html">Dashboard</a></li>
+                <li><a href="./portal-referrals.html">My Referrals</a></li>
+                <li><a href="./portal-appointments.html">Appointments</a></li>
+                <li><a href="./portal-documents.html">Documents</a></li>
+                <li><a href="./portal-integrations.html">Integrations</a></li>
+                <li><a href="./portal-settings.html" class="active">Settings</a></li>
+            </ul>
+            
+            <div class="user-controls">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <div class="user-profile">
+                    <div class="user-avatar">JD</div>
+                    <div class="user-info">
+                        <div style="font-weight: 600; font-size: 0.9rem;">John Doe</div>
+                        <div style="font-size: 0.8rem; color: var(--medium-grey);">Patient #12345</div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--medium-grey);"></i>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Dashboard Content -->
+    <main class="dashboard-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Settings</h1>
+            <p class="page-subtitle">Manage your account preferences, security, and notification settings</p>
+        </div>
+
+        <!-- Settings Layout -->
+        <div class="settings-layout">
+            <!-- Settings Sidebar -->
+            <aside class="settings-sidebar">
+                <ul class="settings-nav">
+                    <li class="settings-nav-item">
+                        <a href="#profile" class="settings-nav-link active">
+                            <i class="fas fa-user"></i>
+                            Profile
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#account" class="settings-nav-link">
+                            <i class="fas fa-cog"></i>
+                            Account
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#security" class="settings-nav-link">
+                            <i class="fas fa-shield-alt"></i>
+                            Security
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#notifications" class="settings-nav-link">
+                            <i class="fas fa-bell"></i>
+                            Notifications
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#billing" class="settings-nav-link">
+                            <i class="fas fa-credit-card"></i>
+                            Billing
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#activity" class="settings-nav-link">
+                            <i class="fas fa-history"></i>
+                            Activity
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- Settings Content -->
+            <div class="settings-content">
+                <!-- Profile Settings -->
+                <section class="settings-section" id="profile">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-user"></i>
+                            Profile Information
+                        </h2>
+                        <button class="btn btn-primary" onclick="saveProfile()">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                    <p class="section-description">Update your personal information and professional details.</p>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-input" value="John" placeholder="Enter your first name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-input" value="Doe" placeholder="Enter your last name">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" value="john.doe@example.com" placeholder="Enter your email">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-input" value="+1 (555) 123-4567" placeholder="Enter your phone">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Specialty</label>
+                            <select class="form-select">
+                                <option>General Dentistry</option>
+                                <option>Orthodontics</option>
+                                <option>Oral Surgery</option>
+                                <option>Periodontics</option>
+                                <option>Endodontics</option>
+                                <option>Prosthodontics</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Practice Name</label>
+                        <input type="text" class="form-input" value="Downtown Dental Care" placeholder="Enter your practice name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Practice Address</label>
+                        <input type="text" class="form-input" value="123 Main Street, Suite 100, Chicago, IL 60601" placeholder="Enter your practice address">
+                    </div>
+                </section>
+
+                <!-- Account Settings -->
+                <section class="settings-section" id="account">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-cog"></i>
+                            Account Preferences
+                        </h2>
+                    </div>
+                    <p class="section-description">Configure your account settings and preferences.</p>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Language</h4>
+                            <p>Choose your preferred language for the interface</p>
+                        </div>
+                        <select class="form-select" style="width: 200px;">
+                            <option>English (US)</option>
+                            <option>English (UK)</option>
+                            <option>Spanish</option>
+                            <option>French</option>
+                            <option>German</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Timezone</h4>
+                            <p>Set your local timezone for appointments and scheduling</p>
+                        </div>
+                        <select class="form-select" style="width: 200px;">
+                            <option>Eastern Time (ET)</option>
+                            <option>Central Time (CT)</option>
+                            <option>Mountain Time (MT)</option>
+                            <option>Pacific Time (PT)</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Dark Mode</h4>
+                            <p>Switch between light and dark theme</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Auto-save Drafts</h4>
+                            <p>Automatically save referral drafts as you type</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- Security Settings -->
+                <section class="settings-section" id="security">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-shield-alt"></i>
+                            Security & Privacy
+                        </h2>
+                    </div>
+                    <p class="section-description">Manage your password, two-factor authentication, and privacy settings.</p>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Change Password</h4>
+                            <p>Update your account password for better security</p>
+                        </div>
+                        <button class="btn btn-secondary" onclick="changePassword()">
+                            <i class="fas fa-key"></i>
+                            Change Password
+                        </button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Two-Factor Authentication</h4>
+                            <p>Add an extra layer of security to your account</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Login Notifications</h4>
+                            <p>Get notified when someone logs into your account</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Session Management</h4>
+                            <p>View and manage your active sessions</p>
+                        </div>
+                        <button class="btn btn-secondary" onclick="manageSessions()">
+                            <i class="fas fa-desktop"></i>
+                            Manage Sessions
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Notification Settings -->
+                <section class="settings-section" id="notifications">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-bell"></i>
+                            Notification Preferences
+                        </h2>
+                    </div>
+                    <p class="section-description">Choose how and when you want to receive notifications.</p>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Email Notifications</h4>
+                            <p>Receive notifications via email</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Push Notifications</h4>
+                            <p>Receive browser push notifications</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Referral Updates</h4>
+                            <p>Get notified when referral status changes</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Appointment Reminders</h4>
+                            <p>Receive reminders for upcoming appointments</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Marketing Communications</h4>
+                            <p>Receive updates about new features and promotions</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- Billing Settings -->
+                <section class="settings-section" id="billing">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-credit-card"></i>
+                            Billing & Subscription
+                        </h2>
+                        <button class="btn btn-primary" onclick="viewInvoices()">
+                            <i class="fas fa-file-invoice"></i>
+                            View Invoices
+                        </button>
+                    </div>
+                    <p class="section-description">Manage your subscription and billing information.</p>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Current Plan</h4>
+                            <p>Professional Plan - $49/month</p>
+                        </div>
+                        <button class="btn btn-secondary" onclick="changePlan()">
+                            <i class="fas fa-exchange-alt"></i>
+                            Change Plan
+                        </button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Payment Method</h4>
+                            <p>•••• •••• •••• 4242 (Visa)</p>
+                        </div>
+                        <button class="btn btn-secondary" onclick="updatePayment()">
+                            <i class="fas fa-edit"></i>
+                            Update
+                        </button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Billing Address</h4>
+                            <p>123 Main Street, Chicago, IL 60601</p>
+                        </div>
+                        <button class="btn btn-secondary" onclick="updateBilling()">
+                            <i class="fas fa-edit"></i>
+                            Update
+                        </button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Auto-renewal</h4>
+                            <p>Automatically renew your subscription</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- Activity Log -->
+                <section class="settings-section" id="activity">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-history"></i>
+                            Recent Activity
+                        </h2>
+                        <button class="btn btn-secondary" onclick="downloadActivity()">
+                            <i class="fas fa-download"></i>
+                            Download Log
+                        </button>
+                    </div>
+                    <p class="section-description">View your recent account activity and login history.</p>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon login">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4>Successful Login</h4>
+                            <p>Logged in from Chrome on Windows (IP: 192.168.1.1)</p>
+                        </div>
+                        <div class="activity-time">2 hours ago</div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon settings">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4>Settings Updated</h4>
+                            <p>Changed notification preferences</p>
+                        </div>
+                        <div class="activity-time">1 day ago</div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon security">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4>Password Changed</h4>
+                            <p>Account password was successfully updated</p>
+                        </div>
+                        <div class="activity-time">3 days ago</div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon login">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4>Mobile Login</h4>
+                            <p>Logged in from mobile app on iOS</p>
+                        </div>
+                        <div class="activity-time">1 week ago</div>
+                    </div>
+                </section>
+
+                <!-- Danger Zone -->
+                <section class="settings-section">
+                    <div class="section-header">
+                        <h2 class="section-title" style="color: var(--danger);">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Danger Zone
+                        </h2>
+                    </div>
+                    <p class="section-description">Irreversible and destructive actions.</p>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Export Account Data</h4>
+                            <p>Download all your account data and referral history</p>
+                        </div>
+                        <button class="btn btn-secondary" onclick="exportData()">
+                            <i class="fas fa-download"></i>
+                            Export Data
+                        </button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Delete Account</h4>
+                            <p>Permanently delete your account and all data</p>
+                        </div>
+                        <button class="btn btn-danger" onclick="deleteAccount()">
+                            <i class="fas fa-trash"></i>
+                            Delete Account
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Settings navigation
+        document.querySelectorAll('.settings-nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all links
+                document.querySelectorAll('.settings-nav-link').forEach(l => l.classList.remove('active'));
+                // Add active class to clicked link
+                this.classList.add('active');
+                
+                // Scroll to section (simplified for demo)
+                const targetId = this.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Save profile function
+        function saveProfile() {
+            alert('Profile information saved successfully!');
+        }
+
+        // Change password function
+        function changePassword() {
+            alert('Opening password change modal...');
+        }
+
+        // Manage sessions function
+        function manageSessions() {
+            alert('Opening session management...');
+        }
+
+        // View invoices function
+        function viewInvoices() {
+            alert('Opening billing history...');
+        }
+
+        // Change plan function
+        function changePlan() {
+            alert('Opening plan selection...');
+        }
+
+        // Update payment function
+        function updatePayment() {
+            alert('Opening payment method update...');
+        }
+
+        // Update billing function
+        function updateBilling() {
+            alert('Opening billing address update...');
+        }
+
+        // Download activity function
+        function downloadActivity() {
+            alert('Preparing activity log download...');
+        }
+
+        // Export data function
+        function exportData() {
+            if (confirm('Are you sure you want to export all your account data?')) {
+                alert('Data export initiated. You will receive an email when ready.');
+            }
+        }
+
+        // Delete account function
+        function deleteAccount() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                alert('Account deletion process initiated. Please check your email for confirmation.');
+            }
+        }
+
+        // Toggle switches
+        document.querySelectorAll('.toggle-switch input').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const setting = this.closest('.setting-item').querySelector('h4').textContent;
+                const status = this.checked ? 'enabled' : 'disabled';
+                console.log(`${setting} ${status}`);
+            });
+        });
+
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate settings sections
+            const sections = document.querySelectorAll('.settings-section');
+            sections.forEach((section, index) => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    section.style.transition = 'all 0.6s ease';
+                    section.style.opacity = '1';
+                    section.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Sidebar animation
+            const sidebar = document.querySelector('.settings-sidebar');
+            sidebar.style.opacity = '0';
+            sidebar.style.transform = 'translateX(-20px)';
+            
+            setTimeout(() => {
+                sidebar.style.transition = 'all 0.6s ease';
+                sidebar.style.opacity = '1';
+                sidebar.style.transform = 'translateX(0)';
+            }, 200);
+        });
+
+        // Auto-save functionality for form inputs
+        document.querySelectorAll('.form-input, .form-select').forEach(input => {
+            input.addEventListener('change', function() {
+                // Auto-save logic would go here
+                console.log('Auto-saving:', this.name || this.id, this.value);
+            });
+        });
+    </script>
+</body>
+</html>
