@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral Management - Sapyyn</title>
+    <meta name="description" content="Streamline your dental referrals with Sapyyn's comprehensive referral management system. Track, manage, and earn rewards for every referral.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --secondary-blue: #3B82F6;
+            --light-blue: #DBEAFE;
+            --accent-yellow: #FCD34D;
+            --warning-yellow: #F59E0B;
+            --white: #FFFFFF;
+            --light-grey: #F8FAFC;
+            --medium-grey: #64748B;
+            --dark-grey: #334155;
+            --black: #0F172A;
+            --success: #10B981;
+            --danger: #EF4444;
+            --shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+            --shadow-hover: 0 16px 64px rgba(37, 99, 235, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--black);
+            line-height: 1.6;
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        }
+        
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--light-blue);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--primary-blue);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo img {
+            height: 45px;
+            margin-right: 12px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+            gap: 2.5rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-grey);
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-links a.active {
+            color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+        
+        .nav-links a:hover {
+            color: var(--secondary-blue);
+            background: var(--light-blue);
+            transform: translateY(-2px);
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        /* Page Header */
+        .page-header {
+            margin-top: 80px;
+            padding: 6rem 5% 4rem;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .page-header p {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 6rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Referral Process Section */
+        .process-section {
+            margin-bottom: 6rem;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .section-header p {
+            font-size: 1.2rem;
+            color: var(--medium-grey);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .step-card {
+            background: var(--white);
+            padding: 2.5rem 2rem;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid var(--light-blue);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--secondary-blue);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .step-number {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .step-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--light-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem auto 1.5rem;
+            font-size: 2rem;
+            color: var(--primary-blue);
+        }
+        
+        .step-card h3 {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .step-card p {
+            color: var(--medium-grey);
+            line-height: 1.6;
+        }
+        
+        /* Referral Types */
+        .referral-types {
+            margin-bottom: 6rem;
+        }
+        
+        .types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .type-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid var(--light-blue);
+            transition: all 0.3s ease;
+        }
+        
+        .type-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--secondary-blue);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .type-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .type-header h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .type-header p {
+            opacity: 0.9;
+        }
+        
+        .type-content {
+            padding: 2rem;
+        }
+        
+        .type-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+        
+        .type-features li {
+            padding: 0.75rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid var(--light-grey);
+        }
+        
+        .type-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .type-features i {
+            color: var(--success);
+            font-size: 1.1rem;
+        }
+        
+        /* Rewards Integration */
+        .rewards-integration {
+            background: linear-gradient(135deg, var(--accent-yellow) 0%, var(--warning-yellow) 100%);
+            color: var(--black);
+            padding: 4rem 2rem;
+            border-radius: 20px;
+            margin-bottom: 6rem;
+            text-align: center;
+        }
+        
+        .rewards-integration h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .rewards-integration p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .rewards-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .reward-stat {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--dark-grey);
+            font-weight: 600;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            padding: 4rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+        
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .cta-buttons {
+            justify-content: center;
+            gap: 1.5rem;
+        }
+        
+        .btn-white {
+            background: var(--white);
+            color: var(--primary-blue);
+        }
+        
+        .btn-white:hover {
+            background: var(--light-grey);
+            transform: translateY(-3px) scale(1.05);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--black);
+            color: white;
+            padding: 4rem 5% 2rem;
+            margin-top: 6rem;
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 3rem;
+        }
+        
+        .footer-brand h3 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+        }
+        
+        .footer-brand p {
+            color: rgba(255,255,255,0.7);
+            line-height: 1.8;
+        }
+        
+        .footer-links h4 {
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-toggle:hover {
+            background: var(--light-blue);
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 2rem;
+                box-shadow: var(--shadow);
+                border-radius: 0 0 16px 16px;
+            }
+            
+            .nav-links.show {
+                display: flex;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .process-steps {
+                grid-template-columns: 1fr;
+            }
+            
+            .types-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <a href="./index.html" class="logo">
+                <img src="./assets/logo.svg" alt="Sapyyn">
+                Sapyyn
+            </a>
+            <ul class="nav-links">
+                <li><a href="./referrals.html" class="active">Referrals</a></li>
+                <li><a href="./about.html">About</a></li>
+                <li><a href="./pricing.html">Pricing</a></li>
+                <li><a href="./resources.html">Resources</a></li>
+                <li><a href="./surgical-instruction.html">Surgical Instruction</a></li>
+                <li><a href="./contact.html">Contact</a></li>
+            </ul>
+            <div class="cta-buttons">
+                <a href="./sapyyn-portal.html" class="btn btn-secondary">Sign In</a>
+                <a href="./portal-signup.html" class="btn btn-primary">Get Started</a>
+            </div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <h1>Referral Management</h1>
+        <p>Streamline your dental referrals with our comprehensive platform. Connect patients with specialists instantly while earning rewards for every successful referral.</p>
+    </section>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Referral Process -->
+        <section class="process-section">
+            <div class="section-header">
+                <h2>How Referrals Work</h2>
+                <p>Our streamlined process makes referring patients simple, secure, and rewarding. Follow these four easy steps to connect your patients with the right specialists.</p>
+            </div>
+            <div class="process-steps">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>Create Referral</h3>
+                    <p>Enter patient information and referral details through our secure platform. Our HIPAA-compliant system ensures all data is protected.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Find Specialists</h3>
+                    <p>Search our network of qualified specialists by location, specialty, and availability. View profiles and ratings to make informed decisions.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <h3>Send Referral</h3>
+                    <p>Send the referral instantly through our platform. Specialists receive immediate notifications and can respond quickly to schedule appointments.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3>Earn Rewards</h3>
+                    <p>Receive points for successful referrals and track patient outcomes. Redeem rewards for cash, credits, or premium features.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Referral Types -->
+        <section class="referral-types">
+            <div class="section-header">
+                <h2>Referral Types</h2>
+                <p>Choose from various referral options to meet your patients' specific needs and treatment requirements.</p>
+            </div>
+            <div class="types-grid">
+                <div class="type-card">
+                    <div class="type-header">
+                        <h3>Emergency Referrals</h3>
+                        <p>Urgent cases requiring immediate attention</p>
+                    </div>
+                    <div class="type-content">
+                        <ul class="type-features">
+                            <li><i class="fas fa-check"></i> 24/7 availability</li>
+                            <li><i class="fas fa-check"></i> Same-day appointments</li>
+                            <li><i class="fas fa-check"></i> Priority scheduling</li>
+                            <li><i class="fas fa-check"></i> Instant notifications</li>
+                        </ul>
+                        <a href="./portal-signup.html" class="btn btn-primary">Start Emergency Referral</a>
+                    </div>
+                </div>
+                <div class="type-card">
+                    <div class="type-header">
+                        <h3>Routine Referrals</h3>
+                        <p>Standard specialist consultations</p>
+                    </div>
+                    <div class="type-content">
+                        <ul class="type-features">
+                            <li><i class="fas fa-check"></i> Flexible scheduling</li>
+                            <li><i class="fas fa-check"></i> Comprehensive reports</li>
+                            <li><i class="fas fa-check"></i> Follow-up tracking</li>
+                            <li><i class="fas fa-check"></i> Reward points earned</li>
+                        </ul>
+                        <a href="./portal-signup.html" class="btn btn-primary">Create Routine Referral</a>
+                    </div>
+                </div>
+                <div class="type-card">
+                    <div class="type-header">
+                        <h3>Consultation Referrals</h3>
+                        <p>Second opinions and specialist advice</p>
+                    </div>
+                    <div class="type-content">
+                        <ul class="type-features">
+                            <li><i class="fas fa-check"></i> Expert consultations</li>
+                            <li><i class="fas fa-check"></i> Detailed assessments</li>
+                            <li><i class="fas fa-check"></i> Treatment recommendations</li>
+                            <li><i class="fas fa-check"></i> Digital reports</li>
+                        </ul>
+                        <a href="./portal-signup.html" class="btn btn-primary">Request Consultation</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rewards Integration -->
+        <section class="rewards-integration">
+            <h2>
+                <i class="fas fa-star"></i>
+                Earn While You Refer
+            </h2>
+            <p>Our integrated rewards system recognizes your valuable contributions to the dental community. Every referral earns points that can be redeemed for real benefits.</p>
+            <div class="rewards-stats">
+                <div class="reward-stat">
+                    <div class="stat-value">25</div>
+                    <div class="stat-label">Points per Referral</div>
+                </div>
+                <div class="reward-stat">
+                    <div class="stat-value">$50</div>
+                    <div class="stat-label">Average Monthly Rewards</div>
+                </div>
+                <div class="reward-stat">
+                    <div class="stat-value">500+</div>
+                    <div class="stat-label">Active Participants</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <h2>Ready to Start Referring?</h2>
+            <p>Join hundreds of dental professionals who are already streamlining their referral process and earning rewards with Sapyyn.</p>
+            <div class="cta-buttons">
+                <a href="./portal-signup.html" class="btn btn-white">
+                    <i class="fas fa-rocket"></i> Start Free Trial
+                </a>
+                <a href="./contact.html" class="btn btn-secondary" style="border-color: white; color: white;">
+                    <i class="fas fa-phone"></i> Contact Sales
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>Sapyyn</h3>
+                <p>Revolutionizing dental referrals with our secure, HIPAA-compliant platform. Connect patients with specialists while earning rewards for your contributions.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="./index.html">Features</a></li>
+                    <li><a href="./pricing.html">Pricing</a></li>
+                    <li><a href="./resources.html">Resources</a></li>
+                    <li><a href="./referrals.html">Referrals</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="./about.html">About</a></li>
+                    <li><a href="./surgical-instruction.html">Surgical Instruction</a></li>
+                    <li><a href="./contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="./privacy.html">Privacy Policy</a></li>
+                    <li><a href="./terms.html">Terms of Service</a></li>
+                    <li><a href="./hipaa.html">HIPAA Compliance</a></li>
+                    <li><a href="./security.html">Security</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Sapyyn. All rights reserved. Transforming dental referrals nationwide.</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('show');
+        }
+
+        // Auto-close mobile menu on window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 968) {
+                document.querySelector('.nav-links').classList.remove('show');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+                header.style.backdropFilter = 'blur(25px)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(20px)';
+            }
+        });
+
+        // Animate cards on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.step-card, .type-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'all 0.6s ease';
+                
+                setTimeout(() => {
+                    observer.observe(card);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
