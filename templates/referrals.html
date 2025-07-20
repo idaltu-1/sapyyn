@@ -3,6 +3,7 @@
 {% block title %}My Referrals - Sapyyn{% endblock %}
 
 {% block content %}
+
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
@@ -103,6 +104,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="referralDetailModalLabel">
+
                     <i class="bi bi-clipboard-data"></i>
                     Referral Details
                 </h5>
@@ -120,6 +122,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
                 <div class="dropdown d-inline-block">
                     <button class="btn btn-primary dropdown-toggle" type="button" id="updateStatusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         Update Status
@@ -136,6 +139,7 @@
         </div>
     </div>
 </div>
+
 {% endblock %}
 
 {% block extra_scripts %}
@@ -433,6 +437,7 @@ function viewReferralDetail(id) {
             `;
         });
 }
+
 
 // Render documents list
 function renderDocumentsList(documents) {
