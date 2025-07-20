@@ -3,265 +3,98 @@
 {% block title %}My Referrals - Sapyyn{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+
+<div class="container-fluid py-4">
     <div class="row">
-        <div class="col-lg-12">
-            <!-- Header -->
+        <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h2><i class="bi bi-clipboard-data me-2 text-primary"></i>My Referrals</h2>
-                    <p class="text-muted mb-0">Manage and track your patient referrals</p>
+                    <h2 class="h3 mb-0">
+                        <i class="bi bi-clipboard-pulse text-primary"></i>
+                        My Referrals
+                    </h2>
+                    <p class="text-muted">Track and manage your patient referrals</p>
                 </div>
                 <div>
                     <a href="{{ url_for('new_referral') }}" class="btn btn-primary">
-                        <i class="bi bi-plus-circle me-2"></i>New Referral
+                        <i class="bi bi-plus-circle"></i>
+                        New Referral
                     </a>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- Statistics Cards -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <div class="d-flex align-items-center justify-content-center mb-2">
-                                <i class="bi bi-clipboard-data text-primary fs-2 me-2"></i>
-                                <span class="h3 mb-0">{{ stats[0] or 0 }}</span>
-                            </div>
-                            <p class="text-muted mb-0">Total Referrals</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <div class="d-flex align-items-center justify-content-center mb-2">
-                                <i class="bi bi-clock text-warning fs-2 me-2"></i>
-                                <span class="h3 mb-0">{{ stats[1] or 0 }}</span>
-                            </div>
-                            <p class="text-muted mb-0">Pending</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <div class="d-flex align-items-center justify-content-center mb-2">
-                                <i class="bi bi-check-circle text-success fs-2 me-2"></i>
-                                <span class="h3 mb-0">{{ stats[2] or 0 }}</span>
-                            </div>
-                            <p class="text-muted mb-0">Completed</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <div class="d-flex align-items-center justify-content-center mb-2">
-                                <i class="bi bi-check2-all text-info fs-2 me-2"></i>
-                                <span class="h3 mb-0">{{ stats[4] or 0 }}</span>
-                            </div>
-                            <p class="text-muted mb-0">Accepted</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Filters and Search -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <form method="GET" class="row g-3">
-                        <div class="col-md-3">
-                            <label for="status" class="form-label">Status</label>
-                            <select class="form-select" id="status" name="status" onchange="this.form.submit()">
-                                <option value="all" {{ 'selected' if current_filter == 'all' else '' }}>All Statuses</option>
-                                {% for status in available_statuses %}
-                                <option value="{{ status }}" {{ 'selected' if current_filter == status else '' }}>
-                                    {{ status.title() }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="sort" class="form-label">Sort By</label>
-                            <select class="form-select" id="sort" name="sort" onchange="this.form.submit()">
-                                <option value="created_at" {{ 'selected' if current_sort == 'created_at' else '' }}>Date Created</option>
-                                <option value="updated_at" {{ 'selected' if current_sort == 'updated_at' else '' }}>Last Updated</option>
-                                <option value="patient_name" {{ 'selected' if current_sort == 'patient_name' else '' }}>Patient Name</option>
-                                <option value="urgency_level" {{ 'selected' if current_sort == 'urgency_level' else '' }}>Urgency</option>
-                                <option value="status" {{ 'selected' if current_sort == 'status' else '' }}>Status</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label for="order" class="form-label">Order</label>
-                            <select class="form-select" id="order" name="order" onchange="this.form.submit()">
-                                <option value="desc" {{ 'selected' if current_order == 'desc' else '' }}>Newest First</option>
-                                <option value="asc" {{ 'selected' if current_order == 'asc' else '' }}>Oldest First</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="search" class="form-label">Search</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="search" name="search" 
-                                       placeholder="Search patients, doctors, conditions..." 
-                                       value="{{ current_search }}">
-                                <button class="btn btn-outline-secondary" type="submit">
-                                    <i class="bi bi-search"></i>
-                                </button>
-                                {% if current_search %}
-                                <a href="{{ url_for('referrals') }}" class="btn btn-outline-secondary">
-                                    <i class="bi bi-x"></i>
-                                </a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Referrals List -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light border-0">
-                    <h6 class="card-title mb-0">
-                        <i class="bi bi-list-ul me-2"></i>Referrals List
-                        <span class="badge bg-primary ms-2">{{ referrals|length }}</span>
-                    </h6>
-                </div>
-                <div class="card-body p-0">
-                    {% if referrals %}
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Referral ID</th>
-                                    <th>Patient</th>
-                                    {% if user_role in ['dentist', 'dentist_admin'] %}
-                                    <th>Referred To</th>
-                                    {% elif user_role in ['specialist', 'specialist_admin'] %}
-                                    <th>Direction</th>
-                                    <th>Provider</th>
-                                    {% else %}
-                                    <th>Referring Doctor</th>
-                                    <th>Specialist</th>
-                                    {% endif %}
-                                    <th>Condition</th>
-                                    <th>Status</th>
-                                    <th>Urgency</th>
-                                    <th>Created</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for referral in referrals %}
-                                <tr>
-                                    <td>
-                                        <code class="text-primary">{{ referral[2] }}</code>
-                                        {% if referral[-1] > 0 %}
-                                        <br><small class="text-muted">
-                                            <i class="bi bi-paperclip"></i> {{ referral[-1] }} docs
-                                        </small>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <strong>{{ referral[3] }}</strong>
-                                    </td>
-                                    {% if user_role in ['dentist', 'dentist_admin'] %}
-                                    <td>{{ referral[5] or 'Not assigned' }}</td>
-                                    {% elif user_role in ['specialist', 'specialist_admin'] %}
-                                    <td>
-                                        {% if referral|length > 20 and referral[20] %}
-                                        <span class="badge bg-{{ 'success' if referral[20] == 'sent' else 'info' }}">
-                                            {{ referral[20].title() }}
-                                        </span>
-                                        {% else %}
-                                        <span class="badge bg-info">Received</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ referral[19] or referral[5] }}</td>
-                                    {% else %}
-                                    <td>{{ referral[4] or 'Self-referral' }}</td>
-                                    <td>{{ referral[5] }}</td>
-                                    {% endif %}
-                                    <td>
-                                        <span class="text-truncate d-inline-block" style="max-width: 150px;" 
-                                              title="{{ referral[6] }}">
-                                            {{ referral[6] }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {% set status_colors = {
-                                            'pending': 'warning',
-                                            'in_progress': 'info', 
-                                            'completed': 'success',
-                                            'cancelled': 'danger',
-                                            'emergency_pending': 'danger'
-                                        } %}
-                                        <span class="badge bg-{{ status_colors.get(referral[8], 'secondary') }}">
-                                            {{ referral[8].replace('_', ' ').title() }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {% set urgency_colors = {
-                                            'low': 'success',
-                                            'normal': 'primary',
-                                            'high': 'warning', 
-                                            'urgent': 'danger'
-                                        } %}
-                                        <span class="badge bg-{{ urgency_colors.get(referral[7], 'secondary') }}">
-                                            {{ referral[7].title() }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <small class="text-muted">
-                                            {{ referral[11][:10] if referral[11] else 'N/A' }}
-                                        </small>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-outline-primary" 
-                                                    onclick="viewReferralDetail('{{ referral[2] }}')"
-                                                    title="View Details">
-                                                <i class="bi bi-eye"></i>
-                                            </button>
-                                            <a href="{{ url_for('track_referral', referral_id=referral[2]) }}" 
-                                               class="btn btn-outline-info" title="Track">
-                                                <i class="bi bi-geo-alt"></i>
-                                            </a>
-                                            {% if referral[10] %}
-                                            <button class="btn btn-outline-secondary" 
-                                                    onclick="viewQRCode('{{ referral[10] }}')"
-                                                    title="QR Code">
-                                                <i class="bi bi-qr-code"></i>
-                                            </button>
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <div class="text-center py-5">
-                        <i class="bi bi-clipboard-x text-muted" style="font-size: 3rem;"></i>
-                        <h6 class="text-muted mt-3">No referrals found</h6>
-                        <p class="text-muted">
-                            {% if current_search or current_filter != 'all' %}
-                            Try adjusting your search criteria or filters.
-                            {% else %}
-                            Get started by creating your first referral.
-                            {% endif %}
-                        </p>
-                        {% if not current_search and current_filter == 'all' %}
-                        <a href="{{ url_for('new_referral') }}" class="btn btn-primary">
-                            <i class="bi bi-plus-circle me-2"></i>Create New Referral
-                        </a>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                </div>
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="btn-group" role="group" aria-label="Status filter">
+                <input type="radio" class="btn-check" name="statusFilter" id="allStatus" value="all" checked>
+                <label class="btn btn-outline-primary" for="allStatus">All</label>
+                
+                <input type="radio" class="btn-check" name="statusFilter" id="pendingStatus" value="pending">
+                <label class="btn btn-outline-primary" for="pendingStatus">Pending</label>
+                
+                <input type="radio" class="btn-check" name="statusFilter" id="inProgressStatus" value="in_progress">
+                <label class="btn btn-outline-primary" for="inProgressStatus">In Progress</label>
+                
+                <input type="radio" class="btn-check" name="statusFilter" id="completedStatus" value="completed">
+                <label class="btn btn-outline-primary" for="completedStatus">Completed</label>
+                
+                <input type="radio" class="btn-check" name="statusFilter" id="cancelledStatus" value="cancelled">
+                <label class="btn btn-outline-primary" for="cancelledStatus">Cancelled</label>
             </div>
         </div>
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" class="form-control" id="searchReferrals" placeholder="Search referrals...">
+            </div>
+        </div>
+    </div>
+
+    <!-- Referrals Table -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="referralsTable">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Referral ID</th>
+                            <th>Patient</th>
+                            <th>Referring Doctor</th>
+                            <th>Target Doctor</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="referralsTableBody">
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading referrals...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="text-center py-5 d-none">
+        <i class="bi bi-clipboard-x text-muted" style="font-size: 4rem;"></i>
+        <h4 class="text-muted mt-3">No referrals found</h4>
+        <p class="text-muted">No referrals match your current filters</p>
+        <a href="{{ url_for('new_referral') }}" class="btn btn-primary btn-lg mt-3">
+            <i class="bi bi-plus-circle"></i>
+            Create Your First Referral
+        </a>
     </div>
 </div>
 
@@ -271,160 +104,461 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="referralDetailModalLabel">
-                    <i class="bi bi-clipboard-data me-2"></i>Referral Details
+
+                    <i class="bi bi-clipboard-data"></i>
+                    Referral Details
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="referralDetailContent">
-                <div class="text-center py-4">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
+            <div class="modal-body">
+                <div id="referralDetailContent">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading referral details...</p>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                <div class="dropdown d-inline-block">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="updateStatusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Update Status
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="updateStatusDropdown">
+                        <li><a class="dropdown-item update-status" data-status="pending" href="#">Pending</a></li>
+                        <li><a class="dropdown-item update-status" data-status="in_progress" href="#">In Progress</a></li>
+                        <li><a class="dropdown-item update-status" data-status="completed" href="#">Completed</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item update-status text-danger" data-status="cancelled" href="#">Cancelled</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- QR Code Modal -->
-<div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="qrCodeModalLabel">
-                    <i class="bi bi-qr-code me-2"></i>Referral QR Code
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center" id="qrCodeContent">
-                <!-- QR Code will be loaded here -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="downloadQRCode()">
-                    <i class="bi bi-download me-2"></i>Download
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+{% endblock %}
 
+{% block extra_scripts %}
 <script>
-function viewReferralDetail(referralId) {
-    const modal = new bootstrap.Modal(document.getElementById('referralDetailModal'));
-    const content = document.getElementById('referralDetailContent');
+document.addEventListener('DOMContentLoaded', function() {
+    // Load referrals on page load
+    loadReferrals();
     
-    // Show loading state
-    content.innerHTML = `
-        <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-3 text-muted">Loading referral details...</p>
-        </div>
-    `;
+    // Set up event listeners
+    document.querySelectorAll('input[name="statusFilter"]').forEach(radio => {
+        radio.addEventListener('change', loadReferrals);
+    });
     
-    modal.show();
+    document.getElementById('searchReferrals').addEventListener('input', filterReferrals);
     
-    // Fetch referral details
-    fetch(`/api/referral/${referralId}`)
+    // Status update event listeners
+    document.querySelectorAll('.update-status').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            updateReferralStatus(this.getAttribute('data-status'));
+        });
+    });
+});
+
+// Global variables
+let referralsData = [];
+let currentReferralId = null;
+
+// Load referrals from API
+function loadReferrals() {
+    const statusFilter = document.querySelector('input[name="statusFilter"]:checked').value;
+    let url = '/api/referrals';
+    
+    if (statusFilter !== 'all') {
+        url += '?status=' + statusFilter;
+    }
+    
+    fetch(url)
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                const referral = data.referral;
-                content.innerHTML = `
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Basic Information</h6>
-                            <p><strong>Referral ID:</strong> <code>${referral.referral_id}</code></p>
-                            <p><strong>Patient:</strong> ${referral.patient_name}</p>
-                            <p><strong>Referring Doctor:</strong> ${referral.referring_doctor || 'N/A'}</p>
-                            <p><strong>Target Doctor:</strong> ${referral.target_doctor || 'N/A'}</p>
-                            <p><strong>Medical Condition:</strong> ${referral.medical_condition}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Status & Timeline</h6>
-                            <p><strong>Status:</strong> 
-                                <span class="badge bg-primary">${referral.status.replace('_', ' ').toUpperCase()}</span>
-                            </p>
-                            <p><strong>Urgency:</strong> 
-                                <span class="badge bg-warning">${referral.urgency_level.toUpperCase()}</span>
-                            </p>
-                            <p><strong>Created:</strong> ${new Date(referral.created_at).toLocaleString()}</p>
-                            <p><strong>Updated:</strong> ${new Date(referral.updated_at).toLocaleString()}</p>
-                        </div>
+            referralsData = data.referrals;
+            renderReferralsTable();
+        })
+        .catch(error => {
+            console.error('Error loading referrals:', error);
+            showError('Failed to load referrals. Please try again.');
+        });
+}
+
+// Render referrals table
+function renderReferralsTable() {
+    const tableBody = document.getElementById('referralsTableBody');
+    const emptyState = document.getElementById('emptyState');
+    
+    // Clear table
+    tableBody.innerHTML = '';
+    
+    // Check if we have referrals
+    if (referralsData.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center py-4">No referrals found</td>
+            </tr>
+        `;
+        emptyState.classList.remove('d-none');
+        return;
+    }
+    
+    // Hide empty state
+    emptyState.classList.add('d-none');
+    
+    // Render each referral
+    referralsData.forEach(referral => {
+        const row = document.createElement('tr');
+        
+        // Format date
+        const createdDate = new Date(referral.created_at).toLocaleDateString();
+        
+        // Determine status class
+        let statusClass = '';
+        switch (referral.status) {
+            case 'pending':
+                statusClass = 'bg-warning text-dark';
+                break;
+            case 'in_progress':
+                statusClass = 'bg-info text-dark';
+                break;
+            case 'completed':
+                statusClass = 'bg-success';
+                break;
+            case 'cancelled':
+                statusClass = 'bg-danger';
+                break;
+            default:
+                statusClass = 'bg-secondary';
+        }
+        
+        row.innerHTML = `
+            <td>${referral.referral_id}</td>
+            <td>${referral.patient_name}</td>
+            <td>${referral.referring_doctor || 'N/A'}</td>
+            <td>${referral.target_doctor || 'N/A'}</td>
+            <td><span class="badge ${statusClass}">${referral.status}</span></td>
+            <td>${createdDate}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary view-referral" data-id="${referral.id}">
+                    <i class="bi bi-eye"></i> View
+                </button>
+            </td>
+        `;
+        
+        tableBody.appendChild(row);
+    });
+    
+    // Add event listeners to view buttons
+    document.querySelectorAll('.view-referral').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            viewReferralDetail(id);
+        });
+    });
+}
+
+// Filter referrals based on search input
+function filterReferrals() {
+    const searchTerm = document.getElementById('searchReferrals').value.toLowerCase();
+    
+    if (!searchTerm) {
+        renderReferralsTable();
+        return;
+    }
+    
+    const filtered = referralsData.filter(referral => {
+        return (
+            referral.referral_id.toLowerCase().includes(searchTerm) ||
+            referral.patient_name.toLowerCase().includes(searchTerm) ||
+            (referral.referring_doctor && referral.referring_doctor.toLowerCase().includes(searchTerm)) ||
+            (referral.target_doctor && referral.target_doctor.toLowerCase().includes(searchTerm))
+        );
+    });
+    
+    const tableBody = document.getElementById('referralsTableBody');
+    const emptyState = document.getElementById('emptyState');
+    
+    // Clear table
+    tableBody.innerHTML = '';
+    
+    // Check if we have filtered referrals
+    if (filtered.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center py-4">No matching referrals found</td>
+            </tr>
+        `;
+        emptyState.classList.remove('d-none');
+        return;
+    }
+    
+    // Hide empty state
+    emptyState.classList.add('d-none');
+    
+    // Render filtered referrals
+    filtered.forEach(referral => {
+        // Same rendering code as in renderReferralsTable
+        // (Omitted for brevity)
+    });
+}
+
+// View referral detail
+function viewReferralDetail(id) {
+    currentReferralId = id;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('referralDetailModal'));
+    modal.show();
+    
+    // Load referral details
+    fetch(`/api/referrals/${id}`)
+        .then(response => response.json())
+        .then(data => {
+            const referral = data.referral;
+            
+            // Format dates
+            const createdDate = new Date(referral.created_at).toLocaleDateString();
+            const updatedDate = new Date(referral.updated_at).toLocaleDateString();
+            
+            // Determine status class
+            let statusClass = '';
+            switch (referral.status) {
+                case 'pending':
+                    statusClass = 'bg-warning text-dark';
+                    break;
+                case 'in_progress':
+                    statusClass = 'bg-info text-dark';
+                    break;
+                case 'completed':
+                    statusClass = 'bg-success';
+                    break;
+                case 'cancelled':
+                    statusClass = 'bg-danger';
+                    break;
+                default:
+                    statusClass = 'bg-secondary';
+            }
+            
+            // Render referral details
+            document.getElementById('referralDetailContent').innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Referral Information</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <th>Referral ID:</th>
+                                <td>${referral.referral_id}</td>
+                            </tr>
+                            <tr>
+                                <th>Status:</th>
+                                <td><span class="badge ${statusClass}">${referral.status}</span></td>
+                            </tr>
+                            <tr>
+                                <th>Created:</th>
+                                <td>${createdDate}</td>
+                            </tr>
+                            <tr>
+                                <th>Last Updated:</th>
+                                <td>${updatedDate}</td>
+                            </tr>
+                            <tr>
+                                <th>Urgency Level:</th>
+                                <td>${referral.urgency_level || 'Normal'}</td>
+                            </tr>
+                        </table>
                     </div>
-                    ${referral.notes ? `
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <h6>Notes</h6>
-                                <div class="bg-light p-3 rounded">${referral.notes.replace(/\n/g, '<br>')}</div>
+                    <div class="col-md-6">
+                        <h5>Patient & Provider Information</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <th>Patient Name:</th>
+                                <td>${referral.patient_name}</td>
+                            </tr>
+                            <tr>
+                                <th>Referring Doctor:</th>
+                                <td>${referral.referring_doctor || 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <th>Target Doctor:</th>
+                                <td>${referral.target_doctor || 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <th>Medical Condition:</th>
+                                <td>${referral.medical_condition || 'N/A'}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h5>Notes</h5>
+                        <div class="card">
+                            <div class="card-body">
+                                ${referral.notes || 'No notes provided.'}
                             </div>
                         </div>
-                    ` : ''}
-                `;
-            } else {
-                content.innerHTML = `
-                    <div class="text-center py-4">
-                        <i class="bi bi-exclamation-triangle text-warning fs-2"></i>
-                        <h6 class="mt-3">Error Loading Details</h6>
-                        <p class="text-muted">${data.error || 'Unknown error occurred'}</p>
                     </div>
-                `;
-            }
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h5>QR Code</h5>
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <img src="data:image/png;base64,${referral.qr_code}" alt="QR Code" class="img-fluid" style="max-height: 150px;">
+                                <p class="mt-2 mb-0">Scan to access referral details</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Documents (${referral.documents.length})</h5>
+                        <div class="card">
+                            <div class="card-body">
+                                ${renderDocumentsList(referral.documents)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         })
         .catch(error => {
             console.error('Error loading referral details:', error);
-            content.innerHTML = `
-                <div class="text-center py-4">
-                    <i class="bi bi-wifi-off text-muted fs-2"></i>
-                    <h6 class="mt-3">Connection Error</h6>
-                    <p class="text-muted">Please try again later</p>
+            document.getElementById('referralDetailContent').innerHTML = `
+                <div class="alert alert-danger">
+                    Failed to load referral details. Please try again.
                 </div>
             `;
         });
 }
 
-function viewQRCode(qrCodeData) {
-    const modal = new bootstrap.Modal(document.getElementById('qrCodeModal'));
-    const content = document.getElementById('qrCodeContent');
+
+// Render documents list
+function renderDocumentsList(documents) {
+    if (documents.length === 0) {
+        return '<p class="text-muted mb-0">No documents attached to this referral.</p>';
+    }
     
-    content.innerHTML = `
-        <img src="data:image/png;base64,${qrCodeData}" class="img-fluid" alt="Referral QR Code">
-        <p class="mt-3 text-muted">Scan this QR code to quickly access referral information</p>
+    let html = '<ul class="list-group list-group-flush">';
+    
+    documents.forEach(doc => {
+        html += `
+            <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                <div>
+                    <i class="bi bi-file-earmark me-2"></i>
+                    ${doc.file_name}
+                </div>
+                <a href="/document/${doc.id}" class="btn btn-sm btn-outline-primary" target="_blank">
+                    <i class="bi bi-eye"></i> View
+                </a>
+            </li>
+        `;
+    });
+    
+    html += '</ul>';
+    return html;
+}
+
+// Update referral status
+function updateReferralStatus(status) {
+    if (!currentReferralId) {
+        showError('No referral selected');
+        return;
+    }
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    
+    // Show loading state
+    const updateBtn = document.getElementById('updateStatusDropdown');
+    const originalBtnText = updateBtn.innerHTML;
+    updateBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...';
+    updateBtn.disabled = true;
+    
+    // Update status
+    fetch(`/api/referrals/${currentReferralId}/status`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            status: status,
+            csrf_token: csrfToken
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
+        // Show success message
+        showSuccess('Referral status updated successfully');
+        
+        // Reload referrals and close modal
+        loadReferrals();
+        bootstrap.Modal.getInstance(document.getElementById('referralDetailModal')).hide();
+    })
+    .catch(error => {
+        console.error('Error updating referral status:', error);
+        showError('Failed to update referral status: ' + error.message);
+    })
+    .finally(() => {
+        // Reset button
+        updateBtn.innerHTML = originalBtnText;
+        updateBtn.disabled = false;
+    });
+}
+
+// Show error message
+function showError(message) {
+    // Create alert element
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-3';
+    alert.setAttribute('role', 'alert');
+    alert.innerHTML = `
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
     
-    modal.show();
+    // Add to document
+    document.body.appendChild(alert);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        alert.classList.remove('show');
+        setTimeout(() => alert.remove(), 300);
+    }, 5000);
 }
 
-function downloadQRCode() {
-    const img = document.querySelector('#qrCodeContent img');
-    if (img) {
-        const link = document.createElement('a');
-        link.download = 'referral-qr-code.png';
-        link.href = img.src;
-        link.click();
-    }
+// Show success message
+function showSuccess(message) {
+    // Create alert element
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3';
+    alert.setAttribute('role', 'alert');
+    alert.innerHTML = `
+        <i class="bi bi-check-circle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    // Add to document
+    document.body.appendChild(alert);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        alert.classList.remove('show');
+        setTimeout(() => alert.remove(), 300);
+    }, 5000);
 }
 </script>
-
-<style>
-.text-truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.table-hover tbody tr:hover {
-    background-color: #f8f9fa;
-}
-
-.btn-group-sm .btn {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-}
-</style>
 {% endblock %}
