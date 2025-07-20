@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Choose Portal Experience - Sapyyn{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="mb-4">Choose Your Portal Experience</h1>
+            <p class="lead mb-5">We're introducing a new portal interface. You can try it out or continue using the classic interface.</p>
+        </div>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <h2 class="h4 mb-3">Classic Portal</h2>
+                    <p>Our original interface with all the features you're familiar with.</p>
+                    <img src="{{ url_for('static', filename='images/classic-portal.png') }}" alt="Classic Portal Screenshot" class="img-fluid rounded mb-4">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary btn-lg">Continue to Classic</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-5">
+            <div class="card h-100 shadow-sm border-primary">
+                <div class="card-body text-center p-4">
+                    <h2 class="h4 mb-3">New Portal <span class="badge bg-primary">New</span></h2>
+                    <p>Our redesigned interface with improved navigation and features.</p>
+                    <img src="{{ url_for('static', filename='images/new-portal.png') }}" alt="New Portal Screenshot" class="img-fluid rounded mb-4">
+                    <a href="{{ url_for('new_portal') }}" class="btn btn-primary btn-lg">Try New Portal</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="rememberChoice">
+                <label class="form-check-label" for="rememberChoice">
+                    Remember my choice
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const rememberChoice = document.getElementById('rememberChoice');
+    
+    // Check if user has a saved preference
+    const savedPortal = localStorage.getItem('portalPreference');
+    if (savedPortal) {
+        if (savedPortal === 'new') {
+            window.location.href = "{{ url_for('new_portal') }}";
+        } else {
+            window.location.href = "{{ url_for('dashboard') }}";
+        }
+    }
+    
+    // Set event listeners for portal choices
+    document.querySelectorAll('.btn-outline-primary, .btn-primary').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (rememberChoice.checked) {
+                const isNewPortal = this.href.includes('new-portal');
+                localStorage.setItem('portalPreference', isNewPortal ? 'new' : 'classic');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

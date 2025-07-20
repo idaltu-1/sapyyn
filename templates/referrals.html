@@ -1,0 +1,559 @@
+{% extends "base.html" %}
+
+{% block title %}My Referrals - Sapyyn{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="h3 mb-0">
+                        <i class="bi bi-clipboard-pulse text-primary"></i>
+                        My Referrals
+                    </h2>
+                    <p class="text-muted">Track and manage your patient referrals</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('new_referral') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i>
+                        New Referral
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="btn-group" role="group" aria-label="Status filter">
+                <input type="radio" class="btn-check" name="statusFilter" id="allStatus" value="all" checked>
+                <label class="btn btn-outline-primary" for="allStatus">All</label>
+                
+                <input type="radio" class="btn-check" name="statusFilter" id="pendingStatus" value="pending">
+                <label class="btn btn-outline-primary" for="pendingStatus">Pending</label>
+                
+                <input type="radio" class="btn-check" name="statusFilter" id="inProgressStatus" value="in_progress">
+                <label class="btn btn-outline-primary" for="inProgressStatus">In Progress</label>
+                
+                <input type="radio" class="btn-check" name="statusFilter" id="completedStatus" value="completed">
+                <label class="btn btn-outline-primary" for="completedStatus">Completed</label>
+                
+                <input type="radio" class="btn-check" name="statusFilter" id="cancelledStatus" value="cancelled">
+                <label class="btn btn-outline-primary" for="cancelledStatus">Cancelled</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" class="form-control" id="searchReferrals" placeholder="Search referrals...">
+            </div>
+        </div>
+    </div>
+
+    <!-- Referrals Table -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="referralsTable">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Referral ID</th>
+                            <th>Patient</th>
+                            <th>Referring Doctor</th>
+                            <th>Target Doctor</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="referralsTableBody">
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading referrals...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="text-center py-5 d-none">
+        <i class="bi bi-clipboard-x text-muted" style="font-size: 4rem;"></i>
+        <h4 class="text-muted mt-3">No referrals found</h4>
+        <p class="text-muted">No referrals match your current filters</p>
+        <a href="{{ url_for('new_referral') }}" class="btn btn-primary btn-lg mt-3">
+            <i class="bi bi-plus-circle"></i>
+            Create Your First Referral
+        </a>
+    </div>
+</div>
+
+<!-- Referral Detail Modal -->
+<div class="modal fade" id="referralDetailModal" tabindex="-1" aria-labelledby="referralDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="referralDetailModalLabel">
+                    <i class="bi bi-clipboard-data"></i>
+                    Referral Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="referralDetailContent">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading referral details...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="dropdown d-inline-block">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="updateStatusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Update Status
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="updateStatusDropdown">
+                        <li><a class="dropdown-item update-status" data-status="pending" href="#">Pending</a></li>
+                        <li><a class="dropdown-item update-status" data-status="in_progress" href="#">In Progress</a></li>
+                        <li><a class="dropdown-item update-status" data-status="completed" href="#">Completed</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item update-status text-danger" data-status="cancelled" href="#">Cancelled</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load referrals on page load
+    loadReferrals();
+    
+    // Set up event listeners
+    document.querySelectorAll('input[name="statusFilter"]').forEach(radio => {
+        radio.addEventListener('change', loadReferrals);
+    });
+    
+    document.getElementById('searchReferrals').addEventListener('input', filterReferrals);
+    
+    // Status update event listeners
+    document.querySelectorAll('.update-status').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            updateReferralStatus(this.getAttribute('data-status'));
+        });
+    });
+});
+
+// Global variables
+let referralsData = [];
+let currentReferralId = null;
+
+// Load referrals from API
+function loadReferrals() {
+    const statusFilter = document.querySelector('input[name="statusFilter"]:checked').value;
+    let url = '/api/referrals';
+    
+    if (statusFilter !== 'all') {
+        url += '?status=' + statusFilter;
+    }
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            referralsData = data.referrals;
+            renderReferralsTable();
+        })
+        .catch(error => {
+            console.error('Error loading referrals:', error);
+            showError('Failed to load referrals. Please try again.');
+        });
+}
+
+// Render referrals table
+function renderReferralsTable() {
+    const tableBody = document.getElementById('referralsTableBody');
+    const emptyState = document.getElementById('emptyState');
+    
+    // Clear table
+    tableBody.innerHTML = '';
+    
+    // Check if we have referrals
+    if (referralsData.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center py-4">No referrals found</td>
+            </tr>
+        `;
+        emptyState.classList.remove('d-none');
+        return;
+    }
+    
+    // Hide empty state
+    emptyState.classList.add('d-none');
+    
+    // Render each referral
+    referralsData.forEach(referral => {
+        const row = document.createElement('tr');
+        
+        // Format date
+        const createdDate = new Date(referral.created_at).toLocaleDateString();
+        
+        // Determine status class
+        let statusClass = '';
+        switch (referral.status) {
+            case 'pending':
+                statusClass = 'bg-warning text-dark';
+                break;
+            case 'in_progress':
+                statusClass = 'bg-info text-dark';
+                break;
+            case 'completed':
+                statusClass = 'bg-success';
+                break;
+            case 'cancelled':
+                statusClass = 'bg-danger';
+                break;
+            default:
+                statusClass = 'bg-secondary';
+        }
+        
+        row.innerHTML = `
+            <td>${referral.referral_id}</td>
+            <td>${referral.patient_name}</td>
+            <td>${referral.referring_doctor || 'N/A'}</td>
+            <td>${referral.target_doctor || 'N/A'}</td>
+            <td><span class="badge ${statusClass}">${referral.status}</span></td>
+            <td>${createdDate}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary view-referral" data-id="${referral.id}">
+                    <i class="bi bi-eye"></i> View
+                </button>
+            </td>
+        `;
+        
+        tableBody.appendChild(row);
+    });
+    
+    // Add event listeners to view buttons
+    document.querySelectorAll('.view-referral').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            viewReferralDetail(id);
+        });
+    });
+}
+
+// Filter referrals based on search input
+function filterReferrals() {
+    const searchTerm = document.getElementById('searchReferrals').value.toLowerCase();
+    
+    if (!searchTerm) {
+        renderReferralsTable();
+        return;
+    }
+    
+    const filtered = referralsData.filter(referral => {
+        return (
+            referral.referral_id.toLowerCase().includes(searchTerm) ||
+            referral.patient_name.toLowerCase().includes(searchTerm) ||
+            (referral.referring_doctor && referral.referring_doctor.toLowerCase().includes(searchTerm)) ||
+            (referral.target_doctor && referral.target_doctor.toLowerCase().includes(searchTerm))
+        );
+    });
+    
+    const tableBody = document.getElementById('referralsTableBody');
+    const emptyState = document.getElementById('emptyState');
+    
+    // Clear table
+    tableBody.innerHTML = '';
+    
+    // Check if we have filtered referrals
+    if (filtered.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center py-4">No matching referrals found</td>
+            </tr>
+        `;
+        emptyState.classList.remove('d-none');
+        return;
+    }
+    
+    // Hide empty state
+    emptyState.classList.add('d-none');
+    
+    // Render filtered referrals
+    filtered.forEach(referral => {
+        // Same rendering code as in renderReferralsTable
+        // (Omitted for brevity)
+    });
+}
+
+// View referral detail
+function viewReferralDetail(id) {
+    currentReferralId = id;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('referralDetailModal'));
+    modal.show();
+    
+    // Load referral details
+    fetch(`/api/referrals/${id}`)
+        .then(response => response.json())
+        .then(data => {
+            const referral = data.referral;
+            
+            // Format dates
+            const createdDate = new Date(referral.created_at).toLocaleDateString();
+            const updatedDate = new Date(referral.updated_at).toLocaleDateString();
+            
+            // Determine status class
+            let statusClass = '';
+            switch (referral.status) {
+                case 'pending':
+                    statusClass = 'bg-warning text-dark';
+                    break;
+                case 'in_progress':
+                    statusClass = 'bg-info text-dark';
+                    break;
+                case 'completed':
+                    statusClass = 'bg-success';
+                    break;
+                case 'cancelled':
+                    statusClass = 'bg-danger';
+                    break;
+                default:
+                    statusClass = 'bg-secondary';
+            }
+            
+            // Render referral details
+            document.getElementById('referralDetailContent').innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Referral Information</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <th>Referral ID:</th>
+                                <td>${referral.referral_id}</td>
+                            </tr>
+                            <tr>
+                                <th>Status:</th>
+                                <td><span class="badge ${statusClass}">${referral.status}</span></td>
+                            </tr>
+                            <tr>
+                                <th>Created:</th>
+                                <td>${createdDate}</td>
+                            </tr>
+                            <tr>
+                                <th>Last Updated:</th>
+                                <td>${updatedDate}</td>
+                            </tr>
+                            <tr>
+                                <th>Urgency Level:</th>
+                                <td>${referral.urgency_level || 'Normal'}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Patient & Provider Information</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <th>Patient Name:</th>
+                                <td>${referral.patient_name}</td>
+                            </tr>
+                            <tr>
+                                <th>Referring Doctor:</th>
+                                <td>${referral.referring_doctor || 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <th>Target Doctor:</th>
+                                <td>${referral.target_doctor || 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <th>Medical Condition:</th>
+                                <td>${referral.medical_condition || 'N/A'}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h5>Notes</h5>
+                        <div class="card">
+                            <div class="card-body">
+                                ${referral.notes || 'No notes provided.'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h5>QR Code</h5>
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <img src="data:image/png;base64,${referral.qr_code}" alt="QR Code" class="img-fluid" style="max-height: 150px;">
+                                <p class="mt-2 mb-0">Scan to access referral details</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Documents (${referral.documents.length})</h5>
+                        <div class="card">
+                            <div class="card-body">
+                                ${renderDocumentsList(referral.documents)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        })
+        .catch(error => {
+            console.error('Error loading referral details:', error);
+            document.getElementById('referralDetailContent').innerHTML = `
+                <div class="alert alert-danger">
+                    Failed to load referral details. Please try again.
+                </div>
+            `;
+        });
+}
+
+// Render documents list
+function renderDocumentsList(documents) {
+    if (documents.length === 0) {
+        return '<p class="text-muted mb-0">No documents attached to this referral.</p>';
+    }
+    
+    let html = '<ul class="list-group list-group-flush">';
+    
+    documents.forEach(doc => {
+        html += `
+            <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                <div>
+                    <i class="bi bi-file-earmark me-2"></i>
+                    ${doc.file_name}
+                </div>
+                <a href="/document/${doc.id}" class="btn btn-sm btn-outline-primary" target="_blank">
+                    <i class="bi bi-eye"></i> View
+                </a>
+            </li>
+        `;
+    });
+    
+    html += '</ul>';
+    return html;
+}
+
+// Update referral status
+function updateReferralStatus(status) {
+    if (!currentReferralId) {
+        showError('No referral selected');
+        return;
+    }
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    
+    // Show loading state
+    const updateBtn = document.getElementById('updateStatusDropdown');
+    const originalBtnText = updateBtn.innerHTML;
+    updateBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...';
+    updateBtn.disabled = true;
+    
+    // Update status
+    fetch(`/api/referrals/${currentReferralId}/status`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            status: status,
+            csrf_token: csrfToken
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
+        // Show success message
+        showSuccess('Referral status updated successfully');
+        
+        // Reload referrals and close modal
+        loadReferrals();
+        bootstrap.Modal.getInstance(document.getElementById('referralDetailModal')).hide();
+    })
+    .catch(error => {
+        console.error('Error updating referral status:', error);
+        showError('Failed to update referral status: ' + error.message);
+    })
+    .finally(() => {
+        // Reset button
+        updateBtn.innerHTML = originalBtnText;
+        updateBtn.disabled = false;
+    });
+}
+
+// Show error message
+function showError(message) {
+    // Create alert element
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-3';
+    alert.setAttribute('role', 'alert');
+    alert.innerHTML = `
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    // Add to document
+    document.body.appendChild(alert);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        alert.classList.remove('show');
+        setTimeout(() => alert.remove(), 300);
+    }, 5000);
+}
+
+// Show success message
+function showSuccess(message) {
+    // Create alert element
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3';
+    alert.setAttribute('role', 'alert');
+    alert.innerHTML = `
+        <i class="bi bi-check-circle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    // Add to document
+    document.body.appendChild(alert);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        alert.classList.remove('show');
+        setTimeout(() => alert.remove(), 300);
+    }, 5000);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,374 @@
+<!-- Accessible Form Controls for Sapyyn -->
+
+<!-- Mobile Menu Toggle Button -->
+<button class="mobile-menu-toggle" 
+        aria-label="Toggle mobile menu" 
+        aria-expanded="false"
+        aria-controls="primary-navigation"
+        onclick="toggleMobileMenu()">
+    <span class="sr-only">Menu</span>
+    <span aria-hidden="true">☰</span>
+</button>
+
+<!-- Accessible Code Input Fields -->
+<div class="code-input-container" role="group" aria-labelledby="code-input-label">
+    <label id="code-input-label" class="sr-only">Enter 6-digit referral code</label>
+    
+    <input type="text" 
+           maxlength="1" 
+           class="code-input" 
+           id="code-input-0"
+           aria-label="Referral code digit 1"
+           oninput="moveToNext(this, 0)"
+           pattern="[0-9A-Z]"
+           inputmode="text"
+           autocomplete="off">
+    
+    <input type="text" 
+           maxlength="1" 
+           class="code-input" 
+           id="code-input-1"
+           aria-label="Referral code digit 2"
+           oninput="moveToNext(this, 1)"
+           pattern="[0-9A-Z]"
+           inputmode="text"
+           autocomplete="off">
+    
+    <input type="text" 
+           maxlength="1" 
+           class="code-input" 
+           id="code-input-2"
+           aria-label="Referral code digit 3"
+           oninput="moveToNext(this, 2)"
+           pattern="[0-9A-Z]"
+           inputmode="text"
+           autocomplete="off">
+    
+    <input type="text" 
+           maxlength="1" 
+           class="code-input" 
+           id="code-input-3"
+           aria-label="Referral code digit 4"
+           oninput="moveToNext(this, 3)"
+           pattern="[0-9A-Z]"
+           inputmode="text"
+           autocomplete="off">
+    
+    <input type="text" 
+           maxlength="1" 
+           class="code-input" 
+           id="code-input-4"
+           aria-label="Referral code digit 5"
+           oninput="moveToNext(this, 4)"
+           pattern="[0-9A-Z]"
+           inputmode="text"
+           autocomplete="off">
+    
+    <input type="text" 
+           maxlength="1" 
+           class="code-input" 
+           id="code-input-5"
+           aria-label="Referral code digit 6"
+           oninput="moveToNext(this, 5)"
+           pattern="[0-9A-Z]"
+           inputmode="text"
+           autocomplete="off">
+</div>
+
+<!-- Accessible Form Labels -->
+<label for="email-input" class="form-label">Email Address</label>
+<input type="email" 
+       id="email-input" 
+       name="email" 
+       class="form-input"
+       aria-required="true"
+       aria-invalid="false"
+       aria-describedby="email-error">
+
+<label for="password-input" class="form-label">Password</label>
+<input type="password" 
+       id="password-input" 
+       name="password" 
+       class="form-input"
+       aria-required="true"
+       aria-invalid="false"
+       aria-describedby="password-error">
+
+<label for="referral-code-input" class="form-label">Referral Code</label>
+<input type="text" 
+       id="referral-code-input" 
+       name="referral_code" 
+       class="form-input"
+       aria-describedby="referral-code-help"
+       pattern="[A-Z0-9]{6}"
+       maxlength="6"
+       inputmode="text">
+
+<!-- Accessible Buttons -->
+<button type="submit" 
+        class="btn btn-primary"
+        aria-label="Submit referral form">
+    Submit Referral
+</button>
+
+<button type="button" 
+        class="btn btn-secondary"
+        aria-label="Cancel referral submission"
+        onclick="cancelReferral()">
+    Cancel
+</button>
+
+<button type="button" 
+        class="btn btn-outline"
+        aria-label="Clear all form fields"
+        onclick="clearForm()">
+    Clear Form
+</button>
+
+<!-- Accessible Navigation Buttons -->
+<button type="button" 
+        class="nav-button"
+        aria-label="Go to dashboard"
+        onclick="navigateTo('/dashboard')">
+    Dashboard
+</button>
+
+<button type="button" 
+        class="nav-button"
+        aria-label="View referrals"
+        onclick="navigateTo('/referrals')">
+    Referrals
+</button>
+
+<button type="button" 
+        class="nav-button"
+        aria-label="View appointments"
+        onclick="navigateTo('/appointments')">
+    Appointments
+</button>
+
+<!-- Accessible Form Validation -->
+<div id="email-error" class="error-message" role="alert" aria-live="polite"></div>
+<div id="password-error" class="error-message" role="alert" aria-live="polite"></div>
+<div id="referral-code-help" class="help-text" aria-live="polite">
+    Enter your 6-digit referral code
+</div>
+
+<!-- Screen Reader Only Content -->
+<span class="sr-only">Required fields are marked with an asterisk (*)</span>
+<span class="sr-only">Press Tab to navigate between form fields</span>
+<span class="sr-only">Press Enter to submit the form</span>
+
+<!-- JavaScript for Accessibility -->
+<script>
+// Enhanced accessibility for code inputs
+function moveToNext(input, index) {
+    const nextInput = document.getElementById(`code-input-${index + 1}`);
+    const prevInput = document.getElementById(`code-input-${index - 1}`);
+    
+    if (input.value.length === 1 && nextInput) {
+        nextInput.focus();
+    } else if (input.value.length === 0 && prevInput && event.inputType === 'deleteContentBackward') {
+        prevInput.focus();
+    }
+    
+    // Announce to screen readers
+    const announcement = `Digit ${index + 1} entered`;
+    announceToScreenReader(announcement);
+}
+
+// Screen reader announcements
+function announceToScreenReader(message) {
+    const announcement = document.createElement('div');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.setAttribute('aria-atomic', 'true');
+    announcement.className = 'sr-only';
+    announcement.textContent = message;
+    
+    document.body.appendChild(announcement);
+    setTimeout(() => {
+        document.body.removeChild(announcement);
+    }, 1000);
+}
+
+// Form validation with accessibility
+function validateForm() {
+    const inputs = document.querySelectorAll('.form-input');
+    let isValid = true;
+    
+    inputs.forEach(input => {
+        const errorElement = document.getElementById(`${input.id}-error`);
+        if (!input.value.trim()) {
+            input.setAttribute('aria-invalid', 'true');
+            if (errorElement) {
+                errorElement.textContent = `${input.previousElementSibling.textContent} is required`;
+            }
+            isValid = false;
+        } else {
+            input.setAttribute('aria-invalid', 'false');
+            if (errorElement) {
+                errorElement.textContent = '';
+            }
+        }
+    });
+    
+    return isValid;
+}
+
+// Keyboard navigation for code inputs
+document.addEventListener('keydown', function(e) {
+    if (e.target.classList.contains('code-input')) {
+        const currentIndex = parseInt(e.target.id.split('-').pop());
+        
+        if (e.key === 'ArrowLeft' && currentIndex > 0) {
+            document.getElementById(`code-input-${currentIndex - 1}`).focus();
+            e.preventDefault();
+        } else if (e.key === 'ArrowRight' && currentIndex < 5) {
+            document.getElementById(`code-input-${currentIndex + 1}`).focus();
+            e.preventDefault();
+        }
+    }
+});
+</script>
+
+<style>
+/* Accessibility styles */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.code-input-container {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.code-input {
+    width: 3rem;
+    height: 3rem;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border: 2px solid #ccc;
+    border-radius: 0.5rem;
+    transition: border-color 0.3s;
+}
+
+.code-input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.code-input[aria-invalid="true"] {
+    border-color: #ef4444;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-input[aria-invalid="true"] {
+    border-color: #ef4444;
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.help-text {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+}
+
+.btn-primary {
+    background-color: #2563eb;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-secondary {
+    background-color: #6b7280;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #4b5563;
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: #2563eb;
+    border: 1px solid #2563eb;
+}
+
+.btn-outline:hover {
+    background-color: #2563eb;
+    color: white;
+}
+
+.nav-button {
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    color: #374151;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.nav-button:hover {
+    color: #2563eb;
+}
+
+.nav-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+    border-radius: 0.25rem;
+}
+</style>

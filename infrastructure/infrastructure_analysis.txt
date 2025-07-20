@@ -1,0 +1,78 @@
+=== SAPYYN.COM INFRASTRUCTURE ANALYSIS ===
+Date: Sat Jul 12 19:05:28 EDT 2025
+
+=== DNS A RECORDS ===
+3.12.139.251
+3.18.31.27
+3.134.179.15
+
+=== DNS FULL LOOKUP ===
+
+; <<>> DiG 9.18.30-0ubuntu0.22.04.2-Ubuntu <<>> sapyyn.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 53382
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 3, AUTHORITY: 0, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;sapyyn.com.			IN	A
+
+;; ANSWER SECTION:
+sapyyn.com.		59	IN	A	3.18.31.27
+sapyyn.com.		59	IN	A	3.134.179.15
+sapyyn.com.		59	IN	A	3.12.139.251
+
+;; Query time: 0 msec
+;; SERVER: 8.8.8.8#53(8.8.8.8) (UDP)
+;; WHEN: Sat Jul 12 19:05:29 EDT 2025
+;; MSG SIZE  rcvd: 76
+
+
+=== SUBDOMAIN DNS ===
+3.134.179.15
+3.18.31.27
+3.12.139.251
+3.18.31.27
+3.12.139.251
+3.134.179.15
+
+=== HTTP HEADERS ANALYSIS ===
+--- sapyyn.com ---
+HTTP/2 200 
+date: Sat, 12 Jul 2025 23:05:40 GMT
+content-type: text/html; charset=utf-8
+content-length: 42028
+server: Apache/2.4.58 (Ubuntu)
+vary: RSC,Next-Router-State-Tree,Next-Router-Prefetch,Next-Url,Accept-Encoding
+x-nextjs-cache: HIT
+x-powered-by: Next.js
+cache-control: s-maxage=31536000, stale-while-revalidate
+etag: "cs6342z76qwf2"
+
+
+--- portal.sapyyn.com ---
+HTTP/2 200 
+date: Sat, 12 Jul 2025 23:05:40 GMT
+content-type: text/html
+content-length: 884
+server: Apache/2.4.58 (Ubuntu)
+last-modified: Mon, 09 Dec 2024 05:06:17 GMT
+etag: "374-628cf530df6a7"
+accept-ranges: bytes
+vary: Accept-Encoding
+
+
+--- admin.sapyyn.com ---
+HTTP/2 200 
+date: Sat, 12 Jul 2025 23:05:40 GMT
+content-type: text/html
+content-length: 1174
+server: Apache/2.4.58 (Ubuntu)
+last-modified: Thu, 12 Jun 2025 12:55:33 GMT
+etag: "496-6375f71f920cb"
+accept-ranges: bytes
+vary: Accept-Encoding
+
+
+=== PORT SCAN ANALYSIS ===
+Port scan completed with limited results
