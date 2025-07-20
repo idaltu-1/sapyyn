@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapyyn - Healthcare Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header {
+            margin-bottom: 3rem;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .feature h3 {
+            margin-bottom: 1rem;
+            color: #4ecdc4;
+        }
+        
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            border-left: 4px solid #4ecdc4;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .api-status {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-family: monospace;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="logo">SAPYYN</h1>
+            <p class="tagline">Advanced Healthcare Platform - Now Live!</p>
+        </div>
+        
+        <div class="status">
+            <h2>🎉 Platform Status: OPERATIONAL</h2>
+            <p>Your Sapyyn platform is successfully deployed and running!</p>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <h3>🔐 User Authentication</h3>
+                <p>Secure login and user management system</p>
+            </div>
+            <div class="feature">
+                <h3>📊 Content Management</h3>
+                <p>Comprehensive content and data management</p>
+            </div>
+            <div class="feature">
+                <h3>📈 Analytics Dashboard</h3>
+                <p>Real-time analytics and reporting</p>
+            </div>
+            <div class="feature">
+                <h3>⚡ Real-time Updates</h3>
+                <p>Live data synchronization and updates</p>
+            </div>
+        </div>
+        
+        <div class="api-status">
+            <h3>🔌 API Endpoints:</h3>
+            <div id="api-results">
+                <p>Loading API status...</p>
+            </div>
+        </div>
+        
+        <div>
+            <a href="/api/health" class="btn">Health Check</a>
+            <a href="/api/demo" class="btn">Demo API</a>
+        </div>
+        
+        <div style="margin-top: 3rem; opacity: 0.7;">
+            <p>Built with ❤️ by the Sapyyn Team</p>
+            <p>Deployed on Heroku • Powered by Node.js & MongoDB</p>
+        </div>
+    </div>
+
+    <script>
+        // Test API endpoints
+        async function testAPIs() {
+            const results = document.getElementById('api-results');
+            
+            try {
+                // Test health endpoint
+                const healthResponse = await fetch('/api/health');
+                const healthData = await healthResponse.json();
+                
+                // Test demo endpoint
+                const demoResponse = await fetch('/api/demo');
+                const demoData = await demoResponse.json();
+                
+                results.innerHTML = `
+                    <div>✅ Health Check: ${healthData.status} (Uptime: ${Math.floor(healthData.uptime)}s)</div>
+                    <div>✅ Demo API: ${demoData.status}</div>
+                    <div>✅ Environment: ${healthData.environment}</div>
+                    <div>✅ Timestamp: ${new Date(healthData.timestamp).toLocaleString()}</div>
+                `;
+            } catch (error) {
+                results.innerHTML = `<div>⚠️ API Status: ${error.message}</div>`;
+            }
+        }
+        
+        // Load API status when page loads
+        window.addEventListener('load', testAPIs);
+        
+        // Refresh every 30 seconds
+        setInterval(testAPIs, 30000);
+    </script>
+</body>
+</html>
