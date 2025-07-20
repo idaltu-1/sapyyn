@@ -1,0 +1,53 @@
+{
+  "name": "sapyyn-platform",
+  "version": "1.0.0",
+  "description": "Complete healthcare referral management platform with enhanced features",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js || node server.js",
+    "test": "echo 'Tests not configured yet'",
+    "install:clean": "rm -rf node_modules package-lock.json && npm install",
+    "install:force": "npm install --force",
+    "install:legacy": "npm install --legacy-peer-deps",
+    "fix:deps": "./scripts/quick-fix.sh",
+    "emergency:install": "./scripts/emergency-install.sh",
+    "setup": "./scripts/install-prereqs.sh",
+    "postinstall": "echo '✅ Installation complete! Run: npm run dev'",
+    "docker:build": "docker build -t sapyyn-platform .",
+    "docker:run": "docker run -p 3000:3000 sapyyn-platform"
+  },
+  "dependencies": {
+    "express": "*",
+    "mongoose": "*",
+    "cors": "*",
+    "bcryptjs": "*",
+    "jsonwebtoken": "*",
+    "dotenv": "*",
+    "helmet": "*",
+    "express-rate-limit": "*",
+    "express-validator": "*",
+    "multer": "*",
+    "nodemailer": "*",
+    "axios": "*",
+    "form-data": "*"
+  },
+  "devDependencies": {
+    "nodemon": "*"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/idaltu-1/sapyyn.git"
+  },
+  "keywords": [
+    "healthcare",
+    "referrals",
+    "medical",
+    "platform"
+  ],
+  "author": "Sapyyn Team",
+  "license": "MIT"
+}

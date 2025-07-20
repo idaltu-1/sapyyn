@@ -1,0 +1,210 @@
+/* Portal-specific styles */
+.portal-card {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.portal-card:hover {
+    transform: translateY(-5px);
+}
+
+.portal-option {
+    transition: all 0.3s ease;
+    border-color: #dee2e6 !important;
+}
+
+.portal-option:hover {
+    border-color: #007bff !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 123, 255, 0.15) !important;
+}
+
+.portal-option[data-portal="patient"]:hover {
+    border-color: #007bff !important;
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.portal-option[data-portal="dentist"]:hover {
+    border-color: #28a745 !important;
+    background-color: rgba(40, 167, 69, 0.05);
+}
+
+.portal-option[data-portal="specialist"]:hover {
+    border-color: #17a2b8 !important;
+    background-color: rgba(23, 162, 184, 0.05);
+}
+
+/* Form validation styles */
+.is-invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.is-valid {
+    border-color: #28a745;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.8.767L4.6 5.976 7.15 4.127l-.907-.955-2.057 1.643-.843-.844L2.3 4.982z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+/* Loading spinner styles */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Alert styles */
+.alert {
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+}
+
+/* Card shadows */
+.card {
+    border-radius: 1rem;
+    border: none;
+}
+
+.shadow {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Input group styles */
+.input-group-text {
+    border-color: #ced4da;
+    background-color: #f8f9fa;
+}
+
+/* Button styles */
+.btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border: none;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    border: none;
+}
+
+.btn-outline-warning {
+    color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-outline-warning:hover {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+}
+
+.btn-outline-info {
+    color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.btn-outline-info:hover {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: #fff;
+}
+
+.btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+}
+
+/* Modal styles */
+.modal-content {
+    border-radius: 1rem;
+    border: none;
+}
+
+.modal-header {
+    border-bottom: 1px solid #f8f9fa;
+    border-radius: 1rem 1rem 0 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .card-body.p-5 {
+        padding: 2rem !important;
+    }
+    
+    .portal-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Custom background gradient */
+body.bg-light {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+}
+
+/* Logo and branding */
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Form focus states */
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Professional info section */
+#professionalInfo {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Reward item styles for future use */
+.reward-item {
+    transition: all 0.3s ease;
+}
+
+.reward-item:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+}
+
+/* Password strength indicator */
+.password-strength {
+    height: 4px;
+    border-radius: 2px;
+    margin-top: 0.5rem;
+}
+
+.password-strength.weak {
+    background-color: #dc3545;
+    width: 25%;
+}
+
+.password-strength.medium {
+    background-color: #ffc107;
+    width: 50%;
+}
+
+.password-strength.strong {
+    background-color: #28a745;
+    width: 100%;
+}

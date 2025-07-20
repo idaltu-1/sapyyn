@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Referral Form - Sapyyn</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/quick-referral.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Header -->
+    <nav class="navbar navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="/">
+                <i class="fas fa-heartbeat me-2"></i>Sapyyn
+            </a>
+            <span class="navbar-text">
+                <i class="fas fa-user-md me-2"></i>Dentist Referral Form
+            </span>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Important Notice -->
+                <div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+                    <div class="d-flex align-items-start">
+                        <i class="fas fa-info-circle fa-lg text-info me-3 mt-1"></i>
+                        <div>
+                            <h6 class="alert-heading mb-2">For Referring Dentists Only</h6>
+                            <p class="mb-2">
+                                This form is designed for <strong>dentists and healthcare professionals</strong> to submit 
+                                patient referrals to specialists using a unique 6-digit referral code.
+                            </p>
+                            <small class="text-muted">
+                                Patients should contact their dentist directly for referrals. This is not a patient self-referral form.
+                            </small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Code Verification -->
+                <div id="codeVerification" class="card shadow border-0">
+                    <div class="card-header bg-primary text-white text-center py-4">
+                        <h3><i class="fas fa-key me-2"></i>Enter Referral Code</h3>
+                        <p class="mb-0 opacity-75">Please enter the 6-digit code provided by the receiving specialist</p>
+                    </div>
+                    <div class="card-body p-5">
+                        <form id="codeForm">
+                            <div class="mb-4">
+                                <label for="referralCode" class="form-label fw-semibold">Specialist's Referral Code</label>
+                                <div class="code-input-container">
+                                    <input 
+                                        type="text" 
+                                        class="form-control form-control-lg text-center"
+                                        id="referralCode" 
+                                        placeholder="Enter 6-digit code"
+                                        maxlength="6"
+                                        pattern="[A-Za-z0-9]{6}"
+                                        required
+                                        autocomplete="off"
+                                    >
+                                    <div class="code-format-hint">
+                                        <small class="text-muted">Format: ABC123 (6 characters, case-insensitive)</small>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg w-100" id="verifyButton">
+                                <span class="spinner-border spinner-border-sm d-none me-2" id="verifySpinner"></span>
+                                <i class="fas fa-check me-2"></i>Verify Code
+                            </button>
+                        </form>
+
+                        <div class="help-section mt-4 p-3 bg-light rounded">
+                            <h6 class="text-dark">
+                                <i class="fas fa-question-circle me-2"></i>How to get a referral code:
+                            </h6>
+                            <ul class="list-unstyled mb-0 small">
+                                <li><i class="fas fa-check text-success me-2"></i>Contact the specialist you want to refer to</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Request their 6-digit Sapyyn referral code</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Use the code to submit referrals quickly</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Track the referral status through the platform</li>
+                            </ul>
+                        </div>
+
+                        <!-- Demo Code Info -->
+                        <div class="demo-info mt-3 p-3 bg-warning bg-opacity-10 border border-warning rounded">
+                            <h6 class="text-warning">
+                                <i class="fas fa-flask me-2"></i>Demo Mode
+                            </h6>
+                            <p class="mb-2 small">
+                                For testing purposes, you can use the demo code: <strong>ABC123</strong>
+                            </p>
+                            <small class="text-muted">
+                                This will show how the referral form works without submitting real data.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Specialist Info Display -->
+                <div id="specialistInfo" class="card shadow border-0 mt-4" style="display: none;">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user-md me-2"></i>Receiving Specialist Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="specialist-info-item">
+                                    <strong>Specialist:</strong>
+                                    <span id="specialistName">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="specialist-info-item">
+                                    <strong>Practice:</strong>
+                                    <span id="practiceName">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <div class="specialist-info-item">
+                                    <strong>Contact:</strong>
+                                    <span id="practicePhone">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="specialist-info-item">
+                                    <strong>Location:</strong>
+                                    <span id="practiceAddress">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professional Referral Form -->
+                <div id="referralForm" class="card shadow border-0 mt-4" style="display: none;">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-file-medical me-2"></i>Patient Referral Information
+                        </h5>
+                        <small class="opacity-75">Complete this form to submit a professional referral</small>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="quickReferralForm" novalidate>
+                            <!-- Referring Dentist Information -->
+                            <div class="section-header">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-user-tie me-2"></i>Referring Dentist Information
+                                </h6>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="dentistFirstName" class="form-label">Your First Name *</label>
+                                        <input type="text" class="form-control" id="dentistFirstName" required>
+                                        <div class="invalid-feedback">Please enter your first name</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="dentistLastName" class="form-label">Your Last Name *</label>
+                                        <input type="text" class="form-control" id="dentistLastName" required>
+                                        <div class="invalid-feedback">Please enter your last name</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="dentistEmail" class="form-label">Your Email Address *</label>
+                                        <input type="email" class="form-control" id="dentistEmail" required>
+                                        <div class="invalid-feedback">Please enter a valid email address</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="dentistPhone" class="form-label">Your Phone Number *</label>
+                                        <input type="tel" class="form-control" id="dentistPhone" required>
+                                        <div class="invalid-feedback">Please enter a valid phone number</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="dentistPractice" class="form-label">Your Practice Name *</label>
+                                        <input type="text" class="form-control" id="dentistPractice" required>
+                                        <div class="invalid-feedback">Please enter your practice name</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="dentistLicense" class="form-label">License Number</label>
+                                        <input type="text" class="form-control" id="dentistLicense">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Patient Information -->
+                            <div class="section-header">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-user me-2"></i>Patient Information
+                                </h6>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="patientFirstName" class="form-label">Patient First Name *</label>
+                                        <input type="text" class="form-control" id="patientFirstName" required>
+                                        <div class="invalid-feedback">Please enter patient's first name</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="patientLastName" class="form-label">Patient Last Name *</label>
+                                        <input type="text" class="form-control" id="patientLastName" required>
+                                        <div class="invalid-feedback">Please enter patient's last name</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="patientPhone" class="form-label">Patient Phone Number *</label>
+                                        <input type="tel" class="form-control" id="patientPhone" required>
+                                        <div class="invalid-feedback">Please enter patient's phone number</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="patientEmail" class="form-label">Patient Email Address</label>
+                                        <input type="email" class="form-control" id="patientEmail">
+                                        <div class="invalid-feedback">Please enter a valid email address</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="patientDOB" class="form-label">Date of Birth</label>
+                                        <input type="date" class="form-control" id="patientDOB">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="patientInsurance" class="form-label">Insurance Provider</label>
+                                        <input type="text" class="form-control" id="patientInsurance" placeholder="e.g., Blue Cross, Aetna">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Referral Details -->
+                            <div class="section-header">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-stethoscope me-2"></i>Referral Details
+                                </h6>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="referralType" class="form-label">Referral Type *</label>
+                                        <select class="form-select" id="referralType" required>
+                                            <option value="">Select referral type...</option>
+                                            <option value="specialist_consultation">Specialist Consultation</option>
+                                            <option value="oral_surgery">Oral Surgery</option>
+                                            <option value="orthodontic_evaluation">Orthodontic Evaluation</option>
+                                            <option value="periodontal_treatment">Periodontal Treatment</option>
+                                            <option value="endodontic_treatment">Endodontic Treatment</option>
+                                            <option value="prosthodontic_consultation">Prosthodontic Consultation</option>
+                                            <option value="diagnostic_imaging">Diagnostic Imaging</option>
+                                            <option value="emergency_care">Emergency Care</option>
+                                            <option value="second_opinion">Second Opinion</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select a referral type</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="urgencyLevel" class="form-label">Urgency Level *</label>
+                                        <select class="form-select" id="urgencyLevel" required>
+                                            <option value="">Select urgency...</option>
+                                            <option value="routine">Routine (2-4 weeks)</option>
+                                            <option value="urgent">Urgent (1-2 weeks)</option>
+                                            <option value="emergency">Emergency (24-48 hours)</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select urgency level</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="clinicalNotes" class="form-label">Clinical Notes & History *</label>
+                                <textarea 
+                                    class="form-control" 
+                                    id="clinicalNotes" 
+                                    rows="5" 
+                                    placeholder="Please provide detailed clinical information including:
+• Chief complaint and symptoms
+• Relevant medical/dental history
+• Current medications
+• Clinical findings and diagnosis
+• Specific reason for referral
+• Any special considerations or requirements"
+                                    required
+                                ></textarea>
+                                <div class="invalid-feedback">Please provide detailed clinical notes</div>
+                                <div class="form-text">
+                                    Comprehensive clinical information helps ensure appropriate specialist care
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="timeframe" class="form-label">Preferred Appointment Timeframe</label>
+                                        <select class="form-select" id="timeframe">
+                                            <option value="">No specific preference</option>
+                                            <option value="asap">As soon as possible</option>
+                                            <option value="this_week">This week</option>
+                                            <option value="next_week">Next week</option>
+                                            <option value="within_month">Within a month</option>
+                                            <option value="flexible">Flexible scheduling</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="communicationPreference" class="form-label">Communication Preference</label>
+                                        <select class="form-select" id="communicationPreference">
+                                            <option value="phone">Phone call</option>
+                                            <option value="email">Email</option>
+                                            <option value="both">Phone and email</option>
+                                            <option value="secure_message">Secure messaging only</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Additional Information -->
+                            <div class="section-header">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Additional Information
+                                </h6>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="patientConsent" required>
+                                    <label class="form-check-label" for="patientConsent">
+                                        Patient has provided informed consent for this referral and sharing of medical information *
+                                    </label>
+                                    <div class="invalid-feedback">Patient consent is required for professional referrals</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="followUpRequired">
+                                    <label class="form-check-label" for="followUpRequired">
+                                        Follow-up appointment with referring dentist required after specialist consultation
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="reportRequired">
+                                    <label class="form-check-label" for="reportRequired">
+                                        Request detailed treatment report from specialist
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="additionalNotes" class="form-label">Additional Notes</label>
+                                <textarea 
+                                    class="form-control" 
+                                    id="additionalNotes" 
+                                    rows="3" 
+                                    placeholder="Any additional information, special instructions, or coordination notes..."
+                                ></textarea>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success btn-lg" id="submitButton">
+                                    <span class="spinner-border spinner-border-sm d-none me-2" id="submitSpinner"></span>
+                                    <i class="fas fa-paper-plane me-2"></i>Submit Professional Referral
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Success Message -->
+                <div id="successMessage" class="card border-success shadow mt-4" style="display: none;">
+                    <div class="card-header bg-success text-white text-center">
+                        <h4><i class="fas fa-check-circle me-2"></i>Referral Submitted Successfully!</h4>
+                    </div>
+                    <div class="card-body text-center p-4">
+                        <div class="success-icon mb-3">
+                            <i class="fas fa-check-circle fa-4x text-success"></i>
+                        </div>
+                        <h5 class="text-success mb-3">Professional referral has been submitted</h5>
+                        <div class="referral-details">
+                            <p><strong>Referral ID:</strong> <span id="submittedReferralId" class="text-primary"></span></p>
+                            <p><strong>Patient:</strong> <span id="submittedPatientName"></span></p>
+                            <p><strong>Referring Dentist:</strong> <span id="submittedDentistName"></span></p>
+                            <p><strong>Type:</strong> <span id="submittedReferralType"></span></p>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>What happens next?</h6>
+                            <ul class="list-unstyled text-start mb-0">
+                                <li>• The specialist will receive your referral immediately</li>
+                                <li>• Patient will be contacted within the specified timeframe</li>
+                                <li>• You'll receive confirmation once the appointment is scheduled</li>
+                                <li>• Treatment reports will be sent as requested</li>
+                                <li>• Follow-up coordination will be arranged as needed</li>
+                            </ul>
+                        </div>
+
+                        <div class="action-buttons">
+                            <a href="#" class="btn btn-primary me-2" id="trackReferralBtn">
+                                <i class="fas fa-search me-2"></i>Track This Referral
+                            </a>
+                            <button class="btn btn-outline-secondary" onclick="resetForm()">
+                                <i class="fas fa-plus me-2"></i>Submit Another Referral
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 9999;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/quick-referral-form.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # Main Application
+  sapyyn-app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://sapyyn-mongo:27017/sapyyn
+      - JWT_SECRET=your-jwt-secret-key
+      - FRONTEND_URL=http://localhost:3000
+    depends_on:
+      - sapyyn-mongo
+      - sapyyn-redis
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - sapyyn-network
+
+  # MongoDB Database
+  sapyyn-mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=sapyyn
+    volumes:
+      - sapyyn-mongo-data:/data/db
+      - ./docker/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    restart: unless-stopped
+    networks:
+      - sapyyn-network
+
+  # Redis for Caching and Sessions
+  sapyyn-redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - sapyyn-redis-data:/data
+    restart: unless-stopped
+    networks:
+      - sapyyn-network
+
+  # Nginx Reverse Proxy (Optional)
+  sapyyn-nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - sapyyn-app
+    restart: unless-stopped
+    networks:
+      - sapyyn-network
+
+volumes:
+  sapyyn-mongo-data:
+  sapyyn-redis-data:
+
+networks:
+  sapyyn-network:
+    driver: bridge
