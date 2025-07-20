@@ -1,0 +1,211 @@
+{% extends "accessible-base.html" %}
+
+{% block title %}Sign In - Sapyyn Patient Referral System{% endblock %}
+
+{% block content %}
+<main id="main-content" role="main">
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1>Sign In to Sapyyn</h1>
+            <p class="auth-description">Access your secure patient referral dashboard</p>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="error-summary" role="alert" aria-live="assertive">
+                        <h2>There was a problem</h2>
+                        <ul>
+                            {% for category, message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST" action="/login" class="auth-form" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="form-group">
+                    <label for="email" class="form-label required">
+                        Email Address
+                        <span class="sr-only">(required)</span>
+                    </label>
+                    <input type="email" 
+                           id="email" 
+                           name="email" 
+                           class="form-input" 
+                           required 
+                           aria-required="true"
+                           aria-describedby="email-help email-error"
+                           placeholder="your.email@example.com">
+                    <div id="email-help" class="form-help">
+                        Enter the email address associated with your account
+                    </div>
+                    <div id="email-error" class="form-error" role="alert" aria-live="polite"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label required">
+                        Password
+                        <span class="sr-only">(required)</span>
+                    </label>
+                    <input type="password" 
+                           id="password" 
+                           name="password" 
+                           class="form-input" 
+                           required 
+                           aria-required="true"
+                           aria-describedby="password-help password-error"
+                           placeholder="Enter your password">
+                    <div id="password-help" class="form-help">
+                        Your secure password (minimum 8 characters)
+                    </div>
+                    <div id="password-error" class="form-error" role="alert" aria-live="polite"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" 
+                               id="remember" 
+                               name="remember" 
+                               aria-describedby="remember-help">
+                        <span>Remember me on this device</span>
+                    </label>
+                    <div id="remember-help" class="form-help">
+                        Only check this box on personal devices
+                    </div>
+                </div>
+                
+                <button type="submit" 
+                        class="btn btn-primary btn-full-width" 
+                        aria-label="Sign in to your Sapyyn account">
+                    Sign In
+                </button>
+                
+                <div class="auth-links">
+                    <a href="/forgot-password" aria-label="Reset your password">Forgot your password?</a>
+                    <a href="/register" aria-label="Create a new Sapyyn account">Don't have an account? Sign up</a>
+                </div>
+            </form>
+        </div>
+        
+        <div class="auth-info">
+            <h2>Why Choose Sapyyn?</h2>
+            <ul>
+                <li>Secure, HIPAA-compliant referrals</li>
+                <li>Real-time tracking and updates</li>
+                <li>Integrated appointment scheduling</li>
+                <li>Rewards program for referrals</li>
+                <li>24/7 accessibility support</li>
+            </ul>
+        </div>
+    </div>
+</main>
+
+<style>
+.auth-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.auth-card h1 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: #111827;
+}
+
+.auth-description {
+    color: #6b7280;
+    margin-bottom: 2rem;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.btn-full-width {
+    width: 100%;
+}
+
+.auth-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.auth-links a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.auth-links a:hover,
+.auth-links a:focus {
+    text-decoration: underline;
+}
+
+.auth-info {
+    background: #f9fafb;
+    border-radius: 0.5rem;
+    padding: 2rem;
+}
+
+.auth-info h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #111827;
+}
+
+.auth-info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.auth-info li {
+    padding: 0.5rem 0;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.auth-info li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #16a34a;
+    font-weight: bold;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .auth-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,164 @@
+/* Promotions and Rewards CSS */
+
+/* Rewards Page Styles */
+.rewards-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.rewards-hero {
+    text-align: center;
+    padding: 3rem 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.rewards-hero h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.rewards-hero p {
+    font-size: 1.2rem;
+    color: #666;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.rewards-benefits, .rewards-tiers, .rewards-cta {
+    margin-bottom: 3rem;
+}
+
+.rewards-benefits h2, .rewards-tiers h2, .rewards-cta h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.benefit-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.benefit-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #0056b3;
+}
+
+.benefit-card p {
+    color: #666;
+}
+
+.tiers-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.tier-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tier-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #0056b3;
+}
+
+.tier-card p {
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #666;
+}
+
+.tier-card ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+}
+
+.tier-card ul li {
+    margin-bottom: 0.5rem;
+    color: #666;
+}
+
+.rewards-cta {
+    text-align: center;
+    padding: 3rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.rewards-cta p {
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    color: #666;
+}
+
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #0056b3;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #003d7a;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #545b62;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .benefits-grid, .tiers-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .rewards-hero h1 {
+        font-size: 2rem;
+    }
+    
+    .rewards-hero p {
+        font-size: 1rem;
+    }
+    
+    .rewards-benefits h2, .rewards-tiers h2, .rewards-cta h2 {
+        font-size: 1.5rem;
+    }
+}

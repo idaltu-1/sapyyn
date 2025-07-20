@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Sapyyn - Patient Referral System{% endblock %}</title>
-    
+    <title>{% block title %}Sapyyn - Dental Referral Platform | Transforming Patient Care{% endblock %}</title>
     <!-- SEO Meta Tags -->
     <meta name="description" content="{% block description %}Sapyyn - Secure patient referral system with HIPAA-compliant document management, QR code tracking, and seamless provider communication.{% endblock %}">
     <meta name="keywords" content="patient referral, dental referral, medical referral, HIPAA compliant, document management, healthcare">
@@ -65,7 +64,7 @@
     
     {% block structured_data %}{% endblock %}
     
-    {% if analytics_enabled %}
+    {% if analytics_enabled and ga4_id %}
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga4_id }}"></script>
     <script>
@@ -96,39 +95,48 @@
         });
         {% endif %}
     </script>
+    {% endif %}
     
+    {% if analytics_enabled and gtm_id %}
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','{{ gtm_id }}');</script>
+    {% endif %}
     
+    {% if analytics_enabled and hotjar_id %}
     <!-- Hotjar Tracking Code -->
     <script>
         (function(h,o,t,j,a,r){
             h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-            h._hjSettings={hjid:{{ hotjar_id }},hjsv:6};
+            h._hjSettings={hjid:parseInt('{{ hotjar_id }}'),hjsv:6};
             a=o.getElementsByTagName('head')[0];
             r=o.createElement('script');r.async=1;
             r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
             a.appendChild(r);
         })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
     </script>
+    {% endif %}
     
+    {% if analytics_enabled %}
     <!-- Analytics Configuration for JavaScript -->
     <script>
         window.ANALYTICS_CONFIG = {
-            ga4MeasurementId: '{{ ga4_id }}',
-            hotjarSiteId: '{{ hotjar_id }}',
-            gtmContainerId: '{{ gtm_id }}',
-            environment: '{{ analytics_config.ENVIRONMENT }}',
-            userId: {% if session.user_id %}'{{ session.user_id }}'{% else %}null{% endif %},
-            userRole: {% if session.role %}'{{ session.role }}'{% else %}null{% endif %},
-            enableDebug: {{ 'true' if analytics_config.ENVIRONMENT == 'development' else 'false' }}
+            ga4MeasurementId: '{{ ga4_id or "" }}',
+            hotjarSiteId: '{{ hotjar_id or "" }}',
+            gtmContainerId: '{{ gtm_id or "" }}',
+            environment: '{{ analytics_config.ENVIRONMENT or "production" }}',
+            userId: '{{ session.user_id or "" }}',
+            userRole: '{{ session.role or "" }}',
+            enableDebug: false
         };
     </script>
     {% endif %}
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     
     <!-- Bootstrap CSS -->
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css'">
@@ -136,6 +144,11 @@
     <link href="{{ url_for('static', filename='css/bootstrap-icons.css') }}" rel="stylesheet" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css'">
     <!-- Custom CSS -->
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <!-- Modern Enhanced Styles -->
+    <link href="{{ url_for('static', filename='css/modern-styles.css') }}" rel="stylesheet">
+
+    <!-- Portal-specific custom styles defining colour palette and quick actions -->
+    <link href="{{ url_for('static', filename='css/portal_custom.css') }}" rel="stylesheet">
     
     {% block extra_head %}{% endblock %}
 </head>
@@ -146,191 +159,217 @@
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     {% endif %}
     
-    <!-- Enhanced Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm" id="mainNavbar">
+    <!-- Clean Header Navigation - Fixed Logo Duplication -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm" id="mainNavbar">
         <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('index') }}">
-                <i class="bi bi-hospital me-2 fs-4"></i>
-                <span class="fs-4">Sapyyn</span>
+            <!-- Single Clean Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='images/sapyyn-logo.svg') }}" 
+                     alt="Sapyyn" 
+                     class="navbar-logo"
+                     style="height: 36px; width: auto;">
             </a>
             
-            <button class="navbar-toggler border-0 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <!-- Mobile Toggle Button -->
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-label="Toggle navigation menu" aria-controls="navbarNav" aria-expanded="false" title="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             
+            <!-- Navigation Content -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     {% if session.user_id %}
-                    <!-- Authenticated User Navigation -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('dashboard') }}">
-                            <i class="bi bi-speedometer2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('new_referral') }}">
-                            <i class="bi bi-plus-circle"></i> New Referral
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('upload_file') }}">
-                            <i class="bi bi-cloud-upload"></i> Upload Documents
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('view_documents') }}">
-                            <i class="bi bi-files"></i> My Documents
-                        </a>
-                    </li>
-                    <!-- Portal Pages Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="portalDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-grid-3x3-gap"></i> Portal
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('portal_dashboard') }}"><i class="bi bi-speedometer2"></i> Portal Dashboard</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('referral_history') }}"><i class="bi bi-clock-history"></i> Referral History</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('track_referral') }}"><i class="bi bi-search"></i> Track Referral</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('appointments') }}"><i class="bi bi-calendar-check"></i> Appointments</a></li>
-                            {% if session.role in ['admin', 'dentist_admin', 'specialist_admin'] %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li><h6 class="dropdown-header">Administration</h6></li>
-                            <li><a class="dropdown-item" href="{{ url_for('admin_panel') }}"><i class="bi bi-gear"></i> Admin Panel</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('analytics_dashboard') }}"><i class="bi bi-graph-up"></i> Analytics Dashboard</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('serve_static_page', filename='admin-users') }}"><i class="bi bi-people"></i> Manage Users</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('serve_static_page', filename='admin-referrals') }}"><i class="bi bi-clipboard-data"></i> Manage Referrals</a></li>
-                            {% endif %}
-                        </ul>
-                    </li>
-                    <!-- Rewards -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('rewards_dashboard') }}">
-                            <i class="bi bi-trophy"></i> Rewards
-                        </a>
-                    </li>
+                        <!-- Authenticated Navigation -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('dashboard') }}">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('new_referral') }}">
+                                <i class="bi bi-plus-circle"></i> New Referral
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('my_referrals') }}">
+                                <i class="bi bi-people"></i> My Referrals
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('portal_appointments') }}">
+                                <i class="bi bi-calendar-check"></i> Appointments
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('rewards_dashboard') }}">
+                                <i class="bi bi-trophy"></i> Rewards
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('upload_file') }}">
+                                <i class="bi bi-cloud-upload"></i> Upload
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('view_documents') }}">
+                                <i class="bi bi-files"></i> Documents
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                <i class="bi bi-grid-3x3-gap"></i> More
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('referral_history') }}"><i class="bi bi-clock-history"></i> Referral History</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('track_referral') }}"><i class="bi bi-search"></i> Track Referral</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('messages_portal') }}"><i class="bi bi-chat-dots"></i> Messages</a></li>
+                                {% if session.role in ['admin', 'dentist_admin', 'specialist_admin'] %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('admin_panel') }}"><i class="bi bi-gear"></i> Admin Panel</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('analytics_dashboard') }}"><i class="bi bi-graph-up"></i> Analytics</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('promotions_list') }}"><i class="bi bi-megaphone"></i> Promotions</a></li>
+                                {% endif %}
+                            </ul>
+                        </li>
                     {% else %}
-                    <!-- Public Navigation - Simplified and Conversion Optimized -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}#benefits">
-                            <i class="bi bi-lightning-charge me-1"></i>Features
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="solutionsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-grid-3x3-gap me-1"></i>Solutions
-                        </a>
-                        <ul class="dropdown-menu shadow" aria-labelledby="solutionsDropdown">
-                            <li><h6 class="dropdown-header">For Healthcare Providers</h6></li>
-                            <li><a class="dropdown-item" href="{{ url_for('register') }}?role=dentist">
-                                <i class="bi bi-person-badge text-primary me-2"></i>General Dentists
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('register') }}?role=specialist">
-                                <i class="bi bi-person-check text-success me-2"></i>Dental Specialists
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('register') }}?role=dentist_admin">
-                                <i class="bi bi-building text-warning me-2"></i>Dental Practices
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><h6 class="dropdown-header">For Patients</h6></li>
-                            <li><a class="dropdown-item" href="{{ url_for('register') }}?role=patient">
-                                <i class="bi bi-person-heart text-info me-2"></i>Individual Patients
-                            </a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="resourcesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-book me-1"></i>Resources
-                        </a>
-                        <ul class="dropdown-menu shadow" aria-labelledby="resourcesDropdown">
-                            <li><a class="dropdown-item" href="{{ url_for('case_studies') }}">
-                                <i class="bi bi-journal-medical me-2"></i>Case Studies
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('tutorials') }}">
-                                <i class="bi bi-play-circle me-2"></i>Video Tutorials
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('how_to_guides') }}">
-                                <i class="bi bi-question-circle me-2"></i>How-to Guides
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('surgical_instruction') }}">
-                                <i class="bi bi-file-medical me-2"></i>Surgical Instructions
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('faq') }}">
-                                <i class="bi bi-patch-question me-2"></i>FAQ
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ url_for('blog') }}">
-                                <i class="bi bi-rss me-2"></i>Blog & News
-                            </a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('pricing') }}">
-                            <i class="bi bi-credit-card me-1"></i>Pricing
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('contact') }}">
-                            <i class="bi bi-envelope me-1"></i>Contact
-                        </a>
-                    </li>
+                        <!-- Public Navigation -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('pricing') }}">Pricing</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('surgical_instruction') }}">Surgical Instructions</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('blog') }}">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('faq') }}">FAQ</a>
+                        </li>
                     {% endif %}
                 </ul>
                 
                 <ul class="navbar-nav">
                     {% if session.user_id %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-circle me-1 fs-5"></i>
-                            <span class="d-none d-lg-inline">{{ session.full_name or session.username }}</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow">
-                            <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="bi bi-person me-2"></i> Profile</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('settings') }}"><i class="bi bi-gear me-2"></i> Settings</a></li>
-                            {% if session.role == 'dentist' %}
-                            <li><a class="dropdown-item" href="{{ url_for('dentist_portal') }}"><i class="bi bi-person-badge me-2"></i> Dentist Portal</a></li>
-                            {% elif session.role == 'specialist' %}
-                            <li><a class="dropdown-item" href="{{ url_for('specialist_portal') }}"><i class="bi bi-person-check me-2"></i> Specialist Portal</a></li>
-                            {% elif session.role == 'patient' %}
-                            <li><a class="dropdown-item" href="{{ url_for('patient_portal') }}"><i class="bi bi-person-heart me-2"></i> Patient Portal</a></li>
-                            {% endif %}
-                            {% if session.role in ['admin', 'dentist_admin', 'specialist_admin'] %}
-                            <li><a class="dropdown-item" href="{{ url_for('admin_portal') }}"><i class="bi bi-shield-check me-2"></i> Admin Portal</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('analytics_dashboard') }}"><i class="bi bi-graph-up me-2"></i> Analytics Dashboard</a></li>
-                            {% endif %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
-                        </ul>
-                    </li>
-                    <!-- Sticky CTA for logged in users -->
-                    <li class="nav-item">
-                        <a class="btn btn-light btn-sm ms-2 px-3" href="{{ url_for('new_referral') }}">
-                            <i class="bi bi-plus-circle me-1"></i>New Referral
-                        </a>
-                    </li>
+                        <!-- User Profile Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>
+                                <span>{{ session.full_name or session.username }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ url_for('profile') }}">Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('settings') }}">Settings</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                                {% if session.role in ['admin', 'dentist_admin', 'specialist_admin'] %}
+                                <li><a class="dropdown-item" href="{{ url_for('admin_panel') }}">Admin Panel</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">Logout</a></li>
+                            </ul>
+                        </li>
                     {% else %}
-                    <!-- Login for returning users -->
-                    <li class="nav-item d-none d-lg-block">
-                        <a class="nav-link" href="{{ url_for('login') }}">
-                            <i class="bi bi-box-arrow-in-right me-1"></i>Sign In
-                        </a>
-                    </li>
-                    <!-- Primary CTA - Get Started (emphasized) -->
-                    <li class="nav-item">
-                        <a class="btn btn-warning btn-sm ms-2 px-3 shadow-sm fw-bold" href="{{ url_for('register') }}" id="stickySignUpBtn">
-                            <i class="bi bi-person-plus me-1"></i>Start Free Trial
-                        </a>
-                    </li>
-                    <!-- Demo CTA -->
-                    <li class="nav-item d-none d-md-block">
-                        <a class="btn btn-outline-light btn-sm ms-2 px-3" href="#" data-bs-toggle="modal" data-bs-target="#demoModal">
-                            <i class="bi bi-play-circle me-1"></i>Demo
-                        </a>
-                    </li>
+                        <!-- Public CTAs -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">Sign In</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-warning btn-sm ms-2" href="{{ url_for('register') }}">
+                                Get Started
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-light btn-sm ms-2" href="{{ url_for('get_started_page') }}">
+                                Demo
+                            </a>
+                        </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
+
+    <!-- Enhanced Header Styles -->
+    <style>
+    .navbar {
+        padding: 0.75rem 0;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%) !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white !important;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .navbar-brand:hover {
+        transform: translateY(-1px);
+    }
+
+    .navbar-logo {
+        height: 36px;
+        width: auto;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+
+    .navbar-nav .nav-link {
+        color: rgba(255, 255, 255, 0.85) !important;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        transition: all 0.3s ease;
+        border-radius: 0.375rem;
+        margin: 0 0.125rem;
+    }
+
+    .navbar-nav .nav-link:hover {
+        color: white !important;
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .navbar-nav .nav-link.active {
+        color: white !important;
+        background-color: rgba(255, 255, 255, 0.2);
+        font-weight: 600;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-warning:hover {
+        background-color: #ffca2c;
+        border-color: #ffca2c;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+    }
+
+    @media (max-width: 991.98px) {
+        .navbar-nav {
+            margin-top: 1rem;
+        }
+        
+        .navbar-nav .nav-link {
+            padding: 0.75rem 1rem;
+            margin: 0.125rem 0;
+        }
+    }
+    </style>
 
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -346,33 +385,6 @@
         {% endif %}
     {% endwith %}
 
-    <!-- Demo Modal -->
-    <div class="modal fade" id="demoModal" tabindex="-1" aria-labelledby="demoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="demoModalLabel">
-                        <i class="bi bi-play-circle me-2"></i>Watch Sapyyn Demo
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center p-4">
-                    <div class="ratio ratio-16x9 mb-3">
-                        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Sapyyn Demo Video" allowfullscreen></iframe>
-                    </div>
-                    <h5>See How Easy Patient Referrals Can Be</h5>
-                    <p class="text-muted">Watch our 3-minute demo to see how Sapyyn streamlines your referral process</p>
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
-                            <i class="bi bi-person-plus me-2"></i>Start Free Trial
-                        </a>
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Main Content -->
     <main class="container-fluid">
         {% block content %}{% endblock %}
@@ -383,8 +395,8 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5>Sapyyn Patient Referral System</h5>
-                    <p class="text-muted">Secure, efficient patient referral management</p>
+                    <h5>Sapyyn - Transforming Dental Referrals</h5>
+                    <p class="text-muted">Connecting general dentists, specialists, and patients on one secure network</p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <p class="text-muted">
@@ -397,9 +409,7 @@
             <div class="row">
                 <div class="col-12 text-center">
                     <p class="text-muted mb-0">
-                        &copy; 2025 Sapyyn. All rights reserved. | 
-                        <a href="#" class="text-decoration-none">Privacy Policy</a> | 
-                        <a href="#" class="text-decoration-none">Terms of Service</a>
+                        &copy; 2025 Sapyyn. All rights reserved.
                     </p>
                 </div>
             </div>
@@ -417,6 +427,15 @@
     
     <!-- User Feedback System -->
     <script src="{{ url_for('static', filename='js/feedback.js') }}"></script>
+    
+    <!-- Enhanced UI JavaScript -->
+    <script src="{{ url_for('static', filename='js/enhanced-ui.js') }}"></script>
+    
+    <!-- Advanced Animations -->
+    <script src="{{ url_for('static', filename='js/advanced-animations.js') }}"></script>
+    
+    <!-- Link Security and Vulnerability Protection -->
+    <script src="{{ url_for('static', filename='js/link-security.js') }}"></script>
     
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
