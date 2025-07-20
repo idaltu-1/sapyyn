@@ -4,6 +4,7 @@
   "description": "Login, file upload and referral prototype for sapyyn.com",
   "main": "server.js",
   "scripts": {
+
     "start": "scripts": {
   "start": "node server.js",
   "build": "echo \"Skipping build, no frontend assets to build\""
