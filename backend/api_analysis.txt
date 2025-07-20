@@ -1,0 +1,116 @@
+=== API ENDPOINT ANALYSIS ===
+Date: Sat Jul 12 19:08:10 EDT 2025
+
+=== PORTAL API ENDPOINTS ===
+https://api.sapyyn.com/api/v1
+https://api.sapyyn.com/api/v1/notification/socket?${h}`)}}},Bj=x.createContext(),$j=()=>{const
+https://socket.sapyyn.com/api/v1
+
+=== ADMIN API ENDPOINTS ===
+https://api.sapyyn.com/api/v1
+
+=== ALL URLS FROM PORTAL ===
+https://reactjs.org/docs/error-decoder.html?invariant=
+http://www.w3.org/1999/xlink
+http://www.w3.org/XML/1998/namespace
+http://www.w3.org/1999/xlink
+http://www.w3.org/2000/svg
+http://www.w3.org/1998/Math/MathML
+http://www.w3.org/1999/xhtml
+http://www.w3.org/1999/xhtml
+http://www.w3.org/2000/svg
+http://www.w3.org/1999/xhtml
+http://www.w3.org/2000/svg
+http://www.w3.org/1999/xhtml
+http://www.w3.org/1999/xhtml
+http://fb.me/use-check-prop-types
+http://jedwatson.github.io/classnames
+http://www.w3.org/2000/svg
+http://localhost
+https://api.sapyyn.com/api/v1
+https://github.com/date-fns/date-fns/blob/master/docs/upgradeGuide.md#string-arguments
+https://github.com/date-fns/date-fns/blob/master/docs/unicodeTokens.md
+
+=== ALL URLS FROM ADMIN ===
+http://www.w3.org/2000/svg
+http://www.w3.org/2000/svg
+http://localhost
+https://api.sapyyn.com/api/v1
+https://api.sapyyn.com/api/v1
+https://www.matrixnmedia.com/
+http://www.w3.org/2000/svg
+http://www.w3.org/1999/xlink
+http://www.w3.org/2000/svg
+http://www.w3.org/1999/xlink
+http://www.w3.org/2000/svg
+http://www.w3.org/1999/xlink
+https://bugs.webkit.org/show_bug.cgi?id=68196
+https://mui.com/production-error/?code=
+http://a
+http://a/c%20d?a=1&c=3
+https://a@b
+http://\u0442\u0435\u0441\u0442
+http://a#\u0431
+http://x
+
+=== BASE URL PATTERNS ===
+portal_main.js:"https://api.sapyyn.com/api/v1"
+portal_main.js:"https://socket.sapyyn.com/api/v1"
+portal_main.js:"https://api.sapyyn.com/api/v1"
+portal_main.js:");return new EventSource(`https://api.sapyyn.com/api/v1/notification/socket?${h}`)}}},Bj=x.createContext(),$j=()=>{const t=q1();return y.jsxs("
+portal_main.js:")});return o?x.createElement(p,ee({},b,{autoCapitalize:"
+portal_main.js:"imperative-api"
+portal_main.js:"https://socket.sapyyn.com/api/v1"
+admin_main.js:"capitalize"
+admin_main.js:")});return n?r.createElement(u,(0,h.A)({},m,{autoCapitalize:"
+admin_main.js:"}];const ma=e=>{const{name:t,value:n,url:o,dataPath:a,optionValue:s,apiFetchEnable:l,multiple:c,disabled:d,option:f}=e,[p,h]=(0,r.useState)([]);console.log("
+
+=== API ENDPOINT TESTING ===
+--- Testing api.sapyyn.com ---
+HTTP/2 401 
+date: Sat, 12 Jul 2025 23:08:31 GMT
+content-type: application/json; charset=utf-8
+content-length: 82
+server: Apache/2.4.58 (Ubuntu)
+access-control-allow-origin: *
+access-control-allow-methods: GET, POST, OPTIONS, PUT, PATCH, DELETE
+access-control-allow-headers: Origin, X-Requested-With, Content-Type, Accept, x-uid
+vary: Origin
+etag: W/"52-gzQ68ePlf/JjzVFBfBlPsBnIUZw"
+
+
+--- Testing socket.sapyyn.com ---
+HTTP/2 200 
+date: Sat, 12 Jul 2025 23:08:31 GMT
+content-type: text/html; charset=utf-8
+content-length: 13
+server: Apache/2.4.58 (Ubuntu)
+access-control-allow-origin: http://localhost:5173
+access-control-allow-origin: https://patientreferal.demoyourprojects.com
+access-control-allow-origin: https://portal.sapyyn.com
+access-control-allow-methods: GET, POST, OPTIONS, PUT, PATCH, DELETE
+access-control-allow-headers: Content-Type
+access-control-allow-credentials: true
+vary: Origin
+etag: W/"d-5QGHkrQGYF1NQgR7tUqIGfdZExo"
+
+
+=== API SUBDOMAIN DNS ===
+3.134.179.15
+3.12.139.251
+3.18.31.27
+3.12.139.251
+3.18.31.27
+3.134.179.15
+
+=== COMMON ENDPOINTS TEST ===
+Testing /health:
+401
+Testing /status:
+401
+Testing /docs:
+401
+Testing /swagger:
+401
+Testing /openapi:
+401

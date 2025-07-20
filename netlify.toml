@@ -649,6 +649,7 @@
 # SECURITY HEADERS
 # ===========================
 
+
 [[headers]]
   for = "/*"
   [headers.values]
@@ -661,6 +662,7 @@
 # ===========================
 # CACHE HEADERS
 # ===========================
+
 
 [[headers]]
   for = "/static/*"
@@ -681,3 +683,4 @@
   for = "/images/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000"
+
