@@ -39,6 +39,7 @@
 
 # Authentication routes
 /login  /static/login.html  200
+/login.html  /static/login.html  200
 /signup  /static/signup.html  200
 
 # Fallback for any other routes - serve the main index.html for SPA
