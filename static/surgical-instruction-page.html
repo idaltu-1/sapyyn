@@ -923,7 +923,7 @@
                                 </div>
                             </li>
                         </ul>
-                        <a href="#" class="view-full-btn">
+                        <a href="./procedures/wisdom-tooth-extraction.html" class="view-full-btn">
                             <i class="fas fa-eye"></i> View Complete Protocol
                         </a>
                     </div>
@@ -959,7 +959,7 @@
                                 </div>
                             </li>
                         </ul>
-                        <a href="#" class="view-full-btn">
+                        <a href="./procedures/root-canal-therapy.html" class="view-full-btn">
                             <i class="fas fa-eye"></i> View Complete Protocol
                         </a>
                     </div>
@@ -995,7 +995,7 @@
                                 </div>
                             </li>
                         </ul>
-                        <a href="#" class="view-full-btn">
+                        <a href="./procedures/crown-lengthening.html" class="view-full-btn">
                             <i class="fas fa-eye"></i> View Complete Protocol
                         </a>
                     </div>
@@ -1031,7 +1031,7 @@
                                 </div>
                             </li>
                         </ul>
-                        <a href="#" class="view-full-btn">
+                        <a href="./procedures/dental-implant-placement.html" class="view-full-btn">
                             <i class="fas fa-eye"></i> View Complete Protocol
                         </a>
                     </div>
@@ -1053,7 +1053,7 @@
                     </div>
                     <h3>Medical Emergency</h3>
                     <p>BLS protocols, medication administration, and emergency contact procedures.</p>
-                    <a href="#" class="emergency-btn">View Protocol</a>
+                    <a href="./emergency/medical-emergency.html" class="emergency-btn">View Protocol</a>
                 </div>
                 <div class="emergency-card">
                     <div class="emergency-icon">
@@ -1061,7 +1061,7 @@
                     </div>
                     <h3>Hemorrhage Control</h3>
                     <p>Immediate bleeding control techniques and hemostatic agent application.</p>
-                    <a href="#" class="emergency-btn">View Protocol</a>
+                    <a href="./emergency/hemorrhage-control.html" class="emergency-btn">View Protocol</a>
                 </div>
                 <div class="emergency-card">
                     <div class="emergency-icon">
@@ -1069,7 +1069,7 @@
                     </div>
                     <h3>Anesthetic Complications</h3>
                     <p>Management of allergic reactions and anesthetic overdose situations.</p>
-                    <a href="#" class="emergency-btn">View Protocol</a>
+                    <a href="./emergency/anesthetic-complications.html" class="emergency-btn">View Protocol</a>
                 </div>
                 <div class="emergency-card">
                     <div class="emergency-icon">
@@ -1077,7 +1077,7 @@
                     </div>
                     <h3>Emergency Contacts</h3>
                     <p>24/7 consultation hotline and emergency referral contacts.</p>
-                    <a href="#" class="emergency-btn">View Contacts</a>
+                    <a href="./emergency/emergency-contacts.html" class="emergency-btn">View Contacts</a>
                 </div>
             </div>
         </section>
@@ -1095,7 +1095,7 @@
                     </div>
                     <h3>Infection Control</h3>
                     <p>Comprehensive sterilization protocols, barrier techniques, and safety measures for surgical procedures.</p>
-                    <a href="#" class="guideline-btn">
+                    <a href="./guidelines/infection-control.html" class="guideline-btn">
                         <i class="fas fa-download"></i> Download Guidelines
                     </a>
                 </div>
@@ -1105,7 +1105,7 @@
                     </div>
                     <h3>Antibiotic Prophylaxis</h3>
                     <p>Evidence-based antibiotic selection and dosing protocols for various surgical procedures.</p>
-                    <a href="#" class="guideline-btn">
+                    <a href="./guidelines/antibiotic-prophylaxis.html" class="guideline-btn">
                         <i class="fas fa-download"></i> Download Guidelines
                     </a>
                 </div>
@@ -1115,7 +1115,7 @@
                     </div>
                     <h3>Post-Operative Care</h3>
                     <p>Standardized post-surgical instructions, follow-up schedules, and complication management.</p>
-                    <a href="#" class="guideline-btn">
+                    <a href="./guidelines/post-operative-care.html" class="guideline-btn">
                         <i class="fas fa-download"></i> Download Guidelines
                     </a>
                 </div>
@@ -1125,7 +1125,7 @@
                     </div>
                     <h3>Quality Assurance</h3>
                     <p>Surgical checklists, outcome tracking, and continuous improvement protocols.</p>
-                    <a href="#" class="guideline-btn">
+                    <a href="./guidelines/quality-assurance.html" class="guideline-btn">
                         <i class="fas fa-download"></i> Download Guidelines
                     </a>
                 </div>
@@ -1135,7 +1135,7 @@
                     </div>
                     <h3>Informed Consent</h3>
                     <p>Legal requirements, documentation standards, and patient communication guidelines.</p>
-                    <a href="#" class="guideline-btn">
+                    <a href="./guidelines/informed-consent.html" class="guideline-btn">
                         <i class="fas fa-download"></i> Download Guidelines
                     </a>
                 </div>
@@ -1145,7 +1145,7 @@
                     </div>
                     <h3>Continuing Education</h3>
                     <p>CE requirements, training modules, and skill development resources for surgical procedures.</p>
-                    <a href="#" class="guideline-btn">
+                    <a href="./guidelines/continuing-education.html" class="guideline-btn">
                         <i class="fas fa-download"></i> Download Guidelines
                     </a>
                 </div>
@@ -1222,9 +1222,20 @@
         }
 
         function filterBySpecialty(specialty) {
-            // This would normally filter by specialty
-            console.log('Filtering by specialty:', specialty);
-            alert(`Showing ${specialty.replace('-', ' ')} procedures. This would filter the content in a real implementation.`);
+            // Redirect to the appropriate specialty page
+            console.log('Redirecting to specialty:', specialty);
+            const specialtyPages = {
+                'oral-surgery': './specialties/oral-surgery.html',
+                'endodontics': './specialties/endodontics.html', 
+                'periodontics': './specialties/periodontics.html',
+                'orthodontics': './specialties/orthodontics.html',
+                'prosthodontics': './specialties/prosthodontics.html',
+                'pediatric': './specialties/pediatric.html'
+            };
+            
+            if (specialtyPages[specialty]) {
+                window.location.href = specialtyPages[specialty];
+            }
         }
 
         // Auto-close mobile menu on window resize

@@ -19,12 +19,13 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <p class="mb-3">Have a 6-digit provider code from your dentist or specialist? Enter it below for instant referral.</p>
+                    <p class="mb-3">Have a 6-character provider code from your dentist or specialist? Enter it below for instant referral.</p>
                     <form id="codeReferralForm" class="row g-3">
                         <div class="col-md-6">
-                            <label for="providerCode" class="form-label">6-Digit Provider Code</label>
-                            <input type="text" class="form-control form-control-lg text-center" id="providerCode" 
-                                   placeholder="000000" maxlength="6" pattern="[0-9]{6}" required>
+                            <label for="providerCode" class="form-label">6-Character Provider Code</label>
+                            <input type="text" class="form-control form-control-lg text-center text-uppercase" id="providerCode" 
+                                   placeholder="ABC123" maxlength="6" pattern="[A-Z0-9]{6}" style="letter-spacing: 0.2em;" required>
+                            <div class="form-text">Enter 6-character alphanumeric code (letters and numbers)</div>
                         </div>
                         <div class="col-md-6">
                             <label for="patientName" class="form-label">Your Name</label>
@@ -129,7 +130,19 @@
 
             <!-- Help & Information -->
             <div class="row g-3">
-                <div class="col-md-6">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="feature-icon bg-primary bg-opacity-15 rounded-circle mx-auto mb-3">
+                                <i class="bi bi-chat-dots-fill text-primary"></i>
+                            </div>
+                            <h6 class="fw-bold">Messages</h6>
+                            <p class="text-muted small mb-3">Communicate with your healthcare providers</p>
+                            <a href="{{ url_for('messages_portal') }}" class="btn btn-outline-primary btn-sm">View Messages</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
                     <div class="card border-0 shadow-sm h-100">
                         <div class="card-body text-center">
                             <div class="feature-icon bg-info bg-opacity-15 rounded-circle mx-auto mb-3">
@@ -141,7 +154,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="card border-0 shadow-sm h-100">
                         <div class="card-body text-center">
                             <div class="feature-icon bg-success bg-opacity-15 rounded-circle mx-auto mb-3">

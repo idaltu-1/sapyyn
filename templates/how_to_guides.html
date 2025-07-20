@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}How-To Guides - Sapyyn Patient Referral System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <h1 class="text-center mb-5">How-To Guides</h1>
+            
+            <div class="accordion" id="guidesAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#guide1">
+                            How to Create a Patient Referral
+                        </button>
+                    </h2>
+                    <div id="guide1" class="accordion-collapse collapse show" data-bs-parent="#guidesAccordion">
+                        <div class="accordion-body">
+                            <ol>
+                                <li>Navigate to the "New Referral" section from your dashboard</li>
+                                <li>Fill in patient information and medical details</li>
+                                <li>Select the target doctor or specialist</li>
+                                <li>Upload relevant medical documents</li>
+                                <li>Generate and share the referral QR code</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#guide2">
+                            How to Upload and Manage Documents
+                        </button>
+                    </h2>
+                    <div id="guide2" class="accordion-collapse collapse" data-bs-parent="#guidesAccordion">
+                        <div class="accordion-body">
+                            <ol>
+                                <li>Go to the "Upload Documents" page</li>
+                                <li>Select document type (Medical Report, Insurance, etc.)</li>
+                                <li>Choose files from your computer</li>
+                                <li>Add descriptions or notes</li>
+                                <li>Click upload to save securely</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#guide3">
+                            How to Use QR Codes
+                        </button>
+                    </h2>
+                    <div id="guide3" class="accordion-collapse collapse" data-bs-parent="#guidesAccordion">
+                        <div class="accordion-body">
+                            <ol>
+                                <li>Generate QR code during referral creation</li>
+                                <li>Share QR code with patient (print or digital)</li>
+                                <li>Patient scans code to access referral information</li>
+                                <li>Track referral progress through the QR code</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -605,3 +605,95 @@ window.Search = Search;
 window.Forms = Forms;
 window.QRCode = QRCode;
 window.Notifications = Notifications;
+
+// Enhanced UI Interactions
+const UIEnhancements = {
+    // Password toggle functionality
+    initPasswordToggle() {
+        const toggleButtons = document.querySelectorAll('.password-toggle, #togglePassword');
+        
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const passwordInput = this.closest('.form-floating, .input-group').querySelector('input[type="password"], input[type="text"]');
+                const icon = this.querySelector('i');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.className = 'bi bi-eye-slash';
+                } else {
+                    passwordInput.type = 'password';
+                    icon.className = 'bi bi-eye';
+                }
+            });
+        });
+    },
+
+    // Enhanced form validation
+    initFormValidation() {
+        const forms = document.querySelectorAll('.needs-validation');
+        
+        forms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+        });
+    },
+
+    // Smooth scroll for anchor links
+    initSmoothScroll() {
+        const anchors = document.querySelectorAll('a[href^="#"]');
+        
+        anchors.forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    },
+
+    // Navbar scroll effect
+    initNavbarScroll() {
+        const navbar = document.getElementById('mainNavbar');
+        if (!navbar) return;
+
+        let lastScrollY = window.scrollY;
+        
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            
+            if (currentScrollY > 100) {
+                navbar.classList.add('navbar-scrolled');
+            } else {
+                navbar.classList.remove('navbar-scrolled');
+            }
+            
+            lastScrollY = currentScrollY;
+        });
+    },
+
+    // Initialize all enhancements
+    init() {
+        this.initPasswordToggle();
+        this.initFormValidation();
+        this.initSmoothScroll();
+        this.initNavbarScroll();
+    }
+};
+
+// Initialize UI enhancements when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    UIEnhancements.init();
+});
+
+// Export UI enhancements
+window.UIEnhancements = UIEnhancements;

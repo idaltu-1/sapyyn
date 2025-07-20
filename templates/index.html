@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Sapyyn - Secure Patient Referral System | HIPAA Compliant Healthcare{% endblock %}
+{% block title %}Sapyyn - Transforming Dental Referrals | Secure Network for Dentists & Specialists{% endblock %}
 
-{% block description %}Transform your patient referrals with Sapyyn's secure, HIPAA-compliant platform. Streamline document management, track referrals with QR codes, and connect providers seamlessly.{% endblock %}
+{% block description %}Transforming dental referrals with Sapyyn's secure, HIPAA-compliant platform. Connect general dentists, specialists, and patients seamlessly. No referral slips through the cracks.{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
@@ -10,7 +10,7 @@
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "Sapyyn Patient Referral System",
-    "description": "Secure, HIPAA-compliant patient referral management platform for healthcare providers",
+    "description": "Secure, HIPAA-compliant dental referral network connecting general dentists, specialists, and patients",
     "url": "{{ request.url }}",
     "mainEntity": {
         "@type": "SoftwareApplication",
@@ -34,73 +34,85 @@
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section with Inline Email Signup -->
-<div class="bg-primary text-white py-5" id="hero">
-    <div class="container">
-        <div class="row align-items-center">
+<!-- Enhanced Hero Section with Gradient Background -->
+<div class="hero-section" id="hero">
+    <div class="container position-relative">
+        <div class="row align-items-center min-vh-75">
             <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-4">
-                    <i class="bi bi-hospital me-3"></i>
-                    Streamline Patient Referrals in Seconds
-                </h1>
-                <p class="lead mb-4">
-                    Join 1000+ healthcare providers using our secure, HIPAA-compliant platform 
-                    to manage patient referrals, track progress, and improve patient outcomes.
-                </p>
-                
-                {% if not session.user_id %}
-                <!-- Inline Email Signup Form -->
-                <div class="card bg-white text-dark p-4 mb-4 shadow-lg border-0 rounded-3">
-                    <div class="card-body p-0">
-                        <h5 class="fw-bold mb-3 text-primary">
-                            <i class="bi bi-gift me-2"></i>Start Your Free 14-Day Trial
-                        </h5>
-                        <form id="inlineSignupForm" class="row g-2" method="post" action="{{ url_for('register') }}">
-                            <div class="col-md-8">
-                                <input type="email" class="form-control form-control-lg" 
+                <div class="hero-content">
+                    <div class="hero-badge mb-3">
+                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
+                            <i class="bi bi-star-fill me-1"></i>
+                            Trusted by 1000+ Dental Practices & Specialists
+                        </span>
+                    </div>
+
+                    <h1 class="hero-title display-3 fw-bold mb-4 text-white">
+                        <span class="text-gradient">Transforming Dental Referrals</span>
+                        <br>– Seamless, Paperless, and Patient-Centered
+                    </h1>
+                    <p class="hero-subtitle lead mb-4 text-white-75">
+                        Connect general dentists, specialists, and patients on one secure network to ensure no referral slips through the cracks
+
+                    </p>
+                    
+                    {% if not session.user_id %}
+                    <!-- Enhanced Inline Email Signup Form -->
+                    <div class="cta-card bg-white p-4 mb-4 shadow-lg border-0 rounded-4">
+                        <div class="text-center mb-3">
+                            <h5 class="fw-bold text-primary mb-2">
+                                <i class="bi bi-rocket-takeoff me-2"></i>Start Your Free 14-Day Trial
+                            </h5>
+                            <p class="text-muted small mb-0">Join thousands of dental professionals already using Sapyyn</p>
+                        </div>
+                        <form id="inlineSignupForm" class="signup-form" method="post" action="{{ url_for('register') }}">
+                            <div class="input-group input-group-lg mb-3">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-envelope text-muted"></i>
+                                </span>
+                                <input type="email" 
+                                       class="form-control border-start-0 ps-0" 
                                        name="email" 
                                        id="heroEmail" 
-                                       placeholder="Enter your work email" 
+                                       placeholder="Enter your dental practice email" 
                                        required>
-                            </div>
-                            <div class="col-md-4">
-                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <button type="submit" class="btn btn-primary btn-lg px-4">
                                     <i class="bi bi-arrow-right me-1"></i>Get Started
                                 </button>
                             </div>
                             <input type="hidden" name="signup_type" value="inline">
                         </form>
-                        <div class="text-center mt-3">
-                            <small class="text-muted">
-                                <i class="bi bi-check-circle text-success me-1"></i>No credit card required
+                        <div class="text-center">
+                            <div class="trust-indicators small text-muted">
+                                <i class="bi bi-shield-check text-success me-1"></i>No credit card required
                                 <span class="mx-2">•</span>
-                                <i class="bi bi-check-circle text-success me-1"></i>14-day free trial
+                                <i class="bi bi-clock text-primary me-1"></i>14-day free trial
                                 <span class="mx-2">•</span>
-                                <i class="bi bi-check-circle text-success me-1"></i>Cancel anytime
-                            </small>
+                                <i class="bi bi-x-circle text-info me-1"></i>Cancel anytime
+                            </div>
                         </div>
                     </div>
+                    <!-- Secondary CTAs with Better Styling -->
+                    <div class="hero-actions d-flex flex-wrap gap-3 align-items-center">
+                        <a href="#" class="btn btn-outline-primary btn-lg px-4" data-bs-toggle="modal" data-bs-target="#demoModal">
+                            <i class="bi bi-play-circle me-2"></i>Watch Demo
+                        </a>
+                        <a href="{{ url_for('login') }}" class="btn btn-link text-primary text-decoration-none fw-medium">
+                            Already have an account? <u class="text-primary">Sign in</u>
+                        </a>
+                    </div>
+                    {% else %}
+                    <!-- Logged in user CTAs -->
+                    <div class="hero-actions d-grid d-md-flex gap-3">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg px-4">
+                            <i class="bi bi-speedometer2 me-2"></i>Go to Dashboard
+                        </a>
+                        <a href="{{ url_for('new_referral') }}" class="btn btn-warning btn-lg px-4">
+                            <i class="bi bi-plus-circle me-2"></i>Create Referral
+                        </a>
+                    </div>
+                    {% endif %}
                 </div>
-                <!-- Secondary CTAs -->
-                <div class="d-grid d-md-flex gap-2">
-                    <a href="#" class="btn btn-outline-light btn-lg" data-bs-toggle="modal" data-bs-target="#demoModal">
-                        <i class="bi bi-play-circle me-2"></i>Watch Demo
-                    </a>
-                    <a href="{{ url_for('login') }}" class="btn btn-link text-white text-decoration-none">
-                        Already have an account? <u>Sign in</u>
-                    </a>
-                </div>
-                {% else %}
-                <!-- Logged in user CTAs -->
-                <div class="d-grid d-md-flex gap-2">
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg">
-                        <i class="bi bi-speedometer2"></i> Go to Dashboard
-                    </a>
-                    <a href="{{ url_for('new_referral') }}" class="btn btn-outline-light btn-lg">
-                        <i class="bi bi-plus-circle"></i> Create Referral
-                    </a>
-                </div>
-                {% endif %}
             </div>
             <div class="col-lg-6 text-center">
                 <div class="hero-image-container">
@@ -150,41 +162,134 @@
     </div>
 </div>
 
-<!-- Quick Referral Section -->
-<div class="bg-light py-5 quick-referral-section">
+<!-- Referral Management Section -->
+<div class="bg-light py-5 referral-management-section">
     <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="fw-bold">Referral Management Portal</h2>
+                <p class="lead text-muted">Access our comprehensive referral management platform. Professional features require a trial subscription or higher.</p>
+            </div>
+        </div>
+        
+        <!-- Primary Referral Actions -->
+        <div class="row g-4 mb-5">
+            <!-- Start Emergency Referral -->
+            <div class="col-lg-4">
+                <div class="card h-100 shadow border-0 referral-action-card emergency-card">
+                    <div class="card-body p-4 text-center">
+                        <div class="bg-danger bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-exclamation-triangle-fill text-danger fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3 text-danger">Start Emergency Referral</h4>
+                        <p class="text-muted mb-4">
+                            Urgent cases requiring immediate specialist attention. Fast-track processing with instant notifications.
+                        </p>
+                        <div class="mb-3">
+                            <span class="badge bg-danger text-white mb-2">Priority Processing</span>
+                            <span class="badge bg-warning text-dark">6-Digit Quick Access</span>
+                        </div>
+                        <button class="btn btn-danger btn-lg w-100 referral-action-btn" 
+                                data-referral-type="emergency" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#referralModal">
+                            <i class="bi bi-lightning-fill me-2"></i>Start Emergency Referral
+                        </button>
+                        <p class="small text-muted mt-2">
+                            <i class="bi bi-lock me-1"></i>Requires trial subscription or higher
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Create Routine Referral -->
+            <div class="col-lg-4">
+                <div class="card h-100 shadow border-0 referral-action-card routine-card">
+                    <div class="card-body p-4 text-center">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-clipboard2-heart-fill text-primary fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3 text-primary">Create Routine Referral</h4>
+                        <p class="text-muted mb-4">
+                            Standard referral process with comprehensive documentation and tracking capabilities.
+                        </p>
+                        <div class="mb-3">
+                            <span class="badge bg-primary text-white mb-2">Full Documentation</span>
+                            <span class="badge bg-info text-white">Progress Tracking</span>
+                        </div>
+                        <button class="btn btn-primary btn-lg w-100 referral-action-btn" 
+                                data-referral-type="routine" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#referralModal">
+                            <i class="bi bi-plus-circle me-2"></i>Create Routine Referral
+                        </button>
+                        <p class="small text-muted mt-2">
+                            <i class="bi bi-lock me-1"></i>Requires trial subscription or higher
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Request Consultation -->
+            <div class="col-lg-4">
+                <div class="card h-100 shadow border-0 referral-action-card consultation-card">
+                    <div class="card-body p-4 text-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-chat-dots-fill text-success fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3 text-success">Request Dental Consultation</h4>
+                        <p class="text-muted mb-4">
+                            Connect with dental specialists for case discussions, second opinions, and collaborative treatment planning. Build your professional network and strengthen provider relationships.
+                        </p>
+                        <div class="mb-3">
+                            <span class="badge bg-success text-white mb-2">Professional Networking</span>
+                            <span class="badge bg-info text-white">HIPAA Compliant</span>
+                        </div>
+                        <button class="btn btn-success btn-lg w-100 referral-action-btn" 
+                                data-referral-type="consultation" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#referralModal">
+                            <i class="bi bi-chat-square-text me-2"></i>Request Consultation
+                        </button>
+                        <p class="small text-muted mt-2">
+                            <i class="bi bi-lock me-1"></i>Requires trial subscription or higher
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Access Section -->
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="card shadow-sm border-0 quick-referral-card">
-                    <div class="card-body p-5 text-center">
-                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-4">
-                            <i class="bi bi-lightning-charge-fill text-primary fs-1"></i>
+                <div class="card shadow-sm border-0 quick-access-card">
+                    <div class="card-body p-4 text-center">
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                            <i class="bi bi-lightning-charge-fill text-warning fs-2"></i>
                         </div>
-                        <h3 class="fw-bold mb-3">Quick Referral Access</h3>
-                        <p class="text-muted mb-4">Have a 6-digit provider code? Enter it below for instant referral</p>
+                        <h5 class="fw-bold mb-3">Quick Access with 6-Character Code</h5>
+                        <p class="text-muted mb-4">Already have a provider code? Access your referral instantly with the 6-character alphanumeric code</p>
                         
                         <form id="quickReferralForm" class="row g-3 justify-content-center">
                             <div class="col-md-6">
-                                <label for="homeProviderCode" class="form-label">6-Digit Provider Code</label>
-                                <input type="text" class="form-control form-control-lg text-center" 
-                                       id="homeProviderCode" placeholder="000000" maxlength="6" pattern="[0-9]{6}">
+                                <label for="homeProviderCode" class="form-label">Enter 6-Character Provider Code</label>
+                                <input type="text" class="form-control form-control-lg text-center fs-3 fw-bold" 
+                                       id="homeProviderCode" placeholder="ABC123" maxlength="6" 
+                                       pattern="[A-Za-z0-9]{6}" style="text-transform: uppercase;">
+                                <div class="form-text">Enter the 6-character alphanumeric code provided by your dentist</div>
                             </div>
                             <div class="col-md-6 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary btn-lg w-100">
-                                    <i class="bi bi-search me-2"></i>Find Provider
+                                <button type="submit" class="btn btn-warning btn-lg w-100">
+                                    <i class="bi bi-search me-2"></i>Connect Now
                                 </button>
                             </div>
                         </form>
                         
-                        <div class="mt-4">
-                            <p class="small text-muted mb-2">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Provider codes are 6-digit numbers (e.g., 123456) given by your healthcare provider
-                            </p>
+                        <div class="mt-3">
                             <div class="d-flex justify-content-center gap-3 flex-wrap">
-                                <span class="badge bg-success">Instant Access</span>
-                                <span class="badge bg-info">Secure Connection</span>
-                                <span class="badge bg-warning text-dark">HIPAA Compliant</span>
+                                <span class="badge bg-success">Emergency Access</span>
+                                <span class="badge bg-info">No Login Required</span>
+                                <span class="badge bg-warning text-dark">Instant Connection</span>
                             </div>
                         </div>
                     </div>
@@ -194,126 +299,170 @@
     </div>
 </div>
 
-<!-- Key Benefits Section -->
+
+<!-- Key Benefits/Features Section -->
+
 <div class="py-5" id="benefits">
     <div class="container">
         <div class="row text-center mb-5">
             <div class="col">
-                <h2 class="fw-bold">Solve Your Biggest Referral Challenges</h2>
-                <p class="lead text-muted">Transform how you manage patient referrals with solutions that address real healthcare pain points</p>
+
+
+
+                <h2 class="fw-bold">Connect, Collaborate, and Transform Dental Care</h2>
+                <p class="lead text-muted">Build stronger professional networks and deliver better patient outcomes through seamless collaboration between general dentists and specialists</p>
+
+
             </div>
         </div>
         
         <div class="row g-4 mb-5">
-            <!-- Benefit 1: Never lose track -->
-            <div class="col-lg-4 col-md-6">
+
+            <!-- Simplified Referrals -->
+            <div class="col-lg-3 col-md-6">
                 <div class="card h-100 shadow-sm border-0 benefit-card">
                     <div class="card-body text-center p-4">
                         <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                            <i class="bi bi-bell-fill text-primary fs-1"></i>
+                            <i class="bi bi-file-earmark-text text-primary fs-1"></i>
                         </div>
-                        <h4 class="fw-bold mb-3">Never Lose Track of a Referral</h4>
-                        <p class="text-muted mb-3">
-                            Real-time status updates keep your team and patients informed throughout the entire referral process.
+
+                        <h4 class="fw-bold mb-3">Streamlined Dental Referrals</h4>
+                        <p class="text-muted">
+                            Digital referral forms and instant data transfer replace paperwork and faxes. Connect dental practices seamlessly with specialists – no more lost referrals, everything is tracked in one collaborative platform.
                         </p>
-                        <div class="benefit-highlight">
-                            <i class="bi bi-check-circle-fill text-success me-2"></i>
-                            <small class="text-muted">Instant notifications when referral status changes</small>
-                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Benefit 2: Seamless transfers -->
-            <div class="col-lg-4 col-md-6">
+            <!-- Provider Network & Collaboration -->
+            <div class="col-lg-3 col-md-6">
                 <div class="card h-100 shadow-sm border-0 benefit-card">
                     <div class="card-body text-center p-4">
                         <div class="bg-success bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                            <i class="bi bi-arrow-left-right text-success fs-1"></i>
+                            <i class="bi bi-people-fill text-success fs-1"></i>
                         </div>
-                        <h4 class="fw-bold mb-3">Seamless Referral Transfers</h4>
-                        <p class="text-muted mb-3">
-                            Eliminate paperwork delays and reduce patient wait times with instant digital referral transfers.
+
+                        <h4 class="fw-bold mb-3">Provider Network & Collaboration</h4>
+                        <p class="text-muted">
+                            Connect with a network of specialists and general dentists. Secure messaging, real-time notifications, and collaborative treatment planning keep all providers connected and informed throughout the referral process.
                         </p>
-                        <div class="benefit-highlight">
-                            <i class="bi bi-check-circle-fill text-success me-2"></i>
-                            <small class="text-muted">Transfer complete patient records in seconds</small>
-                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Benefit 3: Provider collaboration -->
-            <div class="col-lg-4 col-md-6">
+            <!-- Patient Engagement -->
+            <div class="col-lg-3 col-md-6">
                 <div class="card h-100 shadow-sm border-0 benefit-card">
                     <div class="card-body text-center p-4">
                         <div class="bg-info bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                            <i class="bi bi-chat-dots-fill text-info fs-1"></i>
+                            <i class="bi bi-phone text-info fs-1"></i>
                         </div>
-                        <h4 class="fw-bold mb-3">Provider-to-Provider Collaboration Chat</h4>
-                        <p class="text-muted mb-3">
-                            Connect directly with specialists to discuss cases and ensure optimal patient outcomes.
+
+                        <h4 class="fw-bold mb-3">Patient Engagement</h4>
+                        <p class="text-muted">
+                            Automatic SMS/email updates to patients with specialist info and appointment reminders, so patients never fall through the cracks in transition.
                         </p>
-                        <div class="benefit-highlight">
-                            <i class="bi bi-check-circle-fill text-success me-2"></i>
-                            <small class="text-muted">HIPAA-compliant messaging built right in</small>
+
+
+                    </div>
+                </div>
+            </div>
+            
+
+            <!-- Feature 2: Fast, Paperless Workflow -->
+            <div class="col-lg-6 col-md-6">
+                <div class="card h-100 shadow-sm border-0 feature-card">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-start">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3 flex-shrink-0">
+                                <i class="bi bi-lightning-fill text-success fs-2"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold mb-3 text-success">Fast, Paperless Workflow</h4>
+                                <p class="text-muted mb-3">
+                                    <strong>Send and receive referrals with one click</strong> (no more faxing forms). All patient info, x-rays, and notes transfer securely online.
+                                </p>
+                                <div class="feature-highlights">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <small class="text-muted">One-click referral sending</small>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <small class="text-muted">Digital document transfer</small>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <small class="text-muted">Eliminate faxing and paperwork</small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Benefit 4: Analytics dashboard -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card h-100 shadow-sm border-0 benefit-card">
-                    <div class="card-body text-center p-4">
-                        <div class="bg-warning bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                            <i class="bi bi-graph-up text-warning fs-1"></i>
-                        </div>
-                        <h4 class="fw-bold mb-3">Analytics Dashboard for Referrals</h4>
-                        <p class="text-muted mb-3">
-                            Make data-driven decisions with insights into referral patterns, completion rates, and patient satisfaction.
-                        </p>
-                        <div class="benefit-highlight">
-                            <i class="bi bi-check-circle-fill text-success me-2"></i>
-                            <small class="text-muted">Track ROI on your referral partnerships</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Benefit 5: Secure file sharing -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card h-100 shadow-sm border-0 benefit-card">
-                    <div class="card-body text-center p-4">
-                        <div class="bg-danger bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                            <i class="bi bi-shield-lock-fill text-danger fs-1"></i>
-                        </div>
-                        <h4 class="fw-bold mb-3">Stop Worrying About File Security</h4>
-                        <p class="text-muted mb-3">
-                            Exchange large files with full HIPAA compliance - no more email attachments or unsecure file sharing.
-                        </p>
-                        <div class="benefit-highlight">
-                            <i class="bi bi-check-circle-fill text-success me-2"></i>
-                            <small class="text-muted">Bank-level encryption for all patient data</small>
+            <!-- Feature 3: Analytics & Growth -->
+            <div class="col-lg-6 col-md-6">
+                <div class="card h-100 shadow-sm border-0 feature-card">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-start">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3 flex-shrink-0">
+                                <i class="bi bi-bar-chart-fill text-warning fs-2"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold mb-3 text-warning">Analytics & Growth</h4>
+                                <p class="text-muted mb-3">
+                                    <strong>Monitor referral outcomes and conversion rates.</strong> Identify your top referring sources and see how many cases convert to treatments, helping you strengthen relationships and grow your practice.
+                                </p>
+                                <div class="feature-highlights">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <small class="text-muted">Conversion rate tracking</small>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <small class="text-muted">Top referral source insights</small>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <small class="text-muted">Practice growth metrics</small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Benefit 6: Quick access -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card h-100 shadow-sm border-0 benefit-card">
-                    <div class="card-body text-center p-4">
-                        <div class="bg-secondary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                            <i class="bi bi-qr-code-scan text-secondary fs-1"></i>
-                        </div>
-                        <h4 class="fw-bold mb-3">Instant Patient Check-ins</h4>
-                        <p class="text-muted mb-3">
-                            Patients simply scan a QR code to access their referral - no complicated forms or phone calls required.
-                        </p>
-                        <div class="benefit-highlight">
-                            <i class="bi bi-check-circle-fill text-success me-2"></i>
-                            <small class="text-muted">Reduce front desk workload by 60%</small>
+            <!-- Feature 4: Integrated & Secure -->
+            <div class="col-lg-6 col-md-6">
+                <div class="card h-100 shadow-sm border-0 feature-card">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-start">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-3 me-3 flex-shrink-0">
+                                <i class="bi bi-shield-check-fill text-info fs-2"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold mb-3 text-info">Integrated & Secure</h4>
+                                <p class="text-muted mb-3">
+                                    <strong>Works with your existing practice software</strong> (Dentrix, Open Dental, etc.) for easy data import. Fully HIPAA-compliant and encrypted to protect patient privacy.
+                                </p>
+                                <div class="feature-highlights">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <small class="text-muted">Practice software integration</small>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <small class="text-muted">HIPAA-compliant security</small>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        <small class="text-muted">End-to-end encryption</small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -366,152 +515,66 @@
     </div>
 </div>
 
-<!-- How It Works Section -->
-<div class="py-5">
+<!-- How Sapyyn Works Section -->
+<div class="py-5 bg-light">
     <div class="container">
         <div class="row text-center mb-5">
             <div class="col">
-                <h2 class="fw-bold">How It Works</h2>
-                <p class="lead text-muted">Simple steps to manage your patient referrals</p>
+                <h2 class="fw-bold">How Sapyyn Works</h2>
+                <p class="lead text-muted">Referral in 3 Easy Steps</p>
             </div>
         </div>
         
-        <div class="row g-4">
-            <div class="col-md-3 text-center">
-                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                    <span class="fs-2 fw-bold text-primary">1</span>
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-4 col-md-6 text-center">
+                <div class="bg-white rounded-4 p-4 h-100 shadow-sm">
+                    <div class="bg-warning bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                        <span class="fs-2 fw-bold text-warning">1</span>
+                    </div>
+                    <h5 class="fw-bold mb-3">Send Referral</h5>
+                    <p class="text-muted">Enter patient info and select a specialist in Sapyyn. With one click, send the referral securely.</p>
                 </div>
-                <h5 class="fw-bold">Create Account</h5>
-                <p class="text-muted">Register as a healthcare provider or patient to get started</p>
             </div>
-            <div class="col-md-3 text-center">
-                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                    <span class="fs-2 fw-bold text-primary">2</span>
+            <div class="col-lg-4 col-md-6 text-center">
+                <div class="bg-white rounded-4 p-4 h-100 shadow-sm">
+                    <div class="bg-warning bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                        <span class="fs-2 fw-bold text-warning">2</span>
+                    </div>
+                    <h5 class="fw-bold mb-3">Specialist Treats</h5>
+                    <p class="text-muted">The specialist receives the referral, and Sapyyn automatically updates you when the patient schedules and completes treatment.</p>
                 </div>
-                <h5 class="fw-bold">Upload Documents</h5>
-                <p class="text-muted">Securely upload medical reports, insurance, and supporting documents</p>
             </div>
-            <div class="col-md-3 text-center">
-                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                    <span class="fs-2 fw-bold text-primary">3</span>
+            <div class="col-lg-4 col-md-6 text-center">
+                <div class="bg-white rounded-4 p-4 h-100 shadow-sm">
+                    <div class="bg-warning bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                        <span class="fs-2 fw-bold text-warning">3</span>
+                    </div>
+                    <h5 class="fw-bold mb-3">Follow-up & Feedback</h5>
+                    <p class="text-muted">Referring dentist gets notified of treatment completion and can coordinate follow-up. All notes and reports are stored in Sapyyn for review.</p>
                 </div>
-                <h5 class="fw-bold">Create Referral</h5>
-                <p class="text-muted">Generate referrals with QR codes for easy tracking and access</p>
-            </div>
-            <div class="col-md-3 text-center">
-                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
-                    <span class="fs-2 fw-bold text-primary">4</span>
-                </div>
-                <h5 class="fw-bold">Track Progress</h5>
-                <p class="text-muted">Monitor referral status and manage communication efficiently</p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Pricing Preview Section -->
+<!-- Simplified Pricing Section - Focus on CTA -->
 <div class="bg-light py-5">
     <div class="container">
-        <div class="row text-center mb-5">
-            <div class="col">
-                <h2 class="fw-bold">Simple, Transparent Pricing</h2>
-                <p class="lead text-muted">Choose the perfect plan for your practice with our 14-day free trial</p>
-            </div>
-        </div>
-        
-        <div class="row g-4 justify-content-center">
-            <!-- Starter Plan -->
-            <div class="col-lg-3 col-md-6">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-header bg-white text-center border-0 py-4">
-                        <h4 class="fw-bold">Starter</h4>
-                        <div class="pricing-amount">
-                            <span class="currency">$</span>
-                            <span class="amount">49.99</span>
-                            <span class="period">/month</span>
-                        </div>
-                        <p class="text-muted small">Perfect for individual practitioners</p>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-unstyled">
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Up to 50 referrals/month</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>6-digit provider code</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>QR code generation</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>5 GB storage</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Email support</li>
-                        </ul>
-                    </div>
-                    <div class="card-footer bg-transparent text-center border-0 pb-4">
-                        <a href="{{ url_for('get_started_page') }}" class="btn btn-outline-primary w-100">Get Started</a>
-                    </div>
+        <div class="row text-center">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="fw-bold mb-3">Ready to Get Started?</h2>
+                <p class="lead text-muted mb-4">Join thousands of healthcare professionals who trust Sapyyn for their referral management</p>
+                <div class="d-flex flex-column flex-md-row gap-3 justify-content-center mb-4">
+                    <a href="{{ url_for('start_free_trial') }}" class="btn btn-primary btn-lg px-4">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Start Free 14-Day Trial
+                    </a>
+                    <a href="{{ url_for('pricing') }}" class="btn btn-outline-primary btn-lg px-4">
+                        <i class="bi bi-currency-dollar me-2"></i>View Pricing Plans
+                    </a>
                 </div>
-            </div>
-
-            <!-- Professional Plan (Most Popular) -->
-            <div class="col-lg-3 col-md-6">
-                <div class="card h-100 border-0 shadow-lg border-primary position-relative">
-                    <div class="badge bg-primary position-absolute top-0 start-50 translate-middle">Most Popular</div>
-                    <div class="card-header bg-primary text-white text-center border-0 py-4">
-                        <h4 class="fw-bold">Professional</h4>
-                        <div class="pricing-amount">
-                            <span class="currency">$</span>
-                            <span class="amount">99.99</span>
-                            <span class="period">/month</span>
-                        </div>
-                        <p class="opacity-75 small">For growing practices</p>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-unstyled">
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Up to 200 referrals/month</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Multiple provider codes</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Advanced analytics</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>25 GB storage</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Priority support</li>
-                        </ul>
-                    </div>
-                    <div class="card-footer bg-transparent text-center border-0 pb-4">
-                        <a href="{{ url_for('subscribe', plan_name='professional') }}" class="btn btn-primary w-100">Start Free Trial</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Enterprise Plan -->
-            <div class="col-lg-3 col-md-6">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-header bg-dark text-white text-center border-0 py-4">
-                        <h4 class="fw-bold">Enterprise</h4>
-                        <div class="pricing-amount">
-                            <span class="currency">$</span>
-                            <span class="amount">499</span>
-                            <span class="period">/month</span>
-                        </div>
-                        <p class="opacity-75 small">For large practices & hospitals</p>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-unstyled">
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Unlimited referrals</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Custom integrations</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>Dedicated support</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>100 GB storage</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i>24/7 phone support</li>
-                        </ul>
-                    </div>
-                    <div class="card-footer bg-transparent text-center border-0 pb-4">
-                        <a href="{{ url_for('subscribe', plan_name='enterprise') }}" class="btn btn-dark w-100">Contact Sales</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row mt-5">
-            <div class="col text-center">
-                <p class="text-muted mb-3">
-                    <i class="bi bi-gift me-2"></i>
-                    <strong>14-Day Free Trial</strong> - No credit card required. Cancel anytime.
+                <p class="small text-muted">
+                    <i class="bi bi-shield-check text-success me-1"></i><strong>14-Day Free Trial</strong> - No credit card required. Cancel anytime.
                 </p>
-                <a href="{{ url_for('pricing') }}" class="btn btn-outline-primary">
-                    View Complete Pricing Details
-                </a>
             </div>
         </div>
     </div>
@@ -520,6 +583,8 @@
 <!-- CTA Section -->
 <div class="bg-primary text-white py-5" id="cta">
     <div class="container text-center">
+
+
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <h2 class="fw-bold mb-3">Join 1000+ Healthcare Providers Already Using Sapyyn</h2>
@@ -578,6 +643,202 @@
         </div>
     </div>
 </div>
+
+<!-- Referral Action Modal -->
+<div class="modal fade" id="referralModal" tabindex="-1" aria-labelledby="referralModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="referralModalLabel">Start Referral Process</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modalContent">
+                    <!-- Content will be dynamically loaded -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Newsletter Signup Section -->
+<section id="newsletter-signup" class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <h3 class="fw-bold mb-3">Subscribe for Updates</h3>
+                <p class="text-muted mb-4">Stay informed about the latest features, security updates, and best practices for patient referral management.</p>
+                <form id="newsletter-form" class="row g-2 justify-content-center">
+                    <div class="col-auto flex-fill" style="max-width: 300px;">
+                        <input type="email" class="form-control" id="newsletter-email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-envelope me-1"></i>Subscribe
+                        </button>
+                    </div>
+                </form>
+                <p class="small text-muted mt-2 mb-0">
+                    <i class="bi bi-shield-check me-1"></i>We respect your privacy. Unsubscribe anytime.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call-to-Action Banner -->
+<section id="cta-banner" class="py-5" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);">
+    <div class="container">
+        <div class="row justify-content-center text-center text-white">
+            <div class="col-lg-8">
+                <h2 class="display-5 fw-bold mb-3">Ready to modernize your referrals?</h2>
+                <p class="lead mb-4">Get started with Sapyyn and connect your practice today. Join thousands of healthcare providers who trust our secure, HIPAA-compliant platform.</p>
+                <div class="d-grid d-md-flex gap-3 justify-content-center">
+                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg px-4">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Create Your Free Account
+                    </a>
+                    <a href="{{ url_for('contact') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-telephone me-2"></i>Contact Sales
+                    </a>
+                </div>
+                <p class="small mt-3 mb-0 opacity-75">
+                    <i class="bi bi-shield-check me-1"></i>14-day free trial • No credit card required • HIPAA compliant
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Subscription Required Modal -->
+<div class="modal fade" id="subscriptionModal" tabindex="-1" aria-labelledby="subscriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-primary" id="subscriptionModalLabel">
+                    <i class="bi bi-star-fill me-2"></i>Subscription Required
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                    <i class="bi bi-lock-fill text-primary fs-1"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Professional Features Await</h4>
+                <p class="text-muted mb-4">Access to referral management features requires at minimum a trial subscription. Start your free 14-day trial to unlock:</p>
+                
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="feature-item">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Unlimited referrals</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="feature-item">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Priority support</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="feature-item">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>QR code generation</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="feature-item">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Document management</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('start_free_trial') }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Start Free 14-Day Trial
+                    </a>
+                    <a href="{{ url_for('pricing') }}" class="btn btn-outline-primary">
+                        View All Plans
+                    </a>
+                </div>
+                
+                <p class="small text-muted mt-3 mb-0">
+                    <i class="bi bi-shield-check me-1"></i>No credit card required • Cancel anytime
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Referral Modal -->
+<div class="modal fade" id="quickReferralModal" tabindex="-1" aria-labelledby="quickReferralModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="quickReferralModalLabel">
+                    <i class="bi bi-lightning-charge-fill me-2"></i>Quick Referral
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Provider Information Display -->
+                <div id="providerInfo" class="alert alert-info mb-4" style="display: none;">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-person-badge fs-3 me-3"></i>
+                        <div>
+                            <h6 class="mb-1">Referring to:</h6>
+                            <div id="providerDetails"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Referral Form -->
+                <form id="referralForm">
+                    <input type="hidden" id="modalProviderCode" name="provider_code">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="patientName" class="form-label">Patient Name *</label>
+                            <input type="text" class="form-control" id="patientName" name="patient_name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="patientPhone" class="form-label">Patient Phone</label>
+                            <input type="tel" class="form-control" id="patientPhone" name="patient_phone">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="medicalCondition" class="form-label">Medical Condition / Reason for Referral</label>
+                        <input type="text" class="form-control" id="medicalCondition" name="medical_condition" 
+                               placeholder="e.g., Routine cleaning, Orthodontic consultation, Emergency treatment">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="urgencyLevel" class="form-label">Urgency Level</label>
+                        <select class="form-select" id="urgencyLevel" name="urgency_level">
+                            <option value="normal">Normal</option>
+                            <option value="urgent">Urgent</option>
+                            <option value="emergency">Emergency</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Additional Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                  placeholder="Any additional information about the patient or referral"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submitReferralBtn">
+                    <i class="bi bi-send me-2"></i>Create Referral
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_scripts %}
@@ -633,6 +894,386 @@ document.addEventListener('DOMContentLoaded', function() {
     showSlides(slideIndex);
     resetInterval();
     
+    // Referral Action Buttons Handler
+    const referralActionBtns = document.querySelectorAll('.referral-action-btn');
+    
+    referralActionBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const referralType = this.getAttribute('data-referral-type');
+            
+            {% if session.user_id %}
+                // Check if user has subscription
+                checkSubscriptionAndProceed(referralType);
+            {% else %}
+                // Show subscription modal for non-logged-in users
+                showSubscriptionModal();
+            {% endif %}
+        });
+    });
+    
+    function checkSubscriptionAndProceed(referralType) {
+        // Show loading state
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Checking access...';
+        btn.disabled = true;
+        
+        // Check subscription status via API
+        fetch('/api/check-subscription')
+            .then(response => response.json())
+            .then(data => {
+                if (data.has_subscription) {
+                    // Proceed with referral creation
+                    createReferral(referralType);
+                } else {
+                    // Show subscription required modal
+                    showSubscriptionModal();
+                }
+            })
+            .catch(error => {
+                console.error('Error checking subscription:', error);
+                showSubscriptionModal();
+            })
+            .finally(() => {
+                // Restore button state
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+    }
+    
+    function createReferral(referralType) {
+        let modalContent = '';
+        
+        switch(referralType) {
+            case 'emergency':
+                modalContent = getEmergencyReferralContent();
+                break;
+            case 'routine':
+                modalContent = getRoutineReferralContent();
+                break;
+            case 'consultation':
+                modalContent = getConsultationContent();
+                break;
+        }
+        
+        document.getElementById('modalContent').innerHTML = modalContent;
+        document.getElementById('referralModalLabel').textContent = getModalTitle(referralType);
+        
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('referralModal'));
+        modal.show();
+    }
+    
+    function getModalTitle(type) {
+        switch(type) {
+            case 'emergency': return 'Start Emergency Referral';
+            case 'routine': return 'Create Routine Referral';
+            case 'consultation': return 'Request Consultation';
+            default: return 'Start Referral Process';
+        }
+    }
+    
+    function getEmergencyReferralContent() {
+        return `
+            <div class="text-center mb-4">
+                <div class="bg-danger bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                    <i class="bi bi-exclamation-triangle-fill text-danger fs-1"></i>
+                </div>
+                <h4 class="fw-bold text-danger">Emergency Referral</h4>
+                <p class="text-muted">Urgent cases requiring immediate specialist attention</p>
+            </div>
+            
+            <form id="emergencyReferralForm" action="/api/referral/emergency" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="patientName" class="form-label">Patient Name *</label>
+                        <input type="text" class="form-control" id="patientName" name="patient_name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="urgencyLevel" class="form-label">Urgency Level *</label>
+                        <select class="form-select" id="urgencyLevel" name="urgency_level" required>
+                            <option value="critical">Critical - Immediate</option>
+                            <option value="urgent">Urgent - Same Day</option>
+                            <option value="priority">Priority - 24-48 Hours</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="referringDoctor" class="form-label">Referring Doctor</label>
+                        <input type="text" class="form-control" id="referringDoctor" name="referring_doctor" value="{{ session.full_name }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="targetSpecialty" class="form-label">Target Specialty *</label>
+                        <select class="form-select" id="targetSpecialty" name="target_specialty" required>
+                            <option value="">Select Specialty</option>
+                            <option value="oral_surgery">Oral Surgery</option>
+                            <option value="endodontics">Endodontics</option>
+                            <option value="periodontics">Periodontics</option>
+                            <option value="orthodontics">Orthodontics</option>
+                            <option value="prosthodontics">Prosthodontics</option>
+                            <option value="pediatric">Pediatric Dentistry</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label for="emergencyDetails" class="form-label">Emergency Details *</label>
+                        <textarea class="form-control" id="emergencyDetails" name="emergency_details" rows="3" 
+                                  placeholder="Describe the emergency situation, symptoms, and why immediate attention is required" required></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label for="contactNumber" class="form-label">Emergency Contact Number *</label>
+                        <input type="tel" class="form-control" id="contactNumber" name="contact_number" required>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning mt-3">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Emergency Priority:</strong> This referral will be marked as urgent and sent immediately to available specialists.
+                </div>
+                
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-danger flex-fill">
+                        <i class="bi bi-lightning-fill me-2"></i>Submit Emergency Referral
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        `;
+    }
+    
+    function getRoutineReferralContent() {
+        return `
+            <div class="text-center mb-4">
+                <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                    <i class="bi bi-clipboard2-heart-fill text-primary fs-1"></i>
+                </div>
+                <h4 class="fw-bold text-primary">Routine Referral</h4>
+                <p class="text-muted">Standard referral with comprehensive documentation</p>
+            </div>
+            
+            <form id="routineReferralForm" action="/api/referral/routine" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="patientNameRoutine" class="form-label">Patient Name *</label>
+                        <input type="text" class="form-control" id="patientNameRoutine" name="patient_name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="patientAge" class="form-label">Patient Age</label>
+                        <input type="number" class="form-control" id="patientAge" name="patient_age" min="1" max="120">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="referringDoctorRoutine" class="form-label">Referring Doctor</label>
+                        <input type="text" class="form-control" id="referringDoctorRoutine" name="referring_doctor" value="{{ session.full_name }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="targetSpecialtyRoutine" class="form-label">Target Specialty *</label>
+                        <select class="form-select" id="targetSpecialtyRoutine" name="target_specialty" required>
+                            <option value="">Select Specialty</option>
+                            <option value="oral_surgery">Oral Surgery</option>
+                            <option value="endodontics">Endodontics</option>
+                            <option value="periodontics">Periodontics</option>
+                            <option value="orthodontics">Orthodontics</option>
+                            <option value="prosthodontics">Prosthodontics</option>
+                            <option value="pediatric">Pediatric Dentistry</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label for="medicalCondition" class="form-label">Medical Condition/Diagnosis *</label>
+                        <textarea class="form-control" id="medicalCondition" name="medical_condition" rows="2" 
+                                  placeholder="Primary diagnosis or condition requiring specialist care" required></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label for="treatmentHistory" class="form-label">Treatment History</label>
+                        <textarea class="form-control" id="treatmentHistory" name="treatment_history" rows="2" 
+                                  placeholder="Previous treatments, medications, and relevant medical history"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="preferredDate" class="form-label">Preferred Appointment Date</label>
+                        <input type="date" class="form-control" id="preferredDate" name="preferred_date" min="${new Date().toISOString().split('T')[0]}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="insuranceInfo" class="form-label">Insurance Information</label>
+                        <input type="text" class="form-control" id="insuranceInfo" name="insurance_info" placeholder="Insurance provider and plan">
+                    </div>
+                    <div class="col-12">
+                        <label for="additionalNotes" class="form-label">Additional Notes</label>
+                        <textarea class="form-control" id="additionalNotes" name="additional_notes" rows="2" 
+                                  placeholder="Any additional information for the specialist"></textarea>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary flex-fill">
+                        <i class="bi bi-plus-circle me-2"></i>Create Referral
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        `;
+    }
+    
+    function getConsultationContent() {
+        return `
+            <div class="text-center mb-4">
+                <div class="bg-success bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                    <i class="bi bi-chat-dots-fill text-success fs-1"></i>
+                </div>
+                <h4 class="fw-bold text-success">Request Consultation</h4>
+                <p class="text-muted">Connect with specialists for expert guidance</p>
+            </div>
+            
+            <form id="consultationForm" action="/api/consultation/request" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="consultationType" class="form-label">Consultation Type *</label>
+                        <select class="form-select" id="consultationType" name="consultation_type" required>
+                            <option value="">Select Type</option>
+                            <option value="second_opinion">Second Opinion</option>
+                            <option value="treatment_planning">Treatment Planning</option>
+                            <option value="case_discussion">Case Discussion</option>
+                            <option value="educational">Educational Consultation</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="specialtyConsult" class="form-label">Specialty Area *</label>
+                        <select class="form-select" id="specialtyConsult" name="specialty" required>
+                            <option value="">Select Specialty</option>
+                            <option value="oral_surgery">Oral Surgery</option>
+                            <option value="endodontics">Endodontics</option>
+                            <option value="periodontics">Periodontics</option>
+                            <option value="orthodontics">Orthodontics</option>
+                            <option value="prosthodontics">Prosthodontics</option>
+                            <option value="pediatric">Pediatric Dentistry</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label for="caseDescription" class="form-label">Case Description *</label>
+                        <textarea class="form-control" id="caseDescription" name="case_description" rows="3" 
+                                  placeholder="Describe the case you'd like to discuss with a specialist" required></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label for="specificQuestions" class="form-label">Specific Questions</label>
+                        <textarea class="form-control" id="specificQuestions" name="specific_questions" rows="2" 
+                                  placeholder="Any specific questions you have for the specialist"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="urgencyConsult" class="form-label">Urgency Level</label>
+                        <select class="form-select" id="urgencyConsult" name="urgency">
+                            <option value="normal">Normal (3-5 days)</option>
+                            <option value="priority">Priority (1-2 days)</option>
+                            <option value="urgent">Urgent (Same day)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="preferredMethod" class="form-label">Preferred Communication</label>
+                        <select class="form-select" id="preferredMethod" name="preferred_method">
+                            <option value="chat">In-platform Chat</option>
+                            <option value="video">Video Call</option>
+                            <option value="phone">Phone Call</option>
+                            <option value="email">Email</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>HIPAA Compliant:</strong> All consultations are conducted through secure, encrypted channels.
+                </div>
+                
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-success flex-fill">
+                        <i class="bi bi-chat-square-text me-2"></i>Submit Consultation Request
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        `;
+    }
+    
+    function showSubscriptionModal() {
+        const subscriptionModal = new bootstrap.Modal(document.getElementById('subscriptionModal'));
+        subscriptionModal.show();
+    }
+    
+    // Handle form submissions in the referral modal
+    document.addEventListener('submit', function(e) {
+        if (e.target.matches('#emergencyReferralForm, #routineReferralForm, #consultationForm')) {
+            e.preventDefault();
+            submitReferralForm(e.target);
+        }
+    });
+    
+    function submitReferralForm(form) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        // Show loading state
+        submitBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Processing...';
+        submitBtn.disabled = true;
+        
+        // Prepare form data
+        const formData = new FormData(form);
+        
+        // Submit form
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message and redirect
+                showSuccessMessage(data.message, data.referral_id);
+                setTimeout(() => {
+                    window.location.href = data.redirect_url || '/dashboard';
+                }, 2000);
+            } else {
+                // Show error message
+                showErrorMessage(data.message || 'An error occurred while processing your request.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorMessage('Network error. Please check your connection and try again.');
+        })
+        .finally(() => {
+            // Restore button state
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    }
+    
+    function showSuccessMessage(message, referralId) {
+        const modalContent = document.getElementById('modalContent');
+        modalContent.innerHTML = `
+            <div class="text-center py-4">
+                <div class="bg-success bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                    <i class="bi bi-check-circle-fill text-success fs-1"></i>
+                </div>
+                <h4 class="fw-bold text-success mb-3">Request Submitted Successfully!</h4>
+                <p class="text-muted mb-3">${message}</p>
+                ${referralId ? `<p class="fw-bold">Referral ID: <span class="text-primary">${referralId}</span></p>` : ''}
+                <div class="d-grid gap-2 mt-4">
+                    <a href="/dashboard" class="btn btn-primary">Go to Dashboard</a>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        `;
+    }
+    
+    function showErrorMessage(message) {
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-danger alert-dismissible fade show mt-3';
+        alert.innerHTML = `
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        const modalContent = document.getElementById('modalContent');
+        modalContent.insertBefore(alert, modalContent.firstChild);
+    }
+    
     // Inline Signup Forms Handler
     const inlineSignupForm = document.getElementById('inlineSignupForm');
     const ctaSignupForm = document.getElementById('ctaSignupForm');
@@ -641,7 +1282,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!form) return;
         
         form.addEventListener('submit', function(e) {
-            const email = form.querySelector('input[email]').value.trim();
+            const email = form.querySelector('input[name="email"]').value.trim();
             
             // Basic email validation
             if (!email || !email.includes('@')) {
@@ -685,11 +1326,11 @@ document.addEventListener('DOMContentLoaded', function() {
         quickReferralForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const providerCode = providerCodeInput.value.trim();
+            const providerCode = providerCodeInput.value.trim().toUpperCase();
             
-            // Validate 6-digit code
-            if (providerCode.length !== 6 || isNaN(providerCode)) {
-                alert('Please enter a valid 6-digit provider code');
+            // Validate 6-character alphanumeric code
+            if (providerCode.length !== 6 || !/^[A-Z0-9]{6}$/.test(providerCode)) {
+                alert('Please enter a valid 6-character provider code (letters and numbers only)');
                 providerCodeInput.focus();
                 return;
             }
@@ -697,52 +1338,158 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show loading state
             const submitBtn = quickReferralForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Searching...';
+            submitBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Connecting...';
             submitBtn.disabled = true;
             
-            // Simulate API call to find provider
-            setTimeout(() => {
-                {% if session.user_id %}
-                // Redirect to patient portal with provider code
-                window.location.href = '/portal/patient?provider_code=' + providerCode;
-                {% else %}
-                // Redirect to registration with provider code
-                window.location.href = '/register?provider_code=' + providerCode + '&role=patient';
-                {% endif %}
-            }, 1000);
+            // Check provider code via API
+            fetch('/api/provider-code/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ provider_code: providerCode })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    // Show the referral modal with provider information
+                    showReferralModal(providerCode, data.provider);
+                } else {
+                    alert('Invalid provider code. Please check the code and try again.');
+                }
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error validating provider code:', error);
+                alert('Error validating code. Please try again.');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
         });
         
-        // Format input as user types
+        // Format input as user types (alphanumeric, uppercase)
         providerCodeInput.addEventListener('input', function(e) {
-            // Only allow numbers
-            this.value = this.value.replace(/[^0-9]/g, '');
+            // Only allow alphanumeric characters and convert to uppercase
+            this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
             
             // Add visual feedback for valid length
             if (this.value.length === 6) {
                 this.classList.add('is-valid');
                 this.classList.remove('is-invalid');
-            } else if (this.value.length > 0) {
-                this.classList.add('is-invalid');
-                this.classList.remove('is-valid');
             } else {
-                this.classList.remove('is-valid', 'is-invalid');
+                this.classList.remove('is-valid');
+                if (this.value.length > 0) {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                }
             }
         });
     }
     
-    // Sticky navbar behavior enhancement
-    const navbar = document.getElementById('mainNavbar');
-    const stickySignUpBtn = document.getElementById('stickySignUpBtn');
+    // Function to show referral modal with provider information
+    function showReferralModal(providerCode, provider) {
+        // Set provider code in hidden field
+        document.getElementById('modalProviderCode').value = providerCode;
+        
+        // Display provider information
+        const providerInfo = document.getElementById('providerInfo');
+        const providerDetails = document.getElementById('providerDetails');
+        
+        providerDetails.innerHTML = `
+            <strong>${provider.name}</strong><br>
+            <small class="text-muted">${provider.practice} • ${provider.type} • ${provider.specialty}</small>
+        `;
+        
+        providerInfo.style.display = 'block';
+        
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('quickReferralModal'));
+        modal.show();
+    }
     
-    if (navbar && stickySignUpBtn) {
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 100) {
-                navbar.classList.add('navbar-scrolled');
-                stickySignUpBtn.classList.add('btn-pulse');
-            } else {
-                navbar.classList.remove('navbar-scrolled');
-                stickySignUpBtn.classList.remove('btn-pulse');
+    // Handle referral form submission
+    const submitReferralBtn = document.getElementById('submitReferralBtn');
+    if (submitReferralBtn) {
+        submitReferralBtn.addEventListener('click', function() {
+            const form = document.getElementById('referralForm');
+            const formData = new FormData(form);
+            
+            // Convert to JSON
+            const data = {
+                provider_code: formData.get('provider_code'),
+                patient_name: formData.get('patient_name'),
+                patient_phone: formData.get('patient_phone'),
+                medical_condition: formData.get('medical_condition'),
+                urgency_level: formData.get('urgency_level'),
+                notes: formData.get('notes')
+            };
+            
+            // Validate required fields
+            if (!data.patient_name) {
+                alert('Patient name is required');
+                document.getElementById('patientName').focus();
+                return;
             }
+            
+            // Show loading state
+            const originalText = submitReferralBtn.innerHTML;
+            submitReferralBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Creating...';
+            submitReferralBtn.disabled = true;
+            
+            // Submit referral
+            fetch('/api/quick-referral', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close modal and show success message
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('quickReferralModal'));
+                    modal.hide();
+                    
+                    // Show success alert
+                    const successAlert = document.createElement('div');
+                    successAlert.className = 'alert alert-success alert-dismissible fade show';
+                    successAlert.innerHTML = `
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <strong>Referral Created Successfully!</strong><br>
+                        ${data.message}<br>
+                        <small>Referral ID: ${data.referral_id}</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    
+                    // Insert at top of page
+                    document.body.insertBefore(successAlert, document.body.firstChild);
+                    
+                    // Clear form
+                    form.reset();
+                    document.getElementById('providerInfo').style.display = 'none';
+                    
+                    // Auto-hide alert after 5 seconds
+                    setTimeout(() => {
+                        if (successAlert.parentNode) {
+                            successAlert.remove();
+                        }
+                    }, 5000);
+                } else {
+                    alert('Error creating referral: ' + data.message);
+                }
+                
+                submitReferralBtn.innerHTML = originalText;
+                submitReferralBtn.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error creating referral:', error);
+                alert('Error creating referral. Please try again.');
+                submitReferralBtn.innerHTML = originalText;
+                submitReferralBtn.disabled = false;
+            });
         });
     }
     
@@ -765,7 +1512,266 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<script>
+// Newsletter signup form handling
+document.addEventListener('DOMContentLoaded', function() {
+    const newsletterForm = document.getElementById('newsletter-form');
+    const emailInput = document.getElementById('newsletter-email');
+    
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            if (!email) {
+                showMessage('Please enter your email address.', 'warning');
+                return;
+            }
+            
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage('Please enter a valid email address.', 'warning');
+                return;
+            }
+            
+            // Simulate newsletter subscription
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Subscribing...';
+            submitBtn.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                emailInput.value = '';
+                submitBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Subscribed!';
+                submitBtn.classList.remove('btn-primary');
+                submitBtn.classList.add('btn-success');
+                
+                showMessage('Thank you for subscribing! You\'ll receive updates about Sapyyn features and best practices.', 'success');
+                
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('btn-success');
+                    submitBtn.classList.add('btn-primary');
+                }, 3000);
+            }, 1500);
+        });
+    }
+    
+    function showMessage(message, type) {
+        // Create alert if it doesn't exist
+        let alertContainer = document.querySelector('.newsletter-alert');
+        if (!alertContainer) {
+            alertContainer = document.createElement('div');
+            alertContainer.className = 'newsletter-alert mt-3';
+            newsletterForm.parentNode.appendChild(alertContainer);
+        }
+        
+        const alertClass = type === 'success' ? 'alert-success' : 
+                          type === 'warning' ? 'alert-warning' : 'alert-info';
+        
+        alertContainer.innerHTML = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            const alert = alertContainer.querySelector('.alert');
+            if (alert) {
+                alert.classList.remove('show');
+                setTimeout(() => {
+                    alertContainer.innerHTML = '';
+                }, 150);
+            }
+        }, 5000);
+    }
+});
+</script>
+
 <style>
+/* Referral Management Section Styles */
+.referral-management-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 100%);
+}
+
+.referral-action-card {
+    transition: all 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+}
+
+.referral-action-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.referral-action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.emergency-card::before {
+    background: linear-gradient(90deg, #dc3545, #b02a37);
+}
+
+.routine-card::before {
+    background: linear-gradient(90deg, #007bff, #0056b3);
+}
+
+.consultation-card::before {
+    background: linear-gradient(90deg, #198754, #146c43);
+}
+
+.referral-action-card:hover::before {
+    opacity: 1;
+}
+
+.referral-action-btn {
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.referral-action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.referral-action-btn:hover::before {
+    left: 100%;
+}
+
+.quick-access-card {
+    border-radius: 15px;
+    border: 2px solid #ffc107;
+    background: linear-gradient(135deg, #fff 0%, #fffdf7 100%);
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+    border-radius: 15px 15px 0 0;
+}
+
+.feature-item {
+    text-align: left;
+    padding: 0.5rem 0;
+}
+
+/* Form Styles in Modals */
+.modal .form-control {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.modal .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.modal .form-select {
+    border-radius: 8px;
+}
+
+.modal .btn {
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* Loading Animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.2em;
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: 12px;
+    border: none;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-left: 4px solid #17a2b8;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-left: 4px solid #28a745;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-left: 4px solid #dc3545;
+}
+
+/* Badge Enhancements */
+.badge {
+    font-weight: 500;
+    padding: 0.5rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+    .referral-action-card {
+        margin-bottom: 1.5rem;
+    }
+    
+    .modal-dialog {
+        margin: 1rem;
+    }
+    
+    .quick-access-card .row {
+        text-align: center;
+    }
+    
+    .quick-access-card .col-md-6:last-child {
+        margin-top: 1rem;
+    }
+}
+
 /* Hero Section Rotating Images */
 .hero-image-container {
     position: relative;
