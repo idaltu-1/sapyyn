@@ -1,0 +1,35 @@
+# Sapyyn Platform - Fixed Python Dependencies
+# This version resolves Pillow 10.4.0 vs 11.0.0 conflict
+
+# Core dependencies
+anthropic==0.31.0
+
+# Image processing - Using flexible version to resolve conflicts
+# This allows pip to choose the best version between 10.4.0 and 11.0.0
+pillow>=10.4.0
+
+# Web framework (uncomment when needed)
+# fastapi==0.104.1
+# uvicorn==0.24.0
+
+# Database (uncomment when needed)
+# sqlalchemy==2.0.23
+# psycopg2-binary==2.9.9
+
+# AWS SDK (uncomment when needed)
+# boto3==1.29.7
+
+# File handling (uncomment when needed)
+# python-multipart==0.0.6
+
+# Security (uncomment when needed)
+# python-jose[cryptography]==3.3.0
+# passlib[bcrypt]==1.7.4
+
+# Testing (uncomment when needed)
+# pytest==7.4.3
+# pytest-asyncio==0.21.1
+
+# Development (uncomment when needed)
+# black==23.11.0
+# pylint==3.0.2

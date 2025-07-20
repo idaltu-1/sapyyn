@@ -1,0 +1,29 @@
+=== SAPYYN.COM FRONTEND ANALYSIS ===
+Date: $(date)
+
+=== MAIN SITE (sapyyn.com) ===
+Technology Stack:
+- Framework: Next.js (React-based)
+- Server: Apache/2.4.58 (Ubuntu)
+- Caching: Next.js cache with HIT status
+- External Services: Chatbox widget from simplebase.co
+
+JavaScript Bundles Identified:
+- Main app bundle: main-app-2abfdeb087631a01.js
+- Page-specific: app/page-4ec8501b2d876f0e.js, app/layout-59f6ee933d784501.js
+- Webpack runtime: webpack-e42ad6b6bf80eda0.js
+- Polyfills: polyfills-c67a75d1b6f99dc8.js
+- Multiple chunk files (20+ chunks for code splitting)
+
+CSS Files:
+- Custom stylesheets: 4 Next.js generated CSS files
+- External: Slick carousel CSS from cdnjs.cloudflare.com
+
+Third-party Integrations:
+- Chat widget: chatbox.simplebase.co (project ID: 65fde462604c7e2eafcc9139)
+
+Build Characteristics:
+- Code splitting enabled (multiple chunks)
+- Static generation with caching
+- Responsive design with mobile assets
+
