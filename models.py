@@ -1,4 +1,5 @@
 """
+
 SQLAlchemy models for the Sapyyn Patient Referral System
 """
 
@@ -44,6 +45,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+
     password_hash = db.Column(db.String(128), nullable=False)
     full_name = db.Column(db.String(120), nullable=False)
     role = db.Column(db.String(20), default='patient')
@@ -52,6 +54,7 @@ class User(db.Model):
     # Relationships
     referrals = db.relationship('Referral', backref='user', lazy=True)
     documents = db.relationship('Document', backref='user', lazy=True)
+
     promotion_preferences = db.relationship('UserPromotionPreference', backref='user', lazy=True, uselist=False)
     
     def __repr__(self):
@@ -122,6 +125,7 @@ class Referral(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
     referral_id = db.Column(db.String(8), unique=True, nullable=False)
     patient_name = db.Column(db.String(120), nullable=False)
     referring_doctor = db.Column(db.String(120))
@@ -136,6 +140,7 @@ class Referral(db.Model):
     
     # Relationships
     documents = db.relationship('Document', backref='referral', lazy=True)
+
     
     def __repr__(self):
         return f'<Referral {self.referral_id}>'
@@ -149,6 +154,8 @@ class Document(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     file_type = db.Column(db.String(50), nullable=False)
     file_name = db.Column(db.String(255), nullable=False)
+l_language = db.Column(db.Text)
+=======
     file_path = db.Column(db.String(255), nullable=False)
     file_size = db.Column(db.Integer)
     upload_date = db.Column(db.DateTime, default=datetime.utcnow)
@@ -175,6 +182,7 @@ class Appointment(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
+
     patient = db.relationship('User', foreign_keys=[patient_id], backref='patient_appointments')
     specialist = db.relationship('User', foreign_keys=[specialist_id], backref='specialist_appointments')
     creator = db.relationship('User', foreign_keys=[created_by])
