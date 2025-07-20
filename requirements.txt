@@ -37,7 +37,7 @@ selenium==4.27.1
 
 # Additional security-focused dependencies
 cryptography==44.0.0
-urllib3==2.2.3
+urllib3==2.5.0
 certifi==2024.12.14
 idna==3.10
 
