@@ -1,0 +1,25 @@
+/* Logo styling and placement */
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 0;
+}
+
+.logo {
+  height: 50px;
+  width: auto;
+}
+
+/* For mobile devices */
+@media (max-width: 768px) {
+  .logo {
+    height: 40px;
+  }
+}
+
+/* For navigation bars */
+.navbar .logo {
+  height: 40px;
+  margin-right: 20px;
+}

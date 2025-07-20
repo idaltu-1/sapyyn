@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Promotion Management - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-megaphone text-primary"></i>
+                    Promotion Management
+                </h1>
+                <a href="{{ url_for('new_promotion') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i>
+                    New Promotion
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-2 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body text-center">
+                    <h4 class="fw-bold">{{ stats[0] or 0 }}</h4>
+                    <p class="mb-0">Total</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body text-center">
+                    <h4 class="fw-bold">{{ stats[1] or 0 }}</h4>
+                    <p class="mb-0">Active</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body text-center">
+                    <h4 class="fw-bold">{{ stats[2] or 0 }}</h4>
+                    <p class="mb-0">Partner</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="card bg-secondary text-white h-100">
+                <div class="card-body text-center">
+                    <h4 class="fw-bold">{{ stats[3] or 0 }}</h4>
+                    <p class="mb-0">House</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body text-center">
+                    <h4 class="fw-bold">{{ stats[4] or 0 }}</h4>
+                    <p class="mb-0">Impressions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 mb-3">
+            <div class="card bg-danger text-white h-100">
+                <div class="card-body text-center">
+                    <h4 class="fw-bold">{{ stats[5] or 0 }}</h4>
+                    <p class="mb-0">Clicks</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Promotions Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">All Promotions</h5>
+                </div>
+                <div class="card-body">
+                    {% if promotions %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Location</th>
+                                    <th>Weight</th>
+                                    <th>Status</th>
+                                    <th>Stats</th>
+                                    <th>Partner</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for promo in promotions %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ promo[1] }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ promo[2][:100] }}{% if promo[2]|length > 100 %}...{% endif %}</small>
+                                    </td>
+                                    <td>
+                                        {% if promo[3] == 'partner' %}
+                                        <span class="badge bg-success">Partner</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">House</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ promo[4] }}</td>
+                                    <td>{{ promo[5] }}</td>
+                                    <td>
+                                        {% if promo[6] %}
+                                        <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>
+                                            <i class="bi bi-eye"></i> {{ promo[10] }} impressions<br>
+                                            <i class="bi bi-cursor"></i> {{ promo[9] }} clicks
+                                        </small>
+                                    </td>
+                                    <td>{{ promo[12] or '-' }}</td>
+                                    <td>
+                                        <small>{{ promo[13][:10] if promo[13] else '-' }}</small>
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('toggle_promotion', promotion_id=promo[0]) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-sm {% if promo[6] %}btn-outline-danger{% else %}btn-outline-success{% endif %}">
+                                                {% if promo[6] %}
+                                                <i class="bi bi-pause"></i>
+                                                {% else %}
+                                                <i class="bi bi-play"></i>
+                                                {% endif %}
+                                            </button>
+                                        </form>
+                                        {% if promo[11] %}
+                                        <a href="{{ promo[11] }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                            <i class="bi bi-link-45deg"></i>
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-megaphone fs-1 text-muted"></i>
+                        <h5 class="text-muted mt-2">No promotions found</h5>
+                        <p class="text-muted">Create your first promotion to get started.</p>
+                        <a href="{{ url_for('new_promotion') }}" class="btn btn-primary">Create Promotion</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
