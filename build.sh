@@ -20,17 +20,25 @@ npm install
 echo "🏗️ Building frontend assets..."
 npm run build
 
-# Check if Python dependencies are installed
-echo "🐍 Checking Python dependencies..."
-if ! python -c "import flask" &> /dev/null; then
-    echo "📦 Installing Python dependencies..."
-    pip install -r requirements.txt
+# Check if Python is available for Flask app (optional)
+echo "🐍 Checking Python availability..."
+if command -v python3 &> /dev/null; then
+    echo "✅ Python3 is available"
+    # Try to install Python dependencies, but don't fail if it doesn't work
+    if [ -f requirements.txt ]; then
+        echo "📦 Attempting to install Python dependencies..."
+        python3 -m pip install -r requirements.txt --user --timeout 30 2>/dev/null || echo "⚠️  Python dependencies installation failed or timed out (this is optional)"
+    fi
+else
+    echo "⚠️  Python3 not available (this is optional for Node.js mode)"
 fi
 
 echo "✅ Build completed successfully!"
 echo ""
-echo "🚀 To start the application:"
-echo "   python app.py"
+echo "🚀 To start the Node.js application:"
+echo "   npm start"
 echo ""
 echo "🌐 The application will be available at:"
-echo "   http://localhost:5001"
+echo "   http://localhost:3000"
+echo ""
+echo "📁 Static files are served from the public/ directory"

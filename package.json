@@ -4,8 +4,12 @@
   "description": "Login, file upload and referral prototype for sapyyn.com",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "build": "echo \"Skipping build, no frontend assets to build\""
+
+    "start": "scripts": {
+  "start": "node server.js",
+  "build": "echo \"Skipping build, no frontend assets to build\""
+}
+"node server.js"
   },
   "dependencies": {
     "express": "^4.18.2",
