@@ -17,9 +17,9 @@ rm -rf *.pyc
 echo "📦 Updating pip..."
 python3 -m pip install --upgrade pip
 
-# Install build dependencies with compatible versions
-echo "📋 Installing compatible dependencies..."
-python3 -m pip install -r requirements-build.txt
+# Install secure dependencies with vulnerability fixes
+echo "📋 Installing secure dependencies..."
+python3 -m pip install -r requirements.txt
 
 # Verify installations
 echo "✅ Verifying installations..."

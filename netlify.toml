@@ -5,7 +5,7 @@
 [build.environment]
   PYTHON_VERSION = "3.11"
   NODE_VERSION = "18"
-  PIP_VERSION = "24.3.1"
+  PIP_VERSION = "25.0.1"
 
 [[headers]]
   for = "/*"
