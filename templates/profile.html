@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Sapyyn{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Profile Header -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="profile-avatar bg-primary bg-opacity-15 rounded-circle p-3 me-4">
+                            <i class="bi bi-person-fill text-primary"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-1">{{ user.full_name }}</h2>
+                            <p class="text-muted mb-0">@{{ user.username }}</p>
+                            <span class="badge bg-primary bg-opacity-15 text-primary rounded-pill">{{ user.role.title() }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="profile-info-item">
+                                <label class="form-label text-muted small">Email Address</label>
+                                <p class="mb-0">{{ user.email }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="profile-info-item">
+                                <label class="form-label text-muted small">Member Since</label>
+                                <p class="mb-0">{{ user.created_at.split()[0] if user.created_at else 'N/A' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">
+                            <i class="bi bi-pencil-square me-2"></i>Edit Profile
+                        </a>
+                        <a href="{{ url_for('settings') }}" class="btn btn-outline-secondary ms-2">
+                            <i class="bi bi-gear me-2"></i>Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Profile Stats -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body text-center">
+                            <div class="stat-icon bg-success bg-opacity-15 rounded-circle mx-auto mb-3">
+                                <i class="bi bi-arrow-right-circle-fill text-success"></i>
+                            </div>
+                            <h3 class="fw-bold text-success">{{ user.total_referrals }}</h3>
+                            <p class="text-muted mb-0">Total Referrals</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body text-center">
+                            <div class="stat-icon bg-info bg-opacity-15 rounded-circle mx-auto mb-3">
+                                <i class="bi bi-file-earmark-fill text-info"></i>
+                            </div>
+                            <h3 class="fw-bold text-info">{{ user.total_documents }}</h3>
+                            <p class="text-muted mb-0">Documents Uploaded</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-lightning-charge-fill text-warning me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <a href="{{ url_for('new_referral') }}" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-plus-circle me-2"></i>New Referral
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{{ url_for('upload_file') }}" class="btn btn-outline-success w-100">
+                                <i class="bi bi-cloud-upload me-2"></i>Upload Document
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{{ url_for('view_documents') }}" class="btn btn-outline-info w-100">
+                                <i class="bi bi-files me-2"></i>My Documents
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

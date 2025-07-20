@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sapyyn - Patient Referral System{% endblock %}</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{% block description %}Sapyyn - Secure patient referral system with HIPAA-compliant document management, QR code tracking, and seamless provider communication.{% endblock %}">
+    <meta name="keywords" content="patient referral, dental referral, medical referral, HIPAA compliant, document management, healthcare">
+    <meta name="author" content="Sapyyn Team">
+    <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ self.description() }}{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:site_name" content="Sapyyn">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ self.title() }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ self.description() }}{% endblock %}">
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "MedicalBusiness",
+        "name": "Sapyyn",
+        "description": "Secure patient referral system with HIPAA-compliant document management and seamless provider communication",
+        "url": "{{ request.url_root }}",
+        "logo": "{{ url_for('static', filename='images/sapyyn-logo.png', _external=True) }}",
+        "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "US"
+        },
+        "serviceType": "Patient Referral Management",
+        "medicalSpecialty": ["Dentistry", "Oral Surgery", "Orthodontics"],
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Healthcare Services",
+            "itemListElement": [
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Patient Referral Management",
+                        "description": "Secure, HIPAA-compliant patient referral system"
+                    }
+                },
+                {
+                    "@type": "Offer", 
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Document Management",
+                        "description": "Secure medical document storage and sharing"
+                    }
+                }
+            ]
+        },
+        "sameAs": [
+            "https://www.facebook.com/sapyyn",
+            "https://www.twitter.com/sapyyn",
+            "https://www.linkedin.com/company/sapyyn"
+        ]
+    }
+    </script>
+    
+    {% block structured_data %}{% endblock %}
+    
+    {% if analytics_enabled %}
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga4_id }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ ga4_id }}', {
+            page_title: document.title,
+            page_location: window.location.href,
+            custom_map: {
+                'custom_parameter_1': 'user_type'
+            }
+        });
+        
+        // Enhanced eCommerce for conversion tracking
+        gtag('config', '{{ ga4_id }}', {
+            custom_map: {'custom_parameter_1': 'user_role'},
+            enhanced_ecommerce: true
+        });
+        
+        // Set user properties if logged in
+        {% if session.user_id %}
+        gtag('config', '{{ ga4_id }}', {
+            'user_id': '{{ session.user_id }}',
+            'custom_map': {
+                'user_type': '{{ session.role or "unknown" }}'
+            }
+        });
+        {% endif %}
+    </script>
+    
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','{{ gtm_id }}');</script>
+    
+    <!-- Hotjar Tracking Code -->
+    <script>
+        (function(h,o,t,j,a,r){
+            h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+            h._hjSettings={hjid:{{ hotjar_id }},hjsv:6};
+            a=o.getElementsByTagName('head')[0];
+            r=o.createElement('script');r.async=1;
+            r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+            a.appendChild(r);
+        })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+    </script>
+    
+    <!-- Analytics Configuration for JavaScript -->
+    <script>
+        window.ANALYTICS_CONFIG = {
+            ga4MeasurementId: '{{ ga4_id }}',
+            hotjarSiteId: '{{ hotjar_id }}',
+            gtmContainerId: '{{ gtm_id }}',
+            environment: '{{ analytics_config.ENVIRONMENT }}',
+            userId: {% if session.user_id %}'{{ session.user_id }}'{% else %}null{% endif %},
+            userRole: {% if session.role %}'{{ session.role }}'{% else %}null{% endif %},
+            enableDebug: {{ 'true' if analytics_config.ENVIRONMENT == 'development' else 'false' }}
+        };
+    </script>
+    {% endif %}
+    
+    <!-- Bootstrap CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css'">
+    <!-- Bootstrap Icons -->
+    <link href="{{ url_for('static', filename='css/bootstrap-icons.css') }}" rel="stylesheet" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css'">
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {% if analytics_enabled %}
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ gtm_id }}"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    {% endif %}
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm" id="mainNavbar">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">
+                <i class="bi bi-hospital me-2"></i>
+                Sapyyn
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if session.user_id %}
+                    <!-- Authenticated User Navigation -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('new_referral') }}">
+                            <i class="bi bi-plus-circle"></i> New Referral
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('upload_file') }}">
+                            <i class="bi bi-cloud-upload"></i> Upload Documents
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('view_documents') }}">
+                            <i class="bi bi-files"></i> My Documents
+                        </a>
+                    </li>
+                    <!-- Portal Pages Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="portalDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-grid-3x3-gap"></i> Portal
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('portal_dashboard') }}"><i class="bi bi-speedometer2"></i> Portal Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('referral_history') }}"><i class="bi bi-clock-history"></i> Referral History</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('track_referral') }}"><i class="bi bi-search"></i> Track Referral</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('appointments') }}"><i class="bi bi-calendar-check"></i> Appointments</a></li>
+                            {% if session.role in ['admin', 'dentist_admin', 'specialist_admin'] %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Administration</h6></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin_panel') }}"><i class="bi bi-gear"></i> Admin Panel</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('analytics_dashboard') }}"><i class="bi bi-graph-up"></i> Analytics Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('serve_static_page', filename='admin-users') }}"><i class="bi bi-people"></i> Manage Users</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('serve_static_page', filename='admin-referrals') }}"><i class="bi bi-clipboard-data"></i> Manage Referrals</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    <!-- Rewards -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('rewards_dashboard') }}">
+                            <i class="bi bi-trophy"></i> Rewards
+                        </a>
+                    </li>
+                    {% else %}
+                    <!-- Public Navigation - Conversion Optimized -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="whoWeHelpDropdown" role="button" data-bs-toggle="dropdown">
+                            Who We Help
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><h6 class="dropdown-header">Healthcare Providers</h6></li>
+                            <li><a class="dropdown-item" href="{{ url_for('register') }}?role=dentist">
+                                <i class="bi bi-person-badge text-primary me-2"></i>General Dentists
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('register') }}?role=specialist">
+                                <i class="bi bi-person-check text-success me-2"></i>Dental Specialists
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('register') }}?role=dentist_admin">
+                                <i class="bi bi-building text-warning me-2"></i>Dental Practices
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Patients</h6></li>
+                            <li><a class="dropdown-item" href="{{ url_for('register') }}?role=patient">
+                                <i class="bi bi-person-heart text-info me-2"></i>Individual Patients
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="featuresDropdown" role="button" data-bs-toggle="dropdown">
+                            Features & Solutions
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('index') }}#benefits">
+                                <i class="bi bi-lightning-charge text-warning me-2"></i>Quick Referrals
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('index') }}#benefits">
+                                <i class="bi bi-shield-lock text-success me-2"></i>Secure File Sharing
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('index') }}#benefits">
+                                <i class="bi bi-chat-dots text-info me-2"></i>Provider Collaboration
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('index') }}#benefits">
+                                <i class="bi bi-qr-code-scan text-primary me-2"></i>QR Code Access
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('index') }}#benefits">
+                                <i class="bi bi-graph-up text-danger me-2"></i>Analytics Dashboard
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="resourcesDropdown" role="button" data-bs-toggle="dropdown">
+                            Resources
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('case_studies') }}">
+                                <i class="bi bi-journal-medical me-2"></i>Case Studies
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('tutorials') }}">
+                                <i class="bi bi-play-circle me-2"></i>Video Tutorials
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('how_to_guides') }}">
+                                <i class="bi bi-question-circle me-2"></i>How-to Guides
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('surgical_instruction') }}">
+                                <i class="bi bi-file-medical me-2"></i>Surgical Instructions
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('faq') }}">
+                                <i class="bi bi-patch-question me-2"></i>FAQ
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('blog') }}">
+                                <i class="bi bi-rss me-2"></i>Blog & News
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('pricing') }}">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                
+                <ul class="navbar-nav">
+                    {% if session.user_id %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>
+                            {{ session.full_name or session.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="bi bi-person"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('settings') }}"><i class="bi bi-gear"></i> Settings</a></li>
+                            {% if session.role == 'dentist' %}
+                            <li><a class="dropdown-item" href="{{ url_for('dentist_portal') }}"><i class="bi bi-person-badge"></i> Dentist Portal</a></li>
+                            {% elif session.role == 'specialist' %}
+                            <li><a class="dropdown-item" href="{{ url_for('specialist_portal') }}"><i class="bi bi-person-check"></i> Specialist Portal</a></li>
+                            {% elif session.role == 'patient' %}
+                            <li><a class="dropdown-item" href="{{ url_for('patient_portal') }}"><i class="bi bi-person-heart"></i> Patient Portal</a></li>
+                            {% endif %}
+                            {% if session.role in ['admin', 'dentist_admin', 'specialist_admin'] %}
+                            <li><a class="dropdown-item" href="{{ url_for('admin_portal') }}"><i class="bi bi-shield-check"></i> Admin Portal</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('analytics_dashboard') }}"><i class="bi bi-graph-up"></i> Analytics Dashboard</a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                    <!-- Sticky CTA for logged in users -->
+                    <li class="nav-item">
+                        <a class="btn btn-light btn-sm ms-2" href="{{ url_for('new_referral') }}">
+                            <i class="bi bi-plus-circle me-1"></i>New Referral
+                        </a>
+                    </li>
+                    {% else %}
+                    <!-- Login for returning users (de-emphasized) -->
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" href="{{ url_for('login') }}">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Sign In
+                        </a>
+                    </li>
+                    <!-- Primary CTA - Get Started (emphasized) -->
+                    <li class="nav-item">
+                        <a class="btn btn-light btn-sm ms-2 shadow-sm" href="{{ url_for('register') }}" id="stickySignUpBtn">
+                            <i class="bi bi-person-plus me-1"></i>Get Started Free
+                        </a>
+                    </li>
+                    <!-- Demo CTA -->
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light btn-sm ms-1" href="#" data-bs-toggle="modal" data-bs-target="#demoModal">
+                            <i class="bi bi-play-circle me-1"></i>Demo
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Demo Modal -->
+    <div class="modal fade" id="demoModal" tabindex="-1" aria-labelledby="demoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="demoModalLabel">
+                        <i class="bi bi-play-circle me-2"></i>Watch Sapyyn Demo
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div class="ratio ratio-16x9 mb-3">
+                        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Sapyyn Demo Video" allowfullscreen></iframe>
+                    </div>
+                    <h5>See How Easy Patient Referrals Can Be</h5>
+                    <p class="text-muted">Watch our 3-minute demo to see how Sapyyn streamlines your referral process</p>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person-plus me-2"></i>Start Free Trial
+                        </a>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container-fluid">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-light mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Sapyyn Patient Referral System</h5>
+                    <p class="text-muted">Secure, efficient patient referral management</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-muted">
+                        <i class="bi bi-shield-check"></i>
+                        HIPAA Compliant | Secure Document Handling
+                    </p>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="text-muted mb-0">
+                        &copy; 2025 Sapyyn. All rights reserved. | 
+                        <a href="#" class="text-decoration-none">Privacy Policy</a> | 
+                        <a href="#" class="text-decoration-none">Terms of Service</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js'"></script>
+    
+    <!-- Web Vitals for Core Web Vitals tracking -->
+    <script src="https://unpkg.com/web-vitals@3/dist/web-vitals.iife.js"></script>
+    
+    <!-- Custom Analytics -->
+    <script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+    
+    <!-- User Feedback System -->
+    <script src="{{ url_for('static', filename='js/feedback.js') }}"></script>
+    
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

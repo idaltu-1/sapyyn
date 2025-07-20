@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - Sapyyn{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Profile
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" value="{{ user.username }}" disabled>
+                            <div class="form-text">Username cannot be changed</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="full_name" class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" id="full_name" name="full_name" value="{{ user.full_name }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address *</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <input type="text" class="form-control" id="role" value="{{ user.role.title() }}" disabled>
+                            <div class="form-text">Role cannot be changed. Contact administrator if needed.</div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-2"></i>Save Changes
+                            </button>
+                            <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

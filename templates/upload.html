@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Documents - Sapyyn{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-cloud-upload"></i>
+                        Upload Medical Documents
+                    </h4>
+                </div>
+                
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                        <div class="mb-4">
+                            <label for="file_type" class="form-label">Document Type *</label>
+                            <select class="form-select" id="file_type" name="file_type" required>
+                                <option value="">Select document type</option>
+                                <option value="medical_report">Medical Reports</option>
+                                <option value="documents_for_insurance">Insurance Documents</option>
+                                <option value="experience_documents">Experience Documents</option>
+                                <option value="qualification_documents">Qualification Documents</option>
+                                <option value="supporting_documents">Supporting Documents</option>
+                                <option value="profile_pic">Profile Picture</option>
+                                <option value="testimonial_image">Testimonial Images</option>
+                                <option value="broadcast_file">Broadcast Files</option>
+                                <option value="uploaded_files">General Upload</option>
+                            </select>
+                            <div class="form-text">
+                                Choose the appropriate category for your document
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="file" class="form-label">Select File *</label>
+                            <div class="input-group">
+                                <input type="file" class="form-control" id="file" name="file" required 
+                                       accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.gif,.xls,.xlsx">
+                                <button class="btn btn-outline-secondary" type="button" id="clearFile">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">
+                                Supported formats: PDF, DOC, DOCX, TXT, PNG, JPG, JPEG, GIF, XLS, XLSX (Max 16MB)
+                            </div>
+                        </div>
+                        
+                        <!-- File Preview -->
+                        <div id="filePreview" class="mb-4" style="display: none;">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="bi bi-eye"></i>
+                                        File Preview
+                                    </h6>
+                                    <div id="previewContent"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Upload Progress -->
+                        <div id="uploadProgress" class="mb-4" style="display: none;">
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <small class="text-muted">Uploading file...</small>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i>
+                                Back to Dashboard
+                            </a>
+                            
+                            <button type="submit" class="btn btn-success" id="uploadBtn">
+                                <i class="bi bi-cloud-upload"></i>
+                                Upload Document
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Document Types Information -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-info-circle text-info"></i>
+                        Document Categories
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Medical Documents</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-file-medical text-danger"></i> Medical Reports</li>
+                                <li><i class="bi bi-shield-check text-primary"></i> Insurance Documents</li>
+                                <li><i class="bi bi-person-circle text-info"></i> Profile Pictures</li>
+                                <li><i class="bi bi-chat-square-quote text-warning"></i> Testimonial Images</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Professional Documents</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-briefcase text-success"></i> Experience Documents</li>
+                                <li><i class="bi bi-award text-warning"></i> Qualification Documents</li>
+                                <li><i class="bi bi-files text-secondary"></i> Supporting Documents</li>
+                                <li><i class="bi bi-broadcast text-primary"></i> Broadcast Files</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security Notice -->
+            <div class="alert alert-info mt-4">
+                <h6 class="alert-heading">
+                    <i class="bi bi-shield-lock"></i>
+                    Security & Privacy
+                </h6>
+                <p class="mb-0">
+                    All uploaded documents are encrypted and stored securely. We comply with HIPAA 
+                    regulations to protect your medical information. Documents are only accessible 
+                    to authorized healthcare providers involved in your care.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// File input handling
+document.getElementById('file').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        showFilePreview(file);
+        validateFile(file);
+    }
+});
+
+// Clear file button
+document.getElementById('clearFile').addEventListener('click', function() {
+    document.getElementById('file').value = '';
+    document.getElementById('filePreview').style.display = 'none';
+});
+
+// File validation
+function validateFile(file) {
+    const maxSize = 16 * 1024 * 1024; // 16MB
+    const allowedTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'text/plain',
+        'image/png',
+        'image/jpeg',
+        'image/jpg',
+        'image/gif',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ];
+    
+    if (file.size > maxSize) {
+        alert('File size must be less than 16MB');
+        document.getElementById('file').value = '';
+        return false;
+    }
+    
+    if (!allowedTypes.includes(file.type)) {
+        alert('File type not supported. Please upload PDF, DOC, DOCX, TXT, PNG, JPG, JPEG, GIF, XLS, or XLSX files.');
+        document.getElementById('file').value = '';
+        return false;
+    }
+    
+    return true;
+}
+
+// File preview
+function showFilePreview(file) {
+    const preview = document.getElementById('filePreview');
+    const content = document.getElementById('previewContent');
+    
+    let previewHTML = `
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                ${getFileIcon(file.type)}
+            </div>
+            <div>
+                <div class="fw-semibold">${file.name}</div>
+                <div class="text-muted small">
+                    Size: ${formatFileSize(file.size)} | 
+                    Type: ${file.type || 'Unknown'} |
+                    Modified: ${new Date(file.lastModified).toLocaleDateString()}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add image preview for image files
+    if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewHTML += `
+                <div class="mt-3">
+                    <img src="${e.target.result}" alt="Preview" class="img-thumbnail" style="max-height: 200px;">
+                </div>
+            `;
+            content.innerHTML = previewHTML;
+        };
+        reader.readAsDataURL(file);
+    } else {
+        content.innerHTML = previewHTML;
+    }
+    
+    preview.style.display = 'block';
+}
+
+// Get file icon based on type
+function getFileIcon(type) {
+    const iconMap = {
+        'application/pdf': '<i class="bi bi-file-pdf text-danger fs-1"></i>',
+        'application/msword': '<i class="bi bi-file-word text-primary fs-1"></i>',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '<i class="bi bi-file-word text-primary fs-1"></i>',
+        'text/plain': '<i class="bi bi-file-text text-secondary fs-1"></i>',
+        'application/vnd.ms-excel': '<i class="bi bi-file-excel text-success fs-1"></i>',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '<i class="bi bi-file-excel text-success fs-1"></i>'
+    };
+    
+    if (type.startsWith('image/')) {
+        return '<i class="bi bi-file-image text-info fs-1"></i>';
+    }
+    
+    return iconMap[type] || '<i class="bi bi-file-earmark text-muted fs-1"></i>';
+}
+
+// Format file size
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Form submission with progress
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    const file = document.getElementById('file').files[0];
+    const fileType = document.getElementById('file_type').value;
+    
+    if (!file || !fileType) {
+        e.preventDefault();
+        alert('Please select both a file and document type');
+        return false;
+    }
+    
+    // Show progress bar
+    const progressDiv = document.getElementById('uploadProgress');
+    const uploadBtn = document.getElementById('uploadBtn');
+    
+    progressDiv.style.display = 'block';
+    uploadBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Uploading...';
+    uploadBtn.disabled = true;
+    
+    // Simulate progress (in real implementation, use XMLHttpRequest for actual progress)
+    let progress = 0;
+    const progressBar = progressDiv.querySelector('.progress-bar');
+    
+    const interval = setInterval(() => {
+        progress += Math.random() * 30;
+        if (progress > 90) progress = 90;
+        
+        progressBar.style.width = progress + '%';
+        
+        if (progress >= 90) {
+            clearInterval(interval);
+        }
+    }, 200);
+});
+
+// Document type descriptions
+const typeDescriptions = {
+    'medical_report': 'Upload medical reports, test results, and clinical documentation',
+    'documents_for_insurance': 'Insurance cards, coverage documents, and authorization forms',
+    'experience_documents': 'Work experience certificates and professional history',
+    'qualification_documents': 'Educational certificates, licenses, and credentials',
+    'supporting_documents': 'Additional documentation supporting your referral',
+    'profile_pic': 'Profile photo for identification purposes',
+    'testimonial_image': 'Patient testimonials and feedback images',
+    'broadcast_file': 'Files for broadcasting to multiple recipients',
+    'uploaded_files': 'General file uploads not categorized elsewhere'
+};
+
+// Update description when document type changes
+document.getElementById('file_type').addEventListener('change', function() {
+    const description = typeDescriptions[this.value];
+    if (description) {
+        const existingDesc = this.parentNode.querySelector('.type-description');
+        if (existingDesc) {
+            existingDesc.remove();
+        }
+        
+        const descDiv = document.createElement('div');
+        descDiv.className = 'form-text type-description text-info';
+        descDiv.innerHTML = '<i class="bi bi-info-circle"></i> ' + description;
+        this.parentNode.appendChild(descDiv);
+    }
+});
+</script>
+{% endblock %}

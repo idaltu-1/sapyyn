@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapyyn Portal - Messaging & Chat</title>
+    <meta name="description" content="Secure messaging platform for dental professionals and patient communication">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --secondary-blue: #3B82F6;
+            --light-blue: #DBEAFE;
+            --accent-yellow: #FCD34D;
+            --warning-yellow: #F59E0B;
+            --white: #FFFFFF;
+            --light-grey: #F8FAFC;
+            --medium-grey: #64748B;
+            --dark-grey: #334155;
+            --black: #0F172A;
+            --success: #10B981;
+            --danger: #EF4444;
+            --glass: rgba(255, 255, 255, 0.25);
+            --shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+            --shadow-hover: 0 16px 64px rgba(37, 99, 235, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+            color: var(--black);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Portal Header */
+        .portal-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--light-blue);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .portal-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .portal-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--primary-blue);
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+        
+        .portal-logo img {
+            height: 40px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .portal-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .portal-menu a {
+            text-decoration: none;
+            color: var(--dark-grey);
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .portal-menu a:hover {
+            color: var(--secondary-blue);
+            background: var(--light-blue);
+            transform: translateY(-2px);
+        }
+        
+        .portal-menu a.active {
+            color: var(--white);
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            box-shadow: var(--shadow);
+        }
+        
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .notification-btn {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--medium-grey);
+            cursor: pointer;
+            position: relative;
+            padding: 0.75rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .notification-btn:hover {
+            color: var(--primary-blue);
+            background: var(--light-blue);
+            transform: scale(1.1);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--light-blue);
+        }
+        
+        .user-profile:hover {
+            background: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        /* Messaging Layout */
+        .messaging-container {
+            height: calc(100vh - 80px);
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Sidebar */
+        .messaging-sidebar {
+            background: var(--white);
+            border-right: 1px solid var(--light-blue);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--light-blue);
+        }
+        
+        .sidebar-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .search-bar {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 2.5rem 0.75rem 1rem;
+            border: 2px solid var(--light-blue);
+            border-radius: 25px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--medium-grey);
+        }
+        
+        /* Chat Filters */
+        .chat-filters {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--light-blue);
+        }
+        
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        .filter-btn:not(.active) {
+            background: var(--light-grey);
+            color: var(--medium-grey);
+        }
+        
+        .filter-btn:hover:not(.active) {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+        }
+        
+        /* Conversations List */
+        .conversations-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 0;
+        }
+        
+        .conversation-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            position: relative;
+        }
+        
+        .conversation-item:hover {
+            background: var(--light-blue);
+        }
+        
+        .conversation-item.active {
+            background: var(--light-blue);
+            border-left-color: var(--primary-blue);
+        }
+        
+        .conversation-item.unread::after {
+            content: '';
+            position: absolute;
+            right: 1rem;
+            width: 10px;
+            height: 10px;
+            background: var(--danger);
+            border-radius: 50%;
+        }
+        
+        .conversation-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            flex-shrink: 0;
+            position: relative;
+        }
+        
+        .online-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: var(--success);
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+        
+        .conversation-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .conversation-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--black);
+        }
+        
+        .conversation-preview {
+            font-size: 0.85rem;
+            color: var(--medium-grey);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .conversation-meta {
+            text-align: right;
+            font-size: 0.8rem;
+            color: var(--medium-grey);
+        }
+        
+        /* Main Chat Area */
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            background: var(--white);
+        }
+        
+        .chat-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--light-blue);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--white);
+        }
+        
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .chat-header-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .chat-header-details h3 {
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 0.25rem;
+        }
+        
+        .chat-header-details p {
+            font-size: 0.85rem;
+            color: var(--success);
+        }
+        
+        .chat-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .chat-action-btn {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--light-grey);
+            color: var(--medium-grey);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-action-btn:hover {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+        }
+        
+        /* Messages Area */
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .message {
+            display: flex;
+            gap: 1rem;
+            max-width: 70%;
+        }
+        
+        .message.sent {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        
+        .message.sent .message-avatar {
+            background: linear-gradient(135deg, var(--accent-yellow), var(--warning-yellow));
+            color: var(--black);
+        }
+        
+        .message-content {
+            flex: 1;
+        }
+        
+        .message-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 18px;
+            margin-bottom: 0.25rem;
+            word-wrap: break-word;
+        }
+        
+        .message.received .message-bubble {
+            background: var(--light-grey);
+            color: var(--black);
+            border-bottom-left-radius: 6px;
+        }
+        
+        .message.sent .message-bubble {
+            background: var(--primary-blue);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+        
+        .message-time {
+            font-size: 0.7rem;
+            color: var(--medium-grey);
+            padding: 0 0.5rem;
+        }
+        
+        .message.sent .message-time {
+            text-align: right;
+        }
+        
+        /* File Attachment */
+        .file-attachment {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--light-blue);
+            border-radius: 12px;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-attachment:hover {
+            background: var(--light-blue);
+        }
+        
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--secondary-blue);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .file-info h5 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .file-info p {
+            font-size: 0.8rem;
+            color: var(--medium-grey);
+        }
+        
+        /* Message Input */
+        .message-input-area {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--light-blue);
+            background: var(--white);
+        }
+        
+        .message-input-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 1rem;
+            background: var(--light-grey);
+            border-radius: 24px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .message-input-container:focus-within {
+            background: white;
+            box-shadow: 0 0 0 2px var(--secondary-blue);
+        }
+        
+        .attachment-btn {
+            background: none;
+            border: none;
+            color: var(--medium-grey);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .attachment-btn:hover {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+        }
+        
+        .message-input {
+            flex: 1;
+            border: none;
+            background: none;
+            resize: none;
+            outline: none;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            max-height: 120px;
+            min-height: 20px;
+        }
+        
+        .send-btn {
+            background: var(--primary-blue);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .send-btn:hover:not(:disabled) {
+            background: var(--secondary-blue);
+            transform: scale(1.1);
+        }
+        
+        .send-btn:disabled {
+            background: var(--medium-grey);
+            cursor: not-allowed;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .empty-state-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--light-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-blue);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state p {
+            color: var(--medium-grey);
+            max-width: 300px;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 968px) {
+            .portal-menu {
+                display: none;
+            }
+            
+            .messaging-container {
+                grid-template-columns: 1fr;
+                height: calc(100vh - 60px);
+            }
+            
+            .messaging-sidebar {
+                display: none;
+            }
+            
+            .messaging-sidebar.show {
+                display: flex;
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 1000;
+                background: var(--white);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .chat-header {
+                padding: 1rem;
+            }
+            
+            .messages-area {
+                padding: 1rem;
+            }
+            
+            .message-input-area {
+                padding: 1rem;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Portal Header -->
+    <header class="portal-header">
+        <nav class="portal-nav">
+            <a href="./sapyyn-portal.html" class="portal-logo">
+                <img src="./assets/logo.svg" alt="Sapyyn">
+                <span>Portal</span>
+            </a>
+            
+            <ul class="portal-menu">
+                <li><a href="./sapyyn-portal.html">Dashboard</a></li>
+                <li><a href="./portal-referrals.html">My Referrals</a></li>
+                <li><a href="./portal-appointments.html">Appointments</a></li>
+                <li><a href="./portal-documents.html">Documents</a></li>
+                <li><a href="./portal-messages.html" class="active">Messages</a></li>
+                <li><a href="./portal-settings.html">Settings</a></li>
+            </ul>
+            
+            <div class="user-controls">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <div class="user-profile">
+                    <div class="user-avatar">JD</div>
+                    <div class="user-info">
+                        <div style="font-weight: 600; font-size: 0.9rem;">John Doe</div>
+                        <div style="font-size: 0.8rem; color: var(--medium-grey);">Patient #12345</div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--medium-grey);"></i>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Messaging Container -->
+    <main class="messaging-container">
+        <!-- Sidebar -->
+        <aside class="messaging-sidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Messages</h2>
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Search conversations...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+
+            <!-- Chat Filters -->
+            <div class="chat-filters">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">Unread</button>
+                <button class="filter-btn">Referrals</button>
+                <button class="filter-btn">Groups</button>
+            </div>
+
+            <!-- Conversations List -->
+            <div class="conversations-list">
+                <div class="conversation-item active">
+                    <div class="conversation-avatar">
+                        SM
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="conversation-info">
+                        <div class="conversation-name">Dr. Sarah Miller</div>
+                        <div class="conversation-preview">Patient referral for root canal treatment...</div>
+                    </div>
+                    <div class="conversation-meta">
+                        <div>2:30 PM</div>
+                    </div>
+                </div>
+
+                <div class="conversation-item unread">
+                    <div class="conversation-avatar">MC</div>
+                    <div class="conversation-info">
+                        <div class="conversation-name">Dr. Michael Chen</div>
+                        <div class="conversation-preview">Can you send the X-ray images for John?</div>
+                    </div>
+                    <div class="conversation-meta">
+                        <div>1:45 PM</div>
+                    </div>
+                </div>
+
+                <div class="conversation-item">
+                    <div class="conversation-avatar">
+                        RC
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="conversation-info">
+                        <div class="conversation-name">Riverside Clinic</div>
+                        <div class="conversation-preview">Thank you for the referral. Patient scheduled...</div>
+                    </div>
+                    <div class="conversation-meta">
+                        <div>11:20 AM</div>
+                    </div>
+                </div>
+
+                <div class="conversation-item">
+                    <div class="conversation-avatar">JW</div>
+                    <div class="conversation-info">
+                        <div class="conversation-name">Dr. James Wilson</div>
+                        <div class="conversation-preview">Periodontal evaluation completed. Results attached.</div>
+                    </div>
+                    <div class="conversation-meta">
+                        <div>Yesterday</div>
+                    </div>
+                </div>
+
+                <div class="conversation-item unread">
+                    <div class="conversation-avatar">AL</div>
+                    <div class="conversation-info">
+                        <div class="conversation-name">Dr. Anna Lee</div>
+                        <div class="conversation-preview">Patient needs urgent orthodontic consultation</div>
+                    </div>
+                    <div class="conversation-meta">
+                        <div>Yesterday</div>
+                    </div>
+                </div>
+
+                <div class="conversation-item">
+                    <div class="conversation-avatar">DT</div>
+                    <div class="conversation-info">
+                        <div class="conversation-name">Dental Team Support</div>
+                        <div class="conversation-preview">Your platform subscription has been renewed</div>
+                    </div>
+                    <div class="conversation-meta">
+                        <div>2 days ago</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <section class="chat-area">
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <div class="chat-header-avatar">SM</div>
+                    <div class="chat-header-details">
+                        <h3>Dr. Sarah Miller</h3>
+                        <p>Online • Orthodontic Specialist</p>
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <button class="chat-action-btn" title="Voice Call">
+                        <i class="fas fa-phone"></i>
+                    </button>
+                    <button class="chat-action-btn" title="Video Call">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="chat-action-btn" title="Patient Info">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <button class="chat-action-btn" title="More Options">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="messages-area" id="messagesArea">
+                <!-- Received Message -->
+                <div class="message received">
+                    <div class="message-avatar">SM</div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            Hi Dr. Doe! I wanted to discuss the referral for John Smith. I've reviewed his case and I think we can help him with the orthodontic treatment he needs.
+                        </div>
+                        <div class="message-time">2:15 PM</div>
+                    </div>
+                </div>
+
+                <!-- Sent Message -->
+                <div class="message sent">
+                    <div class="message-avatar">JD</div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            That's great to hear! What's your assessment of the treatment timeline?
+                        </div>
+                        <div class="message-time">2:18 PM</div>
+                    </div>
+                </div>
+
+                <!-- Received Message with File -->
+                <div class="message received">
+                    <div class="message-avatar">SM</div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            Based on the X-rays, I estimate 18-24 months for complete treatment. I've prepared a detailed treatment plan for your review.
+                        </div>
+                        <div class="file-attachment" onclick="downloadFile('treatment-plan.pdf')">
+                            <div class="file-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="file-info">
+                                <h5>Treatment_Plan_John_Smith.pdf</h5>
+                                <p>2.4 MB • PDF Document</p>
+                            </div>
+                        </div>
+                        <div class="message-time">2:22 PM</div>
+                    </div>
+                </div>
+
+                <!-- Sent Message -->
+                <div class="message sent">
+                    <div class="message-avatar">JD</div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            Perfect! I'll review the treatment plan and discuss it with the patient. When would be the best time to schedule his first appointment?
+                        </div>
+                        <div class="message-time">2:25 PM</div>
+                    </div>
+                </div>
+
+                <!-- Received Message -->
+                <div class="message received">
+                    <div class="message-avatar">SM</div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            I have openings next Tuesday and Thursday afternoon. Would either of those work for him?
+                        </div>
+                        <div class="message-time">2:30 PM</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Input Area -->
+            <div class="message-input-area">
+                <div class="message-input-container">
+                    <button class="attachment-btn" title="Attach File" onclick="attachFile()">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <textarea 
+                        class="message-input" 
+                        placeholder="Type your message..." 
+                        id="messageInput"
+                        onkeydown="handleKeyDown(event)"
+                        oninput="adjustTextareaHeight(this)"
+                    ></textarea>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Message input handling
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const messagesArea = document.getElementById('messagesArea');
+
+        // Enable/disable send button based on input
+        messageInput.addEventListener('input', function() {
+            sendBtn.disabled = this.value.trim() === '';
+        });
+
+        // Auto-resize textarea
+        function adjustTextareaHeight(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        // Handle keyboard shortcuts
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                if (!sendBtn.disabled) {
+                    sendMessage();
+                }
+            }
+        }
+
+        // Send message function
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (messageText === '') return;
+
+            // Create message element
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message sent';
+            messageDiv.innerHTML = `
+                <div class="message-avatar">JD</div>
+                <div class="message-content">
+                    <div class="message-bubble">${messageText}</div>
+                    <div class="message-time">${getCurrentTime()}</div>
+                </div>
+            `;
+
+            // Add to messages area
+            messagesArea.appendChild(messageDiv);
+            
+            // Clear input
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            sendBtn.disabled = true;
+
+            // Scroll to bottom
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+
+            // Simulate response (in real app, this would be real-time)
+            setTimeout(() => {
+                simulateResponse();
+            }, 1000 + Math.random() * 2000);
+        }
+
+        // Simulate incoming message
+        function simulateResponse() {
+            const responses = [
+                "I'll check my calendar and get back to you shortly.",
+                "Sounds good! Let me know if you need any additional information.",
+                "Perfect! I'll send you the appointment confirmation once it's scheduled.",
+                "Thank you for the coordination. The patient will be well taken care of.",
+                "I appreciate your detailed referral notes. Very helpful!"
+            ];
+
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message received';
+            messageDiv.innerHTML = `
+                <div class="message-avatar">SM</div>
+                <div class="message-content">
+                    <div class="message-bubble">${randomResponse}</div>
+                    <div class="message-time">${getCurrentTime()}</div>
+                </div>
+            `;
+
+            messagesArea.appendChild(messageDiv);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        // Get current time formatted
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Attach file function
+        function attachFile() {
+            // In a real app, this would open a file picker
+            alert('File attachment feature - would open file picker in production');
+        }
+
+        // Download file function
+        function downloadFile(filename) {
+            alert(`Downloading ${filename}...`);
+        }
+
+        // Conversation switching
+        document.querySelectorAll('.conversation-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all conversations
+                document.querySelectorAll('.conversation-item').forEach(conv => {
+                    conv.classList.remove('active');
+                });
+                
+                // Add active class to clicked conversation
+                this.classList.add('active');
+                this.classList.remove('unread');
+
+                // Update chat header
+                const avatar = this.querySelector('.conversation-avatar').textContent.trim();
+                const name = this.querySelector('.conversation-name').textContent;
+                
+                document.querySelector('.chat-header-avatar').textContent = avatar;
+                document.querySelector('.chat-header-details h3').textContent = name;
+
+                // Clear current messages and load new conversation
+                // In a real app, this would load messages from the server
+                loadConversationMessages(name);
+            });
+        });
+
+        // Load conversation messages (simulated)
+        function loadConversationMessages(contactName) {
+            // Clear current messages
+            messagesArea.innerHTML = '';
+
+            // Simulate loading different conversation
+            if (contactName !== 'Dr. Sarah Miller') {
+                const placeholderDiv = document.createElement('div');
+                placeholderDiv.className = 'message received';
+                placeholderDiv.innerHTML = `
+                    <div class="message-avatar">${contactName.split(' ').map(n => n[0]).join('')}</div>
+                    <div class="message-content">
+                        <div class="message-bubble">Hello! This is the beginning of your conversation with ${contactName}.</div>
+                        <div class="message-time">${getCurrentTime()}</div>
+                    </div>
+                `;
+                messagesArea.appendChild(placeholderDiv);
+            }
+        }
+
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                const filter = this.textContent.toLowerCase();
+                const conversations = document.querySelectorAll('.conversation-item');
+
+                conversations.forEach(conv => {
+                    let show = true;
+                    
+                    if (filter === 'unread') {
+                        show = conv.classList.contains('unread');
+                    } else if (filter === 'referrals') {
+                        show = conv.querySelector('.conversation-preview').textContent.toLowerCase().includes('referral');
+                    } else if (filter === 'groups') {
+                        show = conv.querySelector('.conversation-name').textContent.includes('Clinic') || 
+                               conv.querySelector('.conversation-name').textContent.includes('Team');
+                    }
+
+                    conv.style.display = show ? 'flex' : 'none';
+                });
+            });
+        });
+
+        // Search functionality
+        document.querySelector('.search-input').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const conversations = document.querySelectorAll('.conversation-item');
+
+            conversations.forEach(conv => {
+                const name = conv.querySelector('.conversation-name').textContent.toLowerCase();
+                const preview = conv.querySelector('.conversation-preview').textContent.toLowerCase();
+                const show = name.includes(searchTerm) || preview.includes(searchTerm);
+                conv.style.display = show ? 'flex' : 'none';
+            });
+        });
+
+        // Initialize chat
+        document.addEventListener('DOMContentLoaded', function() {
+            // Scroll to bottom of messages
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+
+            // Focus on message input
+            messageInput.focus();
+        });
+    </script>
+</body>
+</html>
