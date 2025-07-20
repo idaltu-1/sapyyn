@@ -1,155 +1,106 @@
 const express = require('express');
-const path = require('path');
 const cors = require('cors');
-const helmet = require('helmet');
-require('dotenv').config();
+const path = require('path');
+const DatabaseService = require('./backend/config/database');
 
-// Import database service
-const DatabaseService = require('./backend/config/database.js');
-
-// Create Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Security middleware
-app.use(helmet({
-    contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false
+// Middleware
+app.use(cors({
+    origin: [
+        'http://localhost:3000',
+        'http://localhost:3001', 
+        'https://www.sapyyn.io',
+        'https://sapyyn.io',
+        'https://sapyyn-app-5465ab15434a.herokuapp.com'
+    ],
+    credentials: true
 }));
-app.use(cors());
 
-// Basic middleware
-app.use(express.static(path.join(__dirname, 'frontend/public')));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Health check endpoint with database status
-app.get('/api/health', async (req, res) => {
-    try {
-        const dbHealth = await DatabaseService.healthCheck();
-        
-        res.json({ 
-            status: 'ok', 
-            message: 'Sapyyn Platform is running!',
-            timestamp: new Date().toISOString(),
-            environment: process.env.NODE_ENV || 'development',
-            version: '1.0.0',
-            database: dbHealth
-        });
-    } catch (error) {
-        res.status(500).json({
-            status: 'error',
-            message: 'Health check failed',
-            error: error.message
-        });
-    }
+// Serve static files from frontend build
+app.use(express.static(path.join(__dirname, 'frontend/build')));
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV || 'development'
+    });
 });
 
 // Database status endpoint
-app.get('/api/database/status', async (req, res) => {
-    try {
-        const dbHealth = await DatabaseService.healthCheck();
-        res.json(dbHealth);
-    } catch (error) {
-        res.status(500).json({
-            status: 'error',
-            message: 'Database status check failed',
-            error: error.message
-        });
-    }
-});
-
-// API routes
-app.get('/api/status', (req, res) => {
+app.get('/api/database/status', (req, res) => {
+    const status = DatabaseService.getStatus();
     res.json({
-        server: 'running',
-        uptime: process.uptime(),
-        memory: process.memoryUsage(),
-        pid: process.pid,
-        database: DatabaseService.isConnected ? 'connected' : 'disconnected'
+        database: status,
+        timestamp: new Date().toISOString()
     });
 });
 
-// Frontend routes
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend/public/index.html'));
+// Demo API endpoints (working without database)
+app.get('/api/demo', (req, res) => {
+    res.json({
+        message: 'Sapyyn Platform Demo API',
+        status: 'operational',
+        features: [
+            'User Authentication',
+            'Content Management', 
+            'Analytics Dashboard',
+            'Real-time Updates'
+        ]
+    });
 });
 
-app.get('/portal', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend/public/portal.html'));
-});
-
-app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend/public/admin.html'));
-});
-
-// API endpoints
-app.post('/api/referrals', async (req, res) => {
-    try {
-        res.json({ 
-            message: 'Referral received successfully', 
-            data: req.body,
-            saved: DatabaseService.isConnected 
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Catch-all for SPA routing
+// Catch-all handler: send back frontend's index.html file
 app.get('*', (req, res) => {
-    if (req.path.startsWith('/api/')) {
-        res.status(404).json({ 
-            error: 'API endpoint not found',
-            path: req.path
-        });
-    } else {
-        res.sendFile(path.join(__dirname, 'frontend/public/index.html'));
-    }
+    res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
 });
 
 // Error handling middleware
-app.use((error, req, res, next) => {
-    console.error('Server error:', error);
-    res.status(500).json({ 
-        error: 'Internal server error',
-        message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : error.message
+app.use((err, req, res, next) => {
+    console.error('❌ Server Error:', err.stack);
+    res.status(500).json({
+        error: 'Internal Server Error',
+        message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong!'
     });
 });
 
-// Initialize database and start server
+// Start server function
 async function startServer() {
     try {
-        if (process.env.MONGODB_URI) {
-            console.log('🔌 Connecting to MongoDB Atlas...');
-            await DatabaseService.connect();
-            await DatabaseService.initializeDatabase();
-        } else {
-            console.warn('⚠️ MongoDB URI not found - running without database');
-        }
-
+        // Try to connect to database (won't fail if it doesn't work)
+        await DatabaseService.connect();
+        
         app.listen(PORT, () => {
-            console.log('🏥 Sapyyn Platform Started Successfully!');
-            console.log(`🌐 Server running on port: ${PORT}`);
-            console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
-            console.log('✅ Server ready with MongoDB Atlas integration!');
+            console.log(`🚀 Server started on port ${PORT}`);
+            console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+            console.log(`📱 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
         });
+        
     } catch (error) {
-        console.error('❌ Failed to start server:', error);
+        console.error('❌ Failed to start server:', error.message);
         process.exit(1);
     }
 }
 
-// Handle uncaught exceptions
-process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
-    process.exit(1);
+// Handle process termination
+process.on('SIGTERM', async () => {
+    console.log('📴 SIGTERM received, shutting down gracefully...');
+    await DatabaseService.disconnect();
+    process.exit(0);
 });
 
-process.on('unhandledRejection', (error) => {
-    console.error('Unhandled Rejection:', error);
-    process.exit(1);
+process.on('SIGINT', async () => {
+    console.log('📴 SIGINT received, shutting down gracefully...');
+    await DatabaseService.disconnect();
+    process.exit(0);
 });
 
+// Start the server
 startServer();
-module.exports = app;

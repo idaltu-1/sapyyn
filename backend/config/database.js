@@ -8,7 +8,7 @@ class DatabaseService {
 
     async connect() {
         try {
-            console.log('🔌 Connecting to MongoDB Atlas...');
+            console.log('🔌 Connecting to MongoDB...');
             
             const options = {
                 useNewUrlParser: true,
@@ -21,14 +21,16 @@ class DatabaseService {
 
             await mongoose.connect(this.connectionString, options);
             
-            console.log('✅ MongoDB Atlas connected successfully');
+            console.log('✅ MongoDB connected successfully');
             this.isConnected = true;
             
             return true;
         } catch (error) {
-            console.error('❌ MongoDB Atlas connection failed:', error.message);
+            console.error('❌ MongoDB connection failed:', error.message);
+            console.log('⚠️  Starting server without database connection...');
             this.isConnected = false;
-            throw error;
+            // Don't throw error - allow server to start without DB
+            return false;
         }
     }
 
@@ -47,7 +49,8 @@ class DatabaseService {
             connected: this.isConnected,
             readyState: mongoose.connection.readyState,
             host: mongoose.connection.host,
-            name: mongoose.connection.name
+            name: mongoose.connection.name,
+            message: this.isConnected ? 'Connected' : 'Disconnected - Running in demo mode'
         };
     }
 }
