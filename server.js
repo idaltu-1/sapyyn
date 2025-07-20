@@ -12,9 +12,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static assets from the public directory. This allows the login and
-// referral pages to be accessed directly (e.g. /login.html, /rewards.html).
+// Serve static assets from multiple directories
+// This allows access to API pages in public/, main site files in root, and assets
 app.use(express.static('public'));
+app.use(express.static('.'));
+app.use('/css', express.static('css'));
+app.use('/js', express.static('js'));
+app.use('/images', express.static('images'));
+app.use('/static', express.static('static'));
 
 // Environment variables for Stackby API. The uploads and referrals tables
 // should be defined in your Stackby base with the appropriate columns.
