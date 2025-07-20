@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}New Promotion - Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-plus-circle text-primary"></i>
+                        Create New Promotion
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="title" class="form-label">Title *</label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="promotion_type" class="form-label">Type *</label>
+                                <select class="form-select" id="promotion_type" name="promotion_type" required>
+                                    <option value="partner">Partner Promotion</option>
+                                    <option value="house">House Ad</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Content *</label>
+                            <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+                            <div class="form-text">Brief description of the promotion</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="location" class="form-label">Location *</label>
+                                <select class="form-select" id="location" name="location" required>
+                                    <option value="DASHBOARD_TOP">Dashboard Top</option>
+                                    <option value="SIDEBAR">Sidebar</option>
+                                    <option value="FOOTER">Footer</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="weight" class="form-label">Weight *</label>
+                                <input type="number" class="form-control" id="weight" name="weight" value="1" min="1" max="10" required>
+                                <div class="form-text">Higher weight = more likely to be shown (1-10)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="link_url" class="form-label">Link URL</label>
+                            <input type="url" class="form-control" id="link_url" name="link_url" placeholder="https://example.com">
+                            <div class="form-text">Where users go when they click the promotion</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="image_url" class="form-label">Image URL</label>
+                            <input type="url" class="form-control" id="image_url" name="image_url" placeholder="https://example.com/image.jpg">
+                            <div class="form-text">Optional image for the promotion</div>
+                        </div>
+                        
+                        <div class="mb-3" id="partner_name_field">
+                            <label for="partner_name" class="form-label">Partner Name</label>
+                            <input type="text" class="form-control" id="partner_name" name="partner_name">
+                            <div class="form-text">Name of the partner company (for partner promotions)</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="datetime-local" class="form-control" id="start_date" name="start_date">
+                                <div class="form-text">When the promotion should start (optional)</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="datetime-local" class="form-control" id="end_date" name="end_date">
+                                <div class="form-text">When the promotion should end (optional)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin_promotions') }}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i>
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i>
+                                Create Promotion
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Show/hide partner name field based on promotion type
+document.getElementById('promotion_type').addEventListener('change', function() {
+    const partnerField = document.getElementById('partner_name_field');
+    if (this.value === 'partner') {
+        partnerField.style.display = 'block';
+    } else {
+        partnerField.style.display = 'none';
+    }
+});
+
+// Set default start date to now
+document.addEventListener('DOMContentLoaded', function() {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.getElementById('start_date').value = now.toISOString().slice(0, 16);
+});
+</script>
+{% endblock %}

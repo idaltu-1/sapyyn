@@ -1,0 +1,123 @@
+{% extends "portal_layout.html" %}
+
+{% set active = 'dashboard' %}
+
+{% block title %}Dashboard - Sapyyn Portal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="h3 mb-4">Welcome, {{ session.full_name }}</h1>
+    </div>
+</div>
+
+<section class="quick-actions">
+  <h2 class="h5 mb-3">Quick Actions</h2>
+  <div class="row g-3">
+    <div class="col-6 col-md-3">
+      <a href="{{ url_for('new_referral') }}" class="action-card">
+        <i class="bi-file-earmark-plus action-icon"></i>
+        <span>New Referral</span>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="{{ url_for('upload_file') }}" class="action-card">
+        <i class="bi-upload action-icon"></i>
+        <span>Upload Document</span>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="{{ url_for('view_documents') }}" class="action-card">
+        <i class="bi-folder action-icon"></i>
+        <span>View Documents</span>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="{{ url_for('appointments') }}" class="action-card">
+        <i class="bi-calendar-plus action-icon"></i>
+        <span>Book Appointment</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="row g-4">
+    <!-- Recent Referrals -->
+    <div class="col-lg-6">
+        <div class="portal-card">
+            <div class="portal-card-header">
+                <h2 class="h5 mb-0">Recent Referrals</h2>
+                <a href="{{ url_for('referrals') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Patient</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentReferrals">
+                        {% if recent_referrals %}
+                            {% for referral in recent_referrals %}
+                            <tr>
+                                <td>{{ referral.referral_id }}</td>
+                                <td>{{ referral.patient_name }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'warning' if referral.status == 'pending' else 'success' if referral.status == 'completed' else 'info' }}">
+                                        {{ referral.status }}
+                                    </span>
+                                </td>
+                                <td>{{ referral.created_at.strftime('%b %d, %Y') if referral.created_at else 'N/A' }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">No recent referrals</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Documents -->
+    <div class="col-lg-6">
+        <div class="portal-card">
+            <div class="portal-card-header">
+                <h2 class="h5 mb-0">Recent Documents</h2>
+                <a href="{{ url_for('view_documents') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentDocuments">
+                        {% if recent_documents %}
+                            {% for doc in recent_documents %}
+                            <tr>
+                                <td>{{ doc.file_name }}</td>
+                                <td>{{ doc.file_type }}</td>
+                                <td>{{ doc.upload_date.strftime('%b %d, %Y') if doc.upload_date else 'N/A' }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center">No recent documents</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

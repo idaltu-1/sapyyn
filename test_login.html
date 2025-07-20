@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Test - Sapyyn</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .login-page-wrapper {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .login-brand-section {
+            background: rgba(44, 90, 160, 0.9);
+            color: white;
+        }
+        
+        .login-form-section {
+            background: white;
+        }
+        
+        .login-form-container {
+            max-width: 400px;
+            width: 100%;
+            padding: 2rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+        
+        .divider {
+            position: relative;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #dee2e6;
+        }
+        
+        .divider-text {
+            background: white;
+            padding: 0 1rem;
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            z-index: 5;
+        }
+        
+        .demo-credentials {
+            border: 1px solid #e9ecef;
+        }
+        
+        .demo-user code {
+            font-size: 0.8rem;
+            display: block;
+            margin: 0.25rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-page-wrapper">
+        <div class="container-fluid">
+            <div class="row min-vh-100">
+                <!-- Left Side - Branding/Info -->
+                <div class="col-lg-6 d-none d-lg-flex login-brand-section">
+                    <div class="d-flex align-items-center justify-content-center w-100">
+                        <div class="text-center text-white">
+                            <div class="brand-logo mb-4">
+                                <i class="bi bi-hospital-fill display-1 mb-3"></i>
+                                <h1 class="fw-bold">Streamline Your Referrals</h1>
+                                <p class="lead mb-4">Instant, secure and HIPAA‑compliant platform for managing referrals, documents, appointments and rewards.</p>
+                                <a href="/register" class="btn btn-warning btn-lg px-4 py-2 fw-bold shadow-sm">
+                                    <i class="bi bi-person-plus me-2"></i>Start Your Free Trial
+                                </a>
+                            </div>
+                            <div class="feature-highlights mt-5">
+                                <div class="feature-item mb-3">
+                                    <i class="bi bi-shield-check text-warning me-2"></i>
+                                    <span>HIPAA Compliant & Secure</span>
+                                </div>
+                                <div class="feature-item mb-3">
+                                    <i class="bi bi-clock text-warning me-2"></i>
+                                    <span>Instant Referral Processing</span>
+                                </div>
+                                <div class="feature-item mb-3">
+                                    <i class="bi bi-people text-warning me-2"></i>
+                                    <span>Trusted by 1000+ Providers</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Side - Login Form -->
+                <div class="col-lg-6">
+                    <div class="login-form-section d-flex align-items-center justify-content-center min-vh-100">
+                        <div class="login-form-container">
+                            <div class="text-center mb-4">
+                                <!-- Mobile logo -->
+                                <div class="d-lg-none mb-3">
+                                    <i class="bi bi-hospital text-primary" style="font-size: 3rem;"></i>
+                                    <h3 class="fw-bold text-primary mt-2">Sapyyn</h3>
+                                </div>
+                                
+                                <h2 class="fw-bold mb-2">Welcome Back</h2>
+                                <p class="text-muted">Sign in to your Sapyyn account</p>
+                            </div>
+                            
+                            <form action="/login" method="POST" class="login-form">
+                                <!-- Username Field -->
+                                <div class="form-floating mb-3">
+                                    <input type="text" 
+                                           class="form-control form-control-lg" 
+                                           id="username" 
+                                           name="username" 
+                                           placeholder="Username" 
+                                           required>
+                                    <label for="username">
+                                        <i class="bi bi-person me-2"></i>Username
+                                    </label>
+                                </div>
+                                
+                                <!-- Password Field -->
+                                <div class="form-floating mb-3">
+                                    <input type="password" 
+                                           class="form-control form-control-lg" 
+                                           id="password" 
+                                           name="password" 
+                                           placeholder="Password" 
+                                           required>
+                                    <label for="password">
+                                        <i class="bi bi-lock me-2"></i>Password
+                                    </label>
+                                    <button class="btn btn-outline-secondary password-toggle" 
+                                            type="button" 
+                                            id="togglePassword"
+                                            aria-label="Toggle password visibility">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Remember Me and Forgot Password -->
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="rememberMe">
+                                        <label class="form-check-label text-muted" for="rememberMe">
+                                            Remember me
+                                        </label>
+                                    </div>
+                                    <a href="#" class="text-decoration-none">
+                                        Forgot password?
+                                    </a>
+                                </div>
+                                
+                                <!-- Login Button -->
+                                <div class="d-grid mb-4">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                                        Sign In
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <!-- Divider -->
+                            <div class="divider my-4">
+                                <span class="divider-text text-muted">or</span>
+                            </div>
+                            
+                            <!-- Sign Up Link -->
+                            <div class="text-center">
+                                <p class="text-muted mb-2">Don't have an account?</p>
+                                <a href="/register" class="btn btn-outline-primary btn-lg w-100">
+                                    <i class="bi bi-person-plus me-2"></i>
+                                    Create Account
+                                </a>
+                            </div>
+                            
+                            <!-- Demo Credentials -->
+                            <div class="demo-credentials mt-5 p-3 bg-light rounded-3">
+                                <h6 class="fw-bold text-center mb-3">
+                                    <i class="bi bi-info-circle me-2"></i>Demo Credentials
+                                </h6>
+                                <p class="small text-muted text-center mb-3">For testing purposes:</p>
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <div class="demo-user">
+                                            <strong class="text-primary">Dentist:</strong><br>
+                                            <code class="bg-white px-2 py-1 rounded">dentist1</code><br>
+                                            <code class="bg-white px-2 py-1 rounded">password123</code>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="demo-user">
+                                            <strong class="text-info">Specialist:</strong><br>
+                                            <code class="bg-white px-2 py-1 rounded">specialist1</code><br>
+                                            <code class="bg-white px-2 py-1 rounded">password123</code>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="demo-user">
+                                            <strong class="text-success">Patient:</strong><br>
+                                            <code class="bg-white px-2 py-1 rounded">patient1</code><br>
+                                            <code class="bg-white px-2 py-1 rounded">password123</code>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Test Links -->
+                                <div class="text-center mt-3">
+                                    <hr>
+                                    <p class="small text-muted mb-2">Test Navigation:</p>
+                                    <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                        <a href="/" class="btn btn-sm btn-outline-secondary">Home</a>
+                                        <a href="/dashboard" class="btn btn-sm btn-outline-primary">Dashboard</a>
+                                        <a href="/portal" class="btn btn-sm btn-outline-info">Portal</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Password toggle functionality
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const password = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            } else {
+                password.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
+        });
+
+        // Test form submission (for non-Flask testing)
+        document.querySelector('.login-form').addEventListener('submit', function(e) {
+            if (!window.location.pathname.includes('/login')) {
+                e.preventDefault();
+                alert('Login form submitted! In a real Flask app, this would process authentication.');
+                console.log('Form data:', {
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value
+                });
+            }
+        });
+    </script>
+</body>
+</html>

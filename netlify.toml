@@ -1,11 +1,654 @@
-[build]
-  command = "./netlify-build.sh"
-  publish = "."
+# Netlify configuration for Sapyyn Patient Referral System
+# Complete routing configuration for all pages
 
-[build.environment]
-  PYTHON_VERSION = "3.11"
-  NODE_VERSION = "18"
-  PIP_VERSION = "25.0.1"
+[build]
+  command = "echo 'Building Sapyyn application...' && if [ -d static ]; then cp -r static/* .; fi"
+  publish = "."
+  environment = { PYTHON_VERSION = "3.12" }
+
+# ===========================
+# MAIN PAGES & ROUTING
+# ===========================
+
+# Home page
+[[redirects]]
+  from = "/"
+  to = "/index.html"
+  status = 200
+
+# Authentication pages
+[[redirects]]
+  from = "/login"
+  to = "/Login.html"
+  status = 200
+
+[[redirects]]
+  from = "/signin"
+  to = "/Login.html"
+  status = 200
+
+[[redirects]]
+  from = "/register"
+  to = "/signup.html"
+  status = 200
+
+[[redirects]]
+  from = "/signup"
+  to = "/signup.html"
+  status = 200
+
+[[redirects]]
+  from = "/forgot-password"
+  to = "/forgot_password.html"
+  status = 200
+
+[[redirects]]
+  from = "/reset-password"
+  to = "/forgot_password.html"
+  status = 200
+
+# ===========================
+# DASHBOARD & PORTAL PAGES
+# ===========================
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/Dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/portal"
+  to = "/sapyyn-portal.html"
+  status = 200
+
+[[redirects]]
+  from = "/portal/*"
+  to = "/sapyyn-portal.html"
+  status = 200
+
+[[redirects]]
+  from = "/portal-1"
+  to = "/portal-1.html"
+  status = 200
+
+[[redirects]]
+  from = "/portal-signup"
+  to = "/portal-signup.html"
+  status = 200
+
+[[redirects]]
+  from = "/portal-referrals"
+  to = "/portal-referrals.html"
+  status = 200
+
+[[redirects]]
+  from = "/portal-integrations"
+  to = "/portal_integrations.html"
+  status = 200
+
+[[redirects]]
+  from = "/portal-messaging"
+  to = "/portal_messaging.html"
+  status = 200
+
+[[redirects]]
+  from = "/portal-settings"
+  to = "/portal_settings.html"
+  status = 200
+
+# ===========================
+# REFERRAL SYSTEM PAGES
+# ===========================
+
+[[redirects]]
+  from = "/referrals"
+  to = "/referrals.html"
+  status = 200
+
+[[redirects]]
+  from = "/referrals/*"
+  to = "/referrals.html"
+  status = 200
+
+[[redirects]]
+  from = "/referrals-page"
+  to = "/referrals_page.html"
+  status = 200
+
+[[redirects]]
+  from = "/new-referral"
+  to = "/Patient Referral.html"
+  status = 200
+
+[[redirects]]
+  from = "/track-referral"
+  to = "/Track Referral.html"
+  status = 200
+
+[[redirects]]
+  from = "/referral-history"
+  to = "/Referral History.html"
+  status = 200
+
+[[redirects]]
+  from = "/patient-referral"
+  to = "/Patient Referral.html"
+  status = 200
+
+[[redirects]]
+  from = "/patient-referral-admin"
+  to = "/Patient Referrral Admin.html"
+  status = 200
+
+[[redirects]]
+  from = "/patient-referral-admin-portal"
+  to = "/Patient Referrral Admin portal.html"
+  status = 200
+
+# ===========================
+# APPOINTMENTS & SCHEDULING
+# ===========================
+
+[[redirects]]
+  from = "/appointments"
+  to = "/appointments.html"
+  status = 200
+
+[[redirects]]
+  from = "/appointments/*"
+  to = "/appointments.html"
+  status = 200
+
+[[redirects]]
+  from = "/schedule"
+  to = "/appointments.html"
+  status = 200
+
+[[redirects]]
+  from = "/booking"
+  to = "/appointments.html"
+  status = 200
+
+[[redirects]]
+  from = "/calendar"
+  to = "/appointments.html"
+  status = 200
+
+# ===========================
+# REWARDS & LOYALTY PROGRAM
+# ===========================
+
+[[redirects]]
+  from = "/rewards"
+  to = "/rewards.html"
+  status = 200
+
+[[redirects]]
+  from = "/loyalty"
+  to = "/loyaltyrewards.html"
+  status = 200
+
+[[redirects]]
+  from = "/loyalty-rewards"
+  to = "/loyaltyrewards.html"
+  status = 200
+
+[[redirects]]
+  from = "/redeem"
+  to = "/redeem list.html"
+  status = 200
+
+[[redirects]]
+  from = "/redeem-list"
+  to = "/redeem list.html"
+  status = 200
+
+[[redirects]]
+  from = "/updated-portal-rewards"
+  to = "/updated_portal_rewards.html"
+  status = 200
+
+# ===========================
+# ADMIN & MANAGEMENT PAGES
+# ===========================
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin-1"
+  to = "/admin-1.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin-2"
+  to = "/admin-2.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin-3"
+  to = "/admin-3.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin-4"
+  to = "/admin-4.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin-users"
+  to = "/admin-users.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin-referrals"
+  to = "/admin-referrals.html"
+  status = 200
+
+[[redirects]]
+  from = "/sapyyn-admin-panel"
+  to = "/sapyyn-admin-panel.html"
+  status = 200
+
+[[redirects]]
+  from = "/corrected-admin"
+  to = "/corrected_admin_html.html"
+  status = 200
+
+# ===========================
+# GET STARTED & ONBOARDING
+# ===========================
+
+[[redirects]]
+  from = "/get-started"
+  to = "/getstarted_page.html"
+  status = 200
+
+[[redirects]]
+  from = "/getstarted"
+  to = "/getstarted_page.html"
+  status = 200
+
+[[redirects]]
+  from = "/start"
+  to = "/getstarted_page.html"
+  status = 200
+
+[[redirects]]
+  from = "/onboarding"
+  to = "/getstarted_page.html"
+  status = 200
+
+[[redirects]]
+  from = "/welcome"
+  to = "/getstarted_page.html"
+  status = 200
+
+# ===========================
+# PRICING & SUBSCRIPTION
+# ===========================
+
+[[redirects]]
+  from = "/pricing"
+  to = "/pricing.html"
+  status = 200
+
+[[redirects]]
+  from = "/pricing-page"
+  to = "/pricing_page.html"
+  status = 200
+
+[[redirects]]
+  from = "/plans"
+  to = "/pricing.html"
+  status = 200
+
+[[redirects]]
+  from = "/subscribe"
+  to = "/pricing.html"
+  status = 200
+
+# ===========================
+# ABOUT & COMPANY PAGES
+# ===========================
+
+[[redirects]]
+  from = "/about"
+  to = "/about.html"
+  status = 200
+
+[[redirects]]
+  from = "/about-us"
+  to = "/about_page.html"
+  status = 200
+
+[[redirects]]
+  from = "/about-page"
+  to = "/about_page.html"
+  status = 200
+
+[[redirects]]
+  from = "/company"
+  to = "/about.html"
+  status = 200
+
+# ===========================
+# CONTACT & SUPPORT
+# ===========================
+
+[[redirects]]
+  from = "/contact"
+  to = "/contact.html"
+  status = 200
+
+[[redirects]]
+  from = "/contact-us"
+  to = "/contact-us.html"
+  status = 200
+
+[[redirects]]
+  from = "/support"
+  to = "/contact.html"
+  status = 200
+
+[[redirects]]
+  from = "/help"
+  to = "/contact.html"
+  status = 200
+
+# ===========================
+# BLOG & CONTENT
+# ===========================
+
+[[redirects]]
+  from = "/blog"
+  to = "/blog.html"
+  status = 200
+
+[[redirects]]
+  from = "/blog-article"
+  to = "/blog-article.html"
+  status = 200
+
+[[redirects]]
+  from = "/news"
+  to = "/newsletter.html"
+  status = 200
+
+[[redirects]]
+  from = "/newsletter"
+  to = "/newsletter.html"
+  status = 200
+
+[[redirects]]
+  from = "/case-studies"
+  to = "/case_studies.html"
+  status = 200
+
+[[redirects]]
+  from = "/case-studies-alt"
+  to = "/case studies.html"
+  status = 200
+
+[[redirects]]
+  from = "/resources"
+  to = "/resources.html"
+  status = 200
+
+[[redirects]]
+  from = "/resources-page"
+  to = "/resources_page.html"
+  status = 200
+
+[[redirects]]
+  from = "/tutorials"
+  to = "/tutorials.html"
+  status = 200
+
+[[redirects]]
+  from = "/how-to-guide"
+  to = "/how_to_guide.html"
+  status = 200
+
+[[redirects]]
+  from = "/how-to"
+  to = "/how-to-guide.html"
+  status = 200
+
+[[redirects]]
+  from = "/training"
+  to = "/training and support.html"
+  status = 200
+
+[[redirects]]
+  from = "/training-support"
+  to = "/training and support.html"
+  status = 200
+
+[[redirects]]
+  from = "/educational-content"
+  to = "/educational content.html"
+  status = 200
+
+[[redirects]]
+  from = "/short-video"
+  to = "/short video.html"
+  status = 200
+
+# ===========================
+# FORMS & DOCUMENTS
+# ===========================
+
+[[redirects]]
+  from = "/forms"
+  to = "/forms.html"
+  status = 200
+
+[[redirects]]
+  from = "/send-documents"
+  to = "/sendpatientdocuments.html"
+  status = 200
+
+[[redirects]]
+  from = "/upload-documents"
+  to = "/sendpatientdocuments.html"
+  status = 200
+
+# ===========================
+# SPECIALISTS & PROVIDERS
+# ===========================
+
+[[redirects]]
+  from = "/dentist"
+  to = "/dentist.html"
+  status = 200
+
+[[redirects]]
+  from = "/specialist"
+  to = "/specialist.html"
+  status = 200
+
+[[redirects]]
+  from = "/speciality"
+  to = "/speciality.html"
+  status = 200
+
+[[redirects]]
+  from = "/connect-providers"
+  to = "/connectproviders.html"
+  status = 200
+
+[[redirects]]
+  from = "/import-dentists"
+  to = "/importDentists.html"
+  status = 200
+
+[[redirects]]
+  from = "/import-specialists"
+  to = "/importSpecialist.html"
+  status = 200
+
+[[redirects]]
+  from = "/import-patients"
+  to = "/importPatients.html"
+  status = 200
+
+# ===========================
+# SURGICAL & MEDICAL
+# ===========================
+
+[[redirects]]
+  from = "/surgical-instructions"
+  to = "/surgical-instruction.html"
+  status = 200
+
+[[redirects]]
+  from = "/surgical-instruction"
+  to = "/surgical-instruction.html"
+  status = 200
+
+[[redirects]]
+  from = "/surgical-instruction-page"
+  to = "/surgical-instruction-page.html"
+  status = 200
+
+[[redirects]]
+  from = "/pre-op-consultation"
+  to = "/pre op consultation.html"
+  status = 200
+
+[[redirects]]
+  from = "/medical-updates"
+  to = "/Medical Updates.html"
+  status = 200
+
+# ===========================
+# LEGAL & COMPLIANCE
+# ===========================
+
+[[redirects]]
+  from = "/privacy"
+  to = "/privacy.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/terms.html"
+  status = 200
+
+[[redirects]]
+  from = "/hipaa"
+  to = "/hipaa.html"
+  status = 200
+
+[[redirects]]
+  from = "/faq"
+  to = "/faq.html"
+  status = 200
+
+# ===========================
+# CO-MARKETING & PARTNERSHIPS
+# ===========================
+
+[[redirects]]
+  from = "/co-marketing"
+  to = "/co_marketing.html"
+  status = 200
+
+[[redirects]]
+  from = "/partnerships"
+  to = "/co_marketing.html"
+  status = 200
+
+# ===========================
+# IMPROVED SITE VERSIONS
+# ===========================
+
+[[redirects]]
+  from = "/improved"
+  to = "/improved_sapyyn_site.html"
+  status = 200
+
+[[redirects]]
+  from = "/improved-main"
+  to = "/improved_main_site_html.html"
+  status = 200
+
+[[redirects]]
+  from = "/updated-main"
+  to = "/updated_main_site_blue.html"
+  status = 200
+
+[[redirects]]
+  from = "/sapyyn-main"
+  to = "/sapyyn-main-site.html"
+  status = 200
+
+[[redirects]]
+  from = "/sapyyn-unified"
+  to = "/sapyyn_unified_platform.html"
+  status = 200
+
+[[redirects]]
+  from = "/sapyyn-unified-portal"
+  to = "/sapyyn_unified_portal.html"
+  status = 200
+
+# ===========================
+# LEGACY & ALTERNATIVE ROUTES
+# ===========================
+
+[[redirects]]
+  from = "/index-1"
+  to = "/index-1.html"
+  status = 200
+
+[[redirects]]
+  from = "/index-2"
+  to = "/index-2.html"
+  status = 200
+
+[[redirects]]
+  from = "/indexold"
+  to = "/indexold.html"
+  status = 200
+
+[[redirects]]
+  from = "/sign-up"
+  to = "/Sign Up.html"
+  status = 200
+
+[[redirects]]
+  from = "/roles"
+  to = "/roles.html"
+  status = 200
+
+[[redirects]]
+  from = "/users"
+  to = "/users.html"
+  status = 200
+
+# ===========================
+# CATCH-ALL FOR SPA ROUTING
+# ===========================
+
+# This should be last - handles any unmatched routes
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# ===========================
+# SECURITY HEADERS
+# ===========================
+
 
 [[headers]]
   for = "/*"
@@ -13,8 +656,31 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://static.hotjar.com https://script.hotjar.com https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: https: blob:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://*.hotjar.com https://*.hotjar.io; frame-src 'self' https://www.youtube.com https://www.vimeo.com; object-src 'none'; base-uri 'self'; form-action 'self'"
+
+# ===========================
+# CACHE HEADERS
+# ===========================
+
 
 [[headers]]
   for = "/static/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+

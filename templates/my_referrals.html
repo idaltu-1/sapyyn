@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}My Referrals - Sapyyn{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h2">My Referrals</h1>
+  </div>
+  {% if referrals %}
+  <div class="list-group">
+    {% for referral in referrals %}
+    <div class="list-group-item">
+      <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1">Referral #{{ referral['id'] }}</h5>
+        <small class="text-muted">{{ referral['created_at'] }}</small>
+      </div>
+      <p class="mb-1">{{ referral['notes'] }}</p>
+      <small>Status: {{ referral['status'] }}</small>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>You have no referrals at this time.</p>
+  {% endif %}
+</div>
+{% endblock %}

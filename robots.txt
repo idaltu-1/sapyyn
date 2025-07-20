@@ -1,0 +1,291 @@
+# Sapyyn Patient Referral System - Robots.txt
+# Allow all search engines to crawl the site
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /static/private/
+Disallow: /templates/
+Disallow: /config/
+Disallow: /tests/
+Disallow: /docs/
+Disallow: /cron_jobs/
+Disallow: /utils/
+Disallow: /controllers/
+Disallow: /services/
+Disallow: /routes/
+Disallow: /*.py$
+Disallow: /*.pyc$
+Disallow: /*.log$
+Disallow: /*.env
+Disallow: /*.db
+Disallow: /*.sqlite
+Disallow: /*.sqlite3
+Disallow: /*.git
+Disallow: /*.gitignore
+Disallow: /*.dockerignore
+Disallow: /*.dockerfile
+Disallow: /*.yml
+Disallow: /*.yaml
+Disallow: /*.json
+Disallow: /*.md
+Disallow: /*.txt
+Disallow: /*.sh
+Disallow: /*.sql
+Disallow: /*.backup
+Disallow: /*.tmp
+Disallow: /*.temp
+Disallow: /*.cache
+Disallow: /*.log
+Disallow: /*.pid
+Disallow: /*.sock
+Disallow: /*.lock
+Disallow: /*.egg-info
+Disallow: /*.pycache
+Disallow: /*__pycache__
+Disallow: /*.coverage
+Disallow: /*.pytest_cache
+Disallow: /*.tox
+Disallow: /*.venv
+Disallow: /*.env
+Disallow: /*.env.local
+Disallow: /*.env.development
+Disallow: /*.env.production
+Disallow: /*.env.test
+Disallow: /*.env.staging
+
+# Allow specific static files
+Allow: /static/css/
+Allow: /static/js/
+Allow: /static/images/
+Allow: /static/fonts/
+Allow: /static/videos/
+Allow: /static/audio/
+
+# Sitemap location
+Sitemap: https://sapyyn.com/sitemap.xml
+Sitemap: https://sapyyn.com/sitemap-index.xml
+
+# Crawl-delay for aggressive bots
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: MJ12bot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+# Block specific bots
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
+
+# Allow Googlebot to crawl everything
+User-agent: Googlebot
+Allow: /
+Allow: /static/
+Allow: /templates/
+Allow: /config/
+Allow: /tests/
+Allow: /docs/
+Allow: /cron_jobs/
+Allow: /utils/
+Allow: /controllers/
+Allow: /services/
+Allow: /routes/
+
+# Allow Bingbot to crawl everything
+User-agent: Bingbot
+Allow: /
+Allow: /static/
+Allow: /templates/
+Allow: /config/
+Allow: /tests/
+Allow: /docs/
+Allow: /cron_jobs/
+Allow: /utils/
+Allow: /controllers/
+Allow: /services/
+Allow: /routes/
+
+# Allow DuckDuckGo bot
+User-agent: DuckDuckBot
+Allow: /
+Allow: /static/
+Allow: /templates/
+Allow: /config/
+Allow: /tests/
+Allow: /docs/
+Allow: /cron_jobs/
+Allow: /utils/
+Allow: /controllers/
+Allow: /services/
+Allow: /routes/
+
+# Allow Facebook bot
+User-agent: facebookexternalhit
+Allow: /
+Allow: /static/
+Allow: /templates/
+Allow: /config/
+Allow: /tests/
+Allow: /docs/
+Allow: /cron_jobs/
+Allow: /utils/
+Allow: /controllers/
+Allow: /services/
+Allow: /routes/
+
+# Allow Twitter bot
+User-agent: Twitterbot
+Allow: /
+Allow: /static/
+Allow: /templates/
+Allow: /config/
+Allow: /tests/
+Allow: /docs/
+Allow: /cron_jobs/
+Allow: /utils/
+Allow: /controllers/
+Allow: /services/
+Allow: /routes/
+
+# Allow LinkedIn bot
+User-agent: LinkedInBot
+Allow: /
+Allow: /static/
+Allow: /templates/
+Allow: /config/
+Allow: /tests/
+Allow: /docs/
+Allow: /cron_jobs/
+Allow: /utils/
+Allow: /controllers/
+Allow: /services/
+Allow: /routes/
+
+# Allow Pinterest bot
+User-agent: Pinterestbot
+Allow: /
+Allow: /static/
+Allow: /templates/
+Allow: /config/
+Allow: /tests/
+Allow: /docs/
+Allow: /cron_jobs/
+Allow: /utils/
+Allow: /controllers/
+Allow: /services/
+Allow: /routes/
+
+# Allow Slack bot
+User-agent: Slackbot
+Allow: /
+Allow: /static/
+Allow: /templates/
+Allow: /config/
+Allow: /tests/
+Allow: /docs/
+Allow: /cron_jobs/
+Allow: /utils/
+Allow: /controllers/
+Allow: /services/
+Allow: /routes/
+
+# Allow WhatsApp bot
+User-agent: WhatsApp
+Allow: /
+Allow: /static/
+Allow: /templates/
+Allow: /config/
+Allow: /tests/
+Allow: /docs/
+Allow: /cron_jobs/
+Allow: /utils/
+Allow: /controllers/
+Allow: /services/
+Allow: /routes/
+
+# Allow Telegram bot
+User-agent: TelegramBot
+Allow: /
+Allow: /static/
+Allow: /templates/
+Allow: /config/
+Allow: /tests/
+Allow: /docs/
+Allow: /cron_jobs/
+Allow: /utils/
+Allow: /controllers/
+Allow: /services/
+Allow: /routes/
+
+# Allow Discord bot
+User-agent: Discordbot
+Allow: /
+Allow: /static/
+Allow: /templates/
+Allow: /config/
+Allow: /tests/
+Allow: /docs/
+Allow: /cron_jobs/
+Allow: /utils/
+Allow: /controllers/
+Allow: /services/
+Allow: /routes/
+
+# Allow Reddit bot
+User-agent: Redditbot
+Allow: /
+Allow: /static/
+Allow: /templates/
+Allow: /config/
+Allow: /tests/
+Allow: /docs/
+Allow: /cron_jobs/
+Allow: /utils/
+Allow: /controllers/
+Allow: /services/
+Allow: /routes/
+
+# Allow Instagram bot
+User-agent: Instagrambot
+Allow: /
+Allow: /static/
+Allow: /templates/
+Allow: /config/
+Allow: /tests/
+Allow: /docs/
+Allow: /cron_jobs/
+Allow: /utils/
+Allow: /controllers/
+Allow: /services/
+Allow: /routes/
+
+# Allow TikTok bot
+User-agent: TikTokBot
+Allow: /
+Allow: /static/
+Allow: /templates/
+Allow: /config/
+Allow: /tests/
+Allow: /docs/
+Allow: /cron_jobs/
+Allow: /utils/
+Allow: /controllers/
+Allow: /services/
+Allow: /routes/
+
+# Allow Snapchat bot
+User-agent: Snapchat
+Allow: /
+Allow: /static/
+Allow: /templates/
+Allow: /config/
+Allow: /tests/
+Allow: /docs/
+Allow: /cron_jobs

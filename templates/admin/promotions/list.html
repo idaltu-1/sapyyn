@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Promotions{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Manage Promotions</h1>
+        <a href="{{ url_for('admin_promotions.create_promotion') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create New Promotion
+        </a>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Filters</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="location" class="form-label">Location</label>
+                    <select name="location" id="location" class="form-select">
+                        <option value="">All Locations</option>
+                        {% for location in locations %}
+                        <option value="{{ location }}" {% if current_filters.get('location') == location %}selected{% endif %}>
+                            {{ location.replace('_', ' ').title() }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="is_active" class="form-label">Status</label>
+                    <select name="is_active" id="is_active" class="form-select">
+                        <option value="">All</option>
+                        <option value="true" {% if current_filters.get('is_active') == true %}selected{% endif %}>Active</option>
+                        <option value="false" {% if current_filters.get('is_active') == false %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+                    <a href="{{ url_for('admin_promotions.list_promotions') }}" class="btn btn-outline-secondary">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Promotions List -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Promotions</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Title</th>
+                            <th>Location</th>
+                            <th>Date Range</th>
+                            <th>Status</th>
+                            <th>Impressions</th>
+                            <th>Clicks</th>
+                            <th>CTR</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if promotions %}
+                            {% for promotion in promotions %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ promotion.image_url }}" alt="{{ promotion.title }}" class="promotion-thumbnail me-2" width="50" height="50">
+                                        <span>{{ promotion.title }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ promotion.location.value.replace('_', ' ').title() }}</td>
+                                <td>
+                                    {{ promotion.start_date.strftime('%Y-%m-%d') }} to {{ promotion.end_date.strftime('%Y-%m-%d') }}
+                                </td>
+                                <td>
+                                    <span class="badge {% if promotion.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                                        {{ 'Active' if promotion.is_active else 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td>{{ promotion.impression_count }}</td>
+                                <td>{{ promotion.click_count }}</td>
+                                <td>
+                                    {% if promotion.impression_count > 0 %}
+                                        {{ "%.2f"|format(promotion.click_count / promotion.impression_count * 100) }}%
+                                    {% else %}
+                                        0.00%
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('admin_promotions.edit_promotion', promotion_id=promotion.id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-{% if promotion.is_active %}warning{% else %}success{% endif %} toggle-status" 
+                                                data-id="{{ promotion.id }}" 
+                                                data-status="{{ promotion.is_active|lower }}"
+                                                title="{{ 'Deactivate' if promotion.is_active else 'Activate' }}">
+                                            <i class="bi bi-{% if promotion.is_active %}pause-fill{% else %}play-fill{% endif %}"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger delete-promotion" 
+                                                data-id="{{ promotion.id }}" 
+                                                data-title="{{ promotion.title }}"
+                                                title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center py-4">
+                                    <p class="text-muted mb-0">No promotions found</p>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deletePromotionModal" tabindex="-1" aria-labelledby="deletePromotionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletePromotionModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the promotion "<span id="promotionTitle"></span>"?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toggle Status Modal -->
+<div class="modal fade" id="toggleStatusModal" tabindex="-1" aria-labelledby="toggleStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="toggleStatusModalLabel">Confirm Status Change</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="toggleStatusBody">
+                Are you sure you want to change the status of this promotion?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="toggleForm" method="post" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="is_active" id="newStatus" value="">
+                    <button type="submit" class="btn btn-primary">Confirm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Delete promotion
+        const deleteButtons = document.querySelectorAll('.delete-promotion');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const title = this.getAttribute('data-title');
+                
+                document.getElementById('promotionTitle').textContent = title;
+                document.getElementById('deleteForm').action = "{{ url_for('admin_promotions.delete_promotion', promotion_id=0) }}".replace('0', id);
+                
+                const deleteModal = new bootstrap.Modal(document.getElementById('deletePromotionModal'));
+                deleteModal.show();
+            });
+        });
+        
+        // Toggle status
+        const toggleButtons = document.querySelectorAll('.toggle-status');
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const currentStatus = this.getAttribute('data-status') === 'true';
+                const newStatus = !currentStatus;
+                
+                document.getElementById('toggleStatusBody').textContent = 
+                    `Are you sure you want to ${newStatus ? 'activate' : 'deactivate'} this promotion?`;
+                document.getElementById('newStatus').value = newStatus.toString();
+                document.getElementById('toggleForm').action = "{{ url_for('admin_promotions.toggle_status', promotion_id=0) }}".replace('0', id);
+                
+                const toggleModal = new bootstrap.Modal(document.getElementById('toggleStatusModal'));
+                toggleModal.show();
+            });
+        });
+    });
+</script>
+{% endblock %}
