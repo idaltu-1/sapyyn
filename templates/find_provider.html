@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block title %}Find Provider - Search Our Network | Sapyyn{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-search me-2 text-primary"></i>Find Provider</h2>
+                <a href="/portal" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Back to Portal
+                </a>
+            </div>
+
+            <!-- Search Filters -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-funnel me-2"></i>Search Our Provider Network
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="providerSearchForm" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="specialty" class="form-label">Specialty</label>
+                            <select class="form-select" id="specialty">
+                                <option value="">All Specialties</option>
+                                <option value="endodontist">Endodontist</option>
+                                <option value="oral_surgeon">Oral Surgeon</option>
+                                <option value="orthodontist">Orthodontist</option>
+                                <option value="periodontist">Periodontist</option>
+                                <option value="prosthodontist">Prosthodontist</option>
+                                <option value="oral_pathologist">Oral Pathologist</option>
+                                <option value="pediatric_dentist">Pediatric Dentist</option>
+                                <option value="general_dentist">General Dentist</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" placeholder="City, State or ZIP">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="radius" class="form-label">Search Radius</label>
+                            <select class="form-select" id="radius">
+                                <option value="10">10 miles</option>
+                                <option value="25" selected>25 miles</option>
+                                <option value="50">50 miles</option>
+                                <option value="100">100 miles</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="providerName" class="form-label">Provider Name</label>
+                            <input type="text" class="form-control" id="providerName" placeholder="Doctor's name">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="practiceName" class="form-label">Practice Name</label>
+                            <input type="text" class="form-control" id="practiceName" placeholder="Practice or clinic name">
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-search me-2"></i>Search Providers
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-lg ms-2" onclick="clearSearch()">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Clear
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Search Results -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light border-0">
+                    <h6 class="card-title mb-0">
+                        <i class="bi bi-list me-2"></i>Provider Search Results
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div id="searchResults">
+                        <!-- Default message -->
+                        <div class="text-center py-5" id="defaultMessage">
+                            <i class="bi bi-search text-muted large-icon"></i>
+                            <h6 class="text-muted mt-3">Search Our Network</h6>
+                            <p class="text-muted small">Use the filters above to find providers in our network</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row g-3 mt-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="feature-icon bg-success bg-opacity-15 rounded-circle mx-auto mb-3">
+                                <i class="bi bi-plus-circle-fill text-success"></i>
+                            </div>
+                            <h6 class="fw-bold">Need a Referral?</h6>
+                            <p class="text-muted small mb-3">Create a new referral to a specialist</p>
+                            <a href="/referral/new" class="btn btn-outline-success btn-sm">New Referral</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="feature-icon bg-info bg-opacity-15 rounded-circle mx-auto mb-3">
+                                <i class="bi bi-question-circle-fill text-info"></i>
+                            </div>
+                            <h6 class="fw-bold">Need Help?</h6>
+                            <p class="text-muted small mb-3">Contact our support team for assistance</p>
+                            <a href="mailto:support@sapyyn.com" class="btn btn-outline-info btn-sm">Contact Support</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="feature-icon bg-warning bg-opacity-15 rounded-circle mx-auto mb-3">
+                                <i class="bi bi-calendar-plus-fill text-warning"></i>
+                            </div>
+                            <h6 class="fw-bold">Schedule Visit</h6>
+                            <p class="text-muted small mb-3">Book an appointment with a provider</p>
+                            <a href="/appointments" class="btn btn-outline-warning btn-sm">Schedule Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Provider search functionality
+document.getElementById('providerSearchForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        specialty: document.getElementById('specialty').value,
+        location: document.getElementById('location').value,
+        radius: document.getElementById('radius').value,
+        provider_name: document.getElementById('providerName').value,
+        practice_name: document.getElementById('practiceName').value
+    };
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Searching...';
+    submitBtn.disabled = true;
+    
+    // Simulate API call for now
+    setTimeout(() => {
+        displaySearchResults(generateSampleResults(formData));
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }, 1500);
+});
+
+function clearSearch() {
+    document.getElementById('providerSearchForm').reset();
+    document.getElementById('searchResults').innerHTML = `
+        <div class="text-center py-5" id="defaultMessage">
+            <i class="bi bi-search text-muted large-icon"></i>
+            <h6 class="text-muted mt-3">Search Our Network</h6>
+            <p class="text-muted small">Use the filters above to find providers in our network</p>
+        </div>
+    `;
+}
+
+function displaySearchResults(results) {
+    const resultsContainer = document.getElementById('searchResults');
+    
+    if (results.length === 0) {
+        resultsContainer.innerHTML = `
+            <div class="text-center py-5">
+                <i class="bi bi-exclamation-circle text-warning large-icon"></i>
+                <h6 class="text-warning mt-3">No Providers Found</h6>
+                <p class="text-muted small">Try adjusting your search criteria</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `
+        <div class="d-flex justify-content-between align-items-center p-3 bg-light">
+            <span><strong>${results.length}</strong> providers found</span>
+            <small class="text-muted">Results sorted by distance</small>
+        </div>
+    `;
+    
+    results.forEach(provider => {
+        html += `
+            <div class="list-group-item border-0 border-bottom">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h6 class="mb-1 fw-bold">${provider.name}</h6>
+                        <p class="mb-1 text-muted">${provider.specialty}</p>
+                        <p class="mb-1"><strong>${provider.practice}</strong></p>
+                        <small class="text-muted">${provider.address}</small>
+                        <div class="mt-2">
+                            <span class="badge bg-success me-2">${provider.distance} miles</span>
+                            <span class="badge bg-info me-2">Provider Code: ${provider.code}</span>
+                            ${provider.accepting ? '<span class="badge bg-success">Accepting Patients</span>' : '<span class="badge bg-warning">Limited Availability</span>'}
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="btn-group-vertical w-100" role="group">
+                            <a href="/referral/new?provider_code=${provider.code}" class="btn btn-primary btn-sm mb-2">
+                                <i class="bi bi-arrow-right-circle me-1"></i>Refer Patient
+                            </a>
+                            <button class="btn btn-outline-info btn-sm mb-2" onclick="viewProviderDetails('${provider.code}')">
+                                <i class="bi bi-info-circle me-1"></i>View Details
+                            </button>
+                            <a href="tel:${provider.phone}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-telephone me-1"></i>${provider.phone}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    resultsContainer.innerHTML = html;
+}
+
+function generateSampleResults(searchCriteria) {
+    // Generate sample results based on search criteria
+    const sampleProviders = [
+        {
+            name: "Dr. Sarah Johnson",
+            specialty: "Endodontist",
+            practice: "Advanced Root Canal Center",
+            address: "123 Main St, Anytown, ST 12345",
+            phone: "(555) 123-4567",
+            distance: "2.3",
+            code: "SJ2024",
+            accepting: true
+        },
+        {
+            name: "Dr. Michael Chen",
+            specialty: "Oral Surgeon",
+            practice: "Oral Surgery Associates",
+            address: "456 Oak Ave, Nearby City, ST 12346",
+            phone: "(555) 987-6543",
+            distance: "5.7",
+            code: "MC2024",
+            accepting: true
+        },
+        {
+            name: "Dr. Emily Rodriguez",
+            specialty: "Orthodontist",
+            practice: "Smile Orthodontics",
+            address: "789 Elm Blvd, Another Town, ST 12347",
+            phone: "(555) 456-7890",
+            distance: "8.1",
+            code: "ER2024",
+            accepting: false
+        }
+    ];
+    
+    // Filter based on specialty if specified
+    let filteredResults = sampleProviders;
+    if (searchCriteria.specialty) {
+        filteredResults = sampleProviders.filter(provider => 
+            provider.specialty.toLowerCase().includes(searchCriteria.specialty.toLowerCase())
+        );
+    }
+    
+    // Filter based on provider name if specified
+    if (searchCriteria.provider_name) {
+        filteredResults = filteredResults.filter(provider => 
+            provider.name.toLowerCase().includes(searchCriteria.provider_name.toLowerCase())
+        );
+    }
+    
+    return filteredResults;
+}
+
+function viewProviderDetails(providerCode) {
+    alert(`Provider details for ${providerCode} - This would show detailed information about the provider including credentials, services, availability, etc.`);
+}
+</script>
+
+<style>
+.large-icon {
+    font-size: 3rem;
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-group-vertical .btn {
+    margin-bottom: 0.25rem;
+}
+
+.btn-group-vertical .btn:last-child {
+    margin-bottom: 0;
+}
+</style>
+{% endblock %}

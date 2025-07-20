@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Reward Program - Sapyyn{% endblock %}
+
+{% block extra_head %}
+<style>
+    .program-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+    .tier-card {
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 10px;
+        background: #f8f9fa;
+    }
+    .trigger-card {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 8px;
+        background: #fff;
+    }
+    .form-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="program-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 mb-2">Edit Reward Program</h1>
+                <p class="mb-0">{{ program[1] if program else 'Program Name' }}</p>
+            </div>
+            <div>
+                {% if program and program[4] == 'active' %}
+                <span class="badge bg-success fs-6">Active</span>
+                {% elif program and program[4] == 'inactive' %}
+                <span class="badge bg-secondary fs-6">Inactive</span>
+                {% else %}
+                <span class="badge bg-warning fs-6">Draft</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Program Details Form -->
+        <div class="col-lg-8">
+            {% if program %}
+            <form method="POST" class="needs-validation" novalidate>
+                <!-- Basic Information -->
+                <div class="form-section">
+                    <h4 class="mb-4">
+                        <i class="bi bi-info-circle"></i>
+                        Program Details
+                    </h4>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="name" class="form-label">Program Name *</label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ program[1] }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="status" class="form-label">Status *</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="draft" {% if program[4] == 'draft' %}selected{% endif %}>Draft</option>
+                                <option value="active" {% if program[4] == 'active' %}selected{% endif %}>Active</option>
+                                <option value="inactive" {% if program[4] == 'inactive' %}selected{% endif %}>Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description *</label>
+                        <textarea class="form-control" id="description" name="description" 
+                                  rows="3" required>{{ program[2] }}</textarea>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date"
+                                   value="{{ program[5] }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date"
+                                   value="{{ program[6] }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compliance Section -->
+                <div class="form-section">
+                    <h4 class="mb-4">
+                        <i class="bi bi-shield-check"></i>
+                        Compliance Documentation
+                    </h4>
+                    
+                    <div class="mb-3">
+                        <label for="compliance_notes" class="form-label">Compliance Notes *</label>
+                        <textarea class="form-control" id="compliance_notes" name="compliance_notes" 
+                                  rows="4" required>{{ program[8] }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="legal_language" class="form-label">Legal Terms & Conditions *</label>
+                        <textarea class="form-control" id="legal_language" name="legal_language" 
+                                  rows="6" required>{{ program[9] }}</textarea>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
+                    <a href="{{ url_for('rewards_admin') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Admin
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Update Program
+                    </button>
+                </div>
+            </form>
+            {% else %}
+            <div class="alert alert-danger">
+                <h6>Program Not Found</h6>
+                <p class="mb-0">The requested reward program could not be found.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Tiers and Triggers Sidebar -->
+        <div class="col-lg-4">
+            <!-- Reward Tiers -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="bi bi-layers"></i>
+                        Reward Tiers
+                    </h6>
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addTierModal">
+                        <i class="bi bi-plus"></i> Add Tier
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if tiers %}
+                    {% for tier in tiers %}
+                    <div class="tier-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="mb-0">{{ tier[2] }}</h6>
+                            <span class="badge bg-info">Level {{ tier[3] }}</span>
+                        </div>
+                        <p class="mb-2 text-muted small">{{ tier[7] }}</p>
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <small class="text-muted">Referrals</small>
+                                <div class="fw-bold">{{ tier[4] }}</div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Reward</small>
+                                <div class="fw-bold">{{ tier[6] }} {{ tier[5] }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted text-center py-3">No tiers configured</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Triggers -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="bi bi-lightning"></i>
+                        Reward Triggers
+                    </h6>
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addTriggerModal">
+                        <i class="bi bi-plus"></i> Add
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if triggers %}
+                    {% for trigger in triggers %}
+                    <div class="trigger-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ trigger[2]|title }}</strong>
+                                <br><small class="text-muted">{{ trigger[5] }} points</small>
+                            </div>
+                            <div>
+                                {% if trigger[7] %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted text-center py-3">No triggers configured</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Tier Modal -->
+<div class="modal fade" id="addTierModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Reward Tier</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addTierForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="tier_name" class="form-label">Tier Name *</label>
+                        <input type="text" class="form-control" id="tier_name" name="tier_name" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="tier_level" class="form-label">Level *</label>
+                            <input type="number" class="form-control" id="tier_level" name="tier_level" min="1" required>
+                        </div>
+                        <div class="col-6">
+                            <label for="referrals_required" class="form-label">Referrals Required *</label>
+                            <input type="number" class="form-control" id="referrals_required" name="referrals_required" min="1" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="reward_type" class="form-label">Reward Type *</label>
+                            <select class="form-select" id="reward_type" name="reward_type" required>
+                                <option value="points">Points</option>
+                                <option value="gift_card">Gift Card</option>
+                                <option value="cash">Cash</option>
+                                <option value="recognition">Recognition</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="reward_value" class="form-label">Reward Value *</label>
+                            <input type="number" class="form-control" id="reward_value" name="reward_value" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reward_description" class="form-label">Description</label>
+                        <textarea class="form-control" id="reward_description" name="reward_description" rows="2"></textarea>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="fulfillment_type" class="form-label">Fulfillment Type *</label>
+                            <select class="form-select" id="fulfillment_type" name="fulfillment_type" required>
+                                <option value="manual">Manual</option>
+                                <option value="automatic">Automatic</option>
+                                <option value="external">External System</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="fulfillment_config" class="form-label">Fulfillment Config</label>
+                            <input type="text" class="form-control" id="fulfillment_config" name="fulfillment_config">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Tier</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Handle tier addition
+document.getElementById('addTierForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const programId = {{ program[0] if program else 0 }};
+    
+    fetch(`/rewards/admin/program/${programId}/tier/new`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error adding tier: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('Error adding tier: ' + error);
+    });
+});
+
+// Bootstrap form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}

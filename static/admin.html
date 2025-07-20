@@ -1,0 +1,2661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapyyn Admin Dashboard</title>
+    <meta name="description" content="Enhanced admin dashboard for managing Sapyyn dental referral platform">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0A2463;
+            --secondary: #3E92CC;
+            --accent: #D8315B;
+            --success: #28A745;
+            --warning: #FFC107;
+            --danger: #DC3545;
+            --light: #F8F9FA;
+            --dark: #1E1B18;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            --sidebar-width: 280px;
+            --header-height: 70px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+        
+        /* Layout */
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, var(--primary) 0%, #0D2A73 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 4px 0 12px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar.collapsed {
+            width: 80px;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed .sidebar-logo .logo-text {
+            opacity: 0;
+            width: 0;
+        }
+        
+        .sidebar-logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: white;
+            padding: 8px;
+        }
+        
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+            margin-left: auto;
+        }
+        
+        .sidebar-toggle:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .menu-title {
+            padding: 0 1.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed .menu-title {
+            opacity: 0;
+            height: 0;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateX(4px);
+        }
+        
+        .menu-item.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+        
+        .menu-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent);
+        }
+        
+        .menu-item i {
+            width: 20px;
+            margin-right: 0.75rem;
+            text-align: center;
+        }
+        
+        .menu-item .menu-text {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed .menu-item .menu-text {
+            opacity: 0;
+            width: 0;
+        }
+        
+        .menu-badge {
+            margin-left: auto;
+            background: var(--accent);
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed .menu-badge {
+            opacity: 0;
+            width: 0;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .main-content.expanded {
+            margin-left: 80px;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: var(--header-height);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+        
+        .breadcrumb .separator {
+            color: var(--gray);
+        }
+        
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .search-bar {
+            position: relative;
+        }
+        
+        .search-bar input {
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            width: 300px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(62, 146, 204, 0.1);
+            background: white;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.1rem;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+        
+        .header-btn:hover {
+            color: var(--primary);
+            background: rgba(10, 36, 99, 0.1);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: var(--accent);
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .user-menu:hover {
+            background: var(--light);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 2rem;
+        }
+        
+        /* Page Header */
+        .page-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .page-header h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-header p {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+        
+        .page-actions {
+            display: flex;
+            gap: 1rem;
+            flex-shrink: 0;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-title {
+            color: var(--gray);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon.primary {
+            background: rgba(10, 36, 99, 0.1);
+            color: var(--primary);
+        }
+        
+        .stat-icon.success {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+        }
+        
+        .stat-icon.warning {
+            background: rgba(255, 193, 7, 0.1);
+            color: var(--warning);
+        }
+        
+        .stat-icon.danger {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+        }
+        
+        .stat-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .stat-change.positive {
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            color: var(--danger);
+        }
+        
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        
+        .chart-options {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--light);
+            padding: 0.25rem;
+            border-radius: 8px;
+        }
+        
+        .chart-option {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            background: none;
+            color: var(--gray);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .chart-option.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .chart-option:hover:not(.active) {
+            background: white;
+            color: var(--primary);
+        }
+        
+        /* Tables */
+        .table-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafbfc;
+        }
+        
+        .table-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: var(--dark);
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background: var(--light);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .data-table th:hover {
+            background: #e9ecef;
+        }
+        
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .data-table tr:hover {
+            background: #fafbfc;
+        }
+        
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .user-cell img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-block;
+            text-transform: capitalize;
+        }
+        
+        .status-badge.active {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+        }
+        
+        .status-badge.pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-badge.completed {
+            background: rgba(62, 146, 204, 0.1);
+            color: var(--secondary);
+        }
+        
+        .status-badge.cancelled {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+        }
+        
+        .table-actions-cell {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            color: var(--primary);
+            background: rgba(10, 36, 99, 0.1);
+        }
+        
+        /* Activity Feed */
+        .activity-feed {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            background: rgba(10, 36, 99, 0.1);
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-description {
+            color: var(--gray);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-time {
+            color: var(--gray);
+            font-size: 0.75rem;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: auto;
+            padding: 0;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                transform: scale(0.95) translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: var(--light);
+            color: var(--dark);
+        }
+        
+        .modal-body {
+            padding: 2rem;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(62, 146, 204, 0.1);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid;
+            z-index: 1001;
+            min-width: 300px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            border-left-color: var(--success);
+        }
+        
+        .notification.error {
+            border-left-color: var(--danger);
+        }
+        
+        .notification.warning {
+            border-left-color: var(--warning);
+        }
+        
+        .notification.info {
+            border-left-color: var(--secondary);
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 1rem;
+        }
+        
+        .pagination-btn {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e0e0e0;
+            background: white;
+            color: var(--gray);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination-btn:hover:not(.disabled) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .pagination-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Filter Panel */
+        .filter-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+            display: none;
+        }
+        
+        .filter-panel.active {
+            display: block;
+        }
+        
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Content Sections */
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        /* Quick Stats */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .quick-stat {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .quick-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .quick-stat-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .main-content.expanded {
+                margin-left: 0;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .header-left {
+                gap: 1rem;
+            }
+            
+            .search-bar input {
+                width: 200px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-content {
+                padding: 1rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .charts-section {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .table-actions {
+                justify-content: stretch;
+            }
+            
+            .table-actions .btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .search-bar {
+                display: none;
+            }
+            
+            .header-left {
+                gap: 0.5rem;
+            }
+            
+            .header-right {
+                gap: 0.5rem;
+            }
+            
+            .user-info {
+                display: none;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 1rem;
+            }
+            
+            .modal-body,
+            .modal-header,
+            .modal-footer {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230A2463'/%3E%3Ctext x='50' y='60' font-family='Arial' font-size='40' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E" alt="Sapyyn">
+                    <span class="logo-text">Sapyyn Admin</span>
+                </div>
+                <button class="sidebar-toggle" onclick="AppController.toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <h3 class="menu-title">Main</h3>
+                    <div class="menu-item active" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span class="menu-text">Dashboard</span>
+                    </div>
+                    <div class="menu-item" data-section="referrals">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span class="menu-text">Referrals</span>
+                        <span class="menu-badge" id="referrals-count">12</span>
+                    </div>
+                    <div class="menu-item" data-section="appointments">
+                        <i class="fas fa-calendar-check"></i>
+                        <span class="menu-text">Appointments</span>
+                        <span class="menu-badge" id="appointments-count">3</span>
+                    </div>
+                </div>
+                <div class="menu-section">
+                    <h3 class="menu-title">Users</h3>
+                    <div class="menu-item" data-section="patients">
+                        <i class="fas fa-users"></i>
+                        <span class="menu-text">Patients</span>
+                    </div>
+                    <div class="menu-item" data-section="specialists">
+                        <i class="fas fa-user-md"></i>
+                        <span class="menu-text">Specialists</span>
+                    </div>
+                    <div class="menu-item" data-section="dentists">
+                        <i class="fas fa-tooth"></i>
+                        <span class="menu-text">Dentists</span>
+                    </div>
+                    <div class="menu-item" data-section="practices">
+                        <i class="fas fa-hospital"></i>
+                        <span class="menu-text">Healthcare Practices</span>
+                    </div>
+                </div>
+                <div class="menu-section">
+                    <h3 class="menu-title">Management</h3>
+                    <div class="menu-item" data-section="rewards">
+                        <i class="fas fa-gift"></i>
+                        <span class="menu-text">Rewards</span>
+                    </div>
+                    <div class="menu-item" data-section="marketing">
+                        <i class="fas fa-bullhorn"></i>
+                        <span class="menu-text">Co-Marketing</span>
+                    </div>
+                    <div class="menu-item" data-section="newsletter">
+                        <i class="fas fa-envelope"></i>
+                        <span class="menu-text">Newsletter</span>
+                        <span class="menu-badge">5</span>
+                    </div>
+                    <div class="menu-item" data-section="analytics">
+                        <i class="fas fa-chart-bar"></i>
+                        <span class="menu-text">Analytics</span>
+                    </div>
+                </div>
+                <div class="menu-section">
+                    <h3 class="menu-title">Content</h3>
+                    <div class="menu-item" data-section="education">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span class="menu-text">Educational Content</span>
+                    </div>
+                    <div class="menu-item" data-section="training">
+                        <i class="fas fa-video"></i>
+                        <span class="menu-text">Training Videos</span>
+                    </div>
+                    <div class="menu-item" data-section="cases">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span class="menu-text">Case Studies</span>
+                    </div>
+                    <div class="menu-item" data-section="guides">
+                        <i class="fas fa-question-circle"></i>
+                        <span class="menu-text">How-To Guides</span>
+                    </div>
+                </div>
+                <div class="menu-section">
+                    <h3 class="menu-title">System</h3>
+                    <div class="menu-item" data-section="settings">
+                        <i class="fas fa-cog"></i>
+                        <span class="menu-text">Settings</span>
+                    </div>
+                    <div class="menu-item" data-section="security">
+                        <i class="fas fa-shield-alt"></i>
+                        <span class="menu-text">Security</span>
+                    </div>
+                    <div class="menu-item" data-section="billing">
+                        <i class="fas fa-file-invoice"></i>
+                        <span class="menu-text">Billing</span>
+                    </div>
+                    <div class="menu-item" data-section="audit">
+                        <i class="fas fa-history"></i>
+                        <span class="menu-text">Audit Log</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="mobile-menu-btn" onclick="AppController.toggleMobileSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="breadcrumb">
+                        <i class="fas fa-home"></i>
+                        <span class="separator">/</span>
+                        <span id="breadcrumb-text">Dashboard</span>
+                    </div>
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search patients, providers, clinics..." onkeyup="AppController.performSearch(this.value)">
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="header-btn" onclick="AppController.showNotifications()">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notification-count">8</span>
+                    </button>
+                    <button class="header-btn" onclick="AppController.showMessages()">
+                        <i class="fas fa-envelope"></i>
+                        <span class="notification-badge">5</span>
+                    </button>
+                    <button class="header-btn" onclick="AppController.showSettings()">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <div class="user-menu" onclick="AppController.showUserMenu()">
+                        <div class="user-avatar">JA</div>
+                        <div class="user-info">
+                            <div style="font-weight: 600; font-size: 0.875rem;">John Admin</div>
+                            <div style="font-size: 0.75rem; color: var(--gray);">Super Admin</div>
+                        </div>
+                        <i class="fas fa-chevron-down" style="color: var(--gray);"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section" class="content-section active">
+                    <!-- Page Header -->
+                    <div class="page-header">
+                        <div>
+                            <h2>Dashboard Overview</h2>
+                            <p>Welcome back! Here's what's happening with your dental referral network today.</p>
+                        </div>
+                        <div class="page-actions">
+                            <button class="btn btn-secondary" onclick="DataManager.exportData()">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                            <button class="btn btn-primary" onclick="ModalController.openModal('newReferralModal')">
+                                <i class="fas fa-plus"></i> New Referral
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card" data-section="patients">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-title">Total Patients</div>
+                                    <div class="stat-value" id="total-patients">2,847</div>
+                                    <div class="stat-change positive">
+                                        <i class="fas fa-arrow-up"></i>
+                                        12.5% from last month
+                                    </div>
+                                </div>
+                                <div class="stat-icon primary">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card" data-section="specialists">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-title">Active Specialists</div>
+                                    <div class="stat-value" id="total-specialists">523</div>
+                                    <div class="stat-change positive">
+                                        <i class="fas fa-arrow-up"></i>
+                                        8.3% from last month
+                                    </div>
+                                </div>
+                                <div class="stat-icon success">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card" data-section="dentists">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-title">Total Dentists</div>
+                                    <div class="stat-value" id="total-dentists">1,248</div>
+                                    <div class="stat-change positive">
+                                        <i class="fas fa-arrow-up"></i>
+                                        15.2% from last month
+                                    </div>
+                                </div>
+                                <div class="stat-icon warning">
+                                    <i class="fas fa-tooth"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card" data-section="billing">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-title">Monthly Revenue</div>
+                                    <div class="stat-value">$184.5K</div>
+                                    <div class="stat-change positive">
+                                        <i class="fas fa-arrow-up"></i>
+                                        18.2% from last month
+                                    </div>
+                                </div>
+                                <div class="stat-icon danger">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="charts-section">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Referral Trends</h3>
+                                <div class="chart-options">
+                                    <button class="chart-option" data-period="daily">Daily</button>
+                                    <button class="chart-option active" data-period="weekly">Weekly</button>
+                                    <button class="chart-option" data-period="monthly">Monthly</button>
+                                </div>
+                            </div>
+                            <canvas id="referralChart" height="100"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Appointment Status</h3>
+                            </div>
+                            <canvas id="appointmentChart" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Tables and Activity Grid -->
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                        <!-- Recent Referrals Table -->
+                        <div class="table-card">
+                            <div class="table-header">
+                                <h3 class="table-title">Recent Referrals</h3>
+                                <div class="table-actions">
+                                    <button class="btn btn-secondary" onclick="FilterController.toggleFilter('referrals-filter')">
+                                        <i class="fas fa-filter"></i> Filter
+                                    </button>
+                                    <button class="btn btn-primary" onclick="ModalController.openModal('newReferralModal')">
+                                        <i class="fas fa-plus"></i> New Referral
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Filter Panel -->
+                            <div id="referrals-filter" class="filter-panel">
+                                <div class="filter-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Status</label>
+                                        <select class="form-select" onchange="FilterController.filterReferrals()">
+                                            <option value="">All Status</option>
+                                            <option value="active">Active</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="completed">Completed</option>
+                                            <option value="cancelled">Cancelled</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Specialty</label>
+                                        <select class="form-select" onchange="FilterController.filterReferrals()">
+                                            <option value="">All Specialties</option>
+                                            <option value="orthodontics">Orthodontics</option>
+                                            <option value="endodontics">Endodontics</option>
+                                            <option value="periodontics">Periodontics</option>
+                                            <option value="oral-surgery">Oral Surgery</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Date Range</label>
+                                        <input type="date" class="form-control" onchange="FilterController.filterReferrals()">
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 1rem;">
+                                    <button class="btn btn-secondary" onclick="FilterController.clearFilters()">Clear Filters</button>
+                                    <button class="btn btn-primary" onclick="FilterController.applyFilters()">Apply Filters</button>
+                                </div>
+                            </div>
+                            
+                            <table class="data-table" id="referrals-table">
+                                <thead>
+                                    <tr>
+                                        <th data-sort="patient">Patient <i class="fas fa-sort"></i></th>
+                                        <th data-sort="provider">Provider <i class="fas fa-sort"></i></th>
+                                        <th data-sort="specialty">Specialty <i class="fas fa-sort"></i></th>
+                                        <th data-sort="date">Date <i class="fas fa-sort"></i></th>
+                                        <th data-sort="status">Status <i class="fas fa-sort"></i></th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="referrals-tbody">
+                                    <!-- Table content will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                            
+                            <!-- Pagination -->
+                            <div class="pagination" id="referrals-pagination">
+                                <!-- Pagination will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="activity-feed">
+                            <h3 style="margin-bottom: 1rem; font-size: 1.125rem; font-weight: 600;">Recent Activity</h3>
+                            <div id="activity-list">
+                                <!-- Activity items will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Sections -->
+                <div id="referrals-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Referral Management</h2>
+                            <p>Manage all patient referrals and track their status</p>
+                        </div>
+                        <div class="page-actions">
+                            <button class="btn btn-secondary" onclick="DataManager.exportReferrals()">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button class="btn btn-primary" onclick="ModalController.openModal('newReferralModal')">
+                                <i class="fas fa-plus"></i> New Referral
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-stats">
+                        <div class="quick-stat">
+                            <div class="quick-stat-value">156</div>
+                            <div class="quick-stat-label">This Month</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="quick-stat-value">23</div>
+                            <div class="quick-stat-label">Today</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="quick-stat-value">89%</div>
+                            <div class="quick-stat-label">Success Rate</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="quick-stat-value">2.3</div>
+                            <div class="quick-stat-label">Avg Days</div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-card">
+                        <div class="table-header">
+                            <h3 class="table-title">All Referrals</h3>
+                            <div class="table-actions">
+                                <button class="btn btn-secondary" onclick="FilterController.toggleFilter('all-referrals-filter')">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <button class="btn btn-primary" onclick="ModalController.openModal('newReferralModal')">
+                                    <i class="fas fa-plus"></i> New Referral
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Patients Section -->
+                <div id="patients-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Patient Management</h2>
+                            <p>View and manage patient records and information</p>
+                        </div>
+                        <div class="page-actions">
+                            <button class="btn btn-secondary" onclick="DataManager.exportPatients()">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button class="btn btn-primary" onclick="ModalController.openModal('newPatientModal')">
+                                <i class="fas fa-plus"></i> Add Patient
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div id="settings-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>System Settings</h2>
+                            <p>Configure system preferences and options</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div class="table-card">
+                            <div class="table-header">
+                                <h3 class="table-title">General Settings</h3>
+                            </div>
+                            <div style="padding: 2rem;">
+                                <div class="form-group">
+                                    <label class="form-label">Site Name</label>
+                                    <input type="text" class="form-control" value="Sapyyn Admin" onchange="SettingsController.updateSetting('siteName', this.value)">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Timezone</label>
+                                    <select class="form-select" onchange="SettingsController.updateSetting('timezone', this.value)">
+                                        <option value="UTC">UTC</option>
+                                        <option value="EST" selected>Eastern Time</option>
+                                        <option value="PST">Pacific Time</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email Notifications</label>
+                                    <select class="form-select" onchange="SettingsController.updateSetting('emailNotifications', this.value)">
+                                        <option value="all" selected>All Notifications</option>
+                                        <option value="important">Important Only</option>
+                                        <option value="none">None</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-card">
+                            <div class="table-header">
+                                <h3 class="table-title">Security Settings</h3>
+                            </div>
+                            <div style="padding: 2rem;">
+                                <div class="form-group">
+                                    <label class="form-label">Two-Factor Authentication</label>
+                                    <select class="form-select" onchange="SettingsController.updateSetting('twoFactor', this.value)">
+                                        <option value="enabled" selected>Enabled</option>
+                                        <option value="disabled">Disabled</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Session Timeout (minutes)</label>
+                                    <input type="number" class="form-control" value="30" onchange="SettingsController.updateSetting('sessionTimeout', this.value)">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Password Policy</label>
+                                    <select class="form-select" onchange="SettingsController.updateSetting('passwordPolicy', this.value)">
+                                        <option value="strong" selected>Strong</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="basic">Basic</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other sections placeholders -->
+                <div id="specialists-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Specialist Management</h2>
+                            <p>Manage specialist profiles and availability</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="dentists-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Dentist Management</h2>
+                            <p>Manage dentist profiles and practices</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="practices-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Healthcare Practices</h2>
+                            <p>Manage healthcare practice information</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="appointments-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Appointment Management</h2>
+                            <p>View and manage all appointments</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="rewards-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Rewards Management</h2>
+                            <p>Manage reward programs and incentives</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="marketing-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Co-Marketing</h2>
+                            <p>Manage marketing campaigns and partnerships</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="newsletter-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Newsletter Management</h2>
+                            <p>Create and manage newsletter campaigns</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="analytics-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Analytics Dashboard</h2>
+                            <p>View detailed analytics and reports</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="education-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Educational Content</h2>
+                            <p>Manage educational materials and resources</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="training-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Training Videos</h2>
+                            <p>Manage training video library</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cases-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Case Studies</h2>
+                            <p>Manage case study repository</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="guides-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>How-To Guides</h2>
+                            <p>Manage instructional guides and documentation</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="security-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Security Management</h2>
+                            <p>Manage security settings and permissions</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="billing-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Billing Management</h2>
+                            <p>Manage billing and payment information</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="audit-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Audit Log</h2>
+                            <p>View system activity and audit trails</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- New Referral Modal -->
+    <div id="newReferralModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Create New Referral</h3>
+                <button class="modal-close" onclick="ModalController.closeModal('newReferralModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="newReferralForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Patient Name</label>
+                            <input type="text" class="form-control" name="patientName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Patient ID</label>
+                            <input type="text" class="form-control" name="patientId" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Referring Provider</label>
+                            <select class="form-select" name="referringProvider" required>
+                                <option value="">Select Provider</option>
+                                <option value="dr-smith">Dr. Sarah Smith</option>
+                                <option value="dr-johnson">Dr. Michael Johnson</option>
+                                <option value="dr-williams">Dr. Emily Williams</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Specialty</label>
+                            <select class="form-select" name="specialty" required>
+                                <option value="">Select Specialty</option>
+                                <option value="orthodontics">Orthodontics</option>
+                                <option value="endodontics">Endodontics</option>
+                                <option value="periodontics">Periodontics</option>
+                                <option value="oral-surgery">Oral Surgery</option>
+                                <option value="prosthodontics">Prosthodontics</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Reason for Referral</label>
+                        <textarea class="form-control" name="reason" rows="3" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Priority</label>
+                            <select class="form-select" name="priority" required>
+                                <option value="routine">Routine</option>
+                                <option value="urgent">Urgent</option>
+                                <option value="emergency">Emergency</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Preferred Date</label>
+                            <input type="date" class="form-control" name="preferredDate">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="ModalController.closeModal('newReferralModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="FormController.submitReferral()">
+                    <span class="loading-spinner" style="display: none;"></span>
+                    Create Referral
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Patient Modal -->
+    <div id="newPatientModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Patient</h3>
+                <button class="modal-close" onclick="ModalController.closeModal('newPatientModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="newPatientForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" name="lastName" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" name="phone" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" name="dateOfBirth" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Insurance Provider</label>
+                            <input type="text" class="form-control" name="insurance">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <textarea class="form-control" name="address" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="ModalController.closeModal('newPatientModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="FormController.submitPatient()">
+                    Add Patient
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State Management
+        class AppState {
+            constructor() {
+                this.currentSection = 'dashboard';
+                this.currentSortColumn = '';
+                this.currentSortDirection = 'asc';
+                this.currentPage = 1;
+                this.itemsPerPage = 10;
+                this.searchQuery = '';
+                this.filters = {};
+            }
+        }
+
+        // Data Management
+        class DataManager {
+            static sampleReferrals = [
+                { id: 1, patient: 'Mary Johnson', patientId: '#28471', provider: 'Dr. Sarah Miller', specialty: 'Orthodontics', date: '2024-12-15', status: 'active' },
+                { id: 2, patient: 'John Davis', patientId: '#28470', provider: 'Dr. Michael Chen', specialty: 'Endodontics', date: '2024-12-15', status: 'pending' },
+                { id: 3, patient: 'Emma Brown', patientId: '#28469', provider: 'Dr. James Wilson', specialty: 'Periodontics', date: '2024-12-14', status: 'completed' },
+                { id: 4, patient: 'Robert Miller', patientId: '#28468', provider: 'Dr. Lisa Anderson', specialty: 'Oral Surgery', date: '2024-12-14', status: 'active' },
+                { id: 5, patient: 'Sarah Wilson', patientId: '#28467', provider: 'Dr. David Thompson', specialty: 'Orthodontics', date: '2024-12-13', status: 'cancelled' },
+                { id: 6, patient: 'Michael Brown', patientId: '#28466', provider: 'Dr. Jennifer Lee', specialty: 'Periodontics', date: '2024-12-13', status: 'pending' },
+                { id: 7, patient: 'Lisa Garcia', patientId: '#28465', provider: 'Dr. Robert Taylor', specialty: 'Endodontics', date: '2024-12-12', status: 'completed' },
+                { id: 8, patient: 'David Smith', patientId: '#28464', provider: 'Dr. Amanda White', specialty: 'Oral Surgery', date: '2024-12-12', status: 'active' }
+            ];
+
+            static sampleActivities = [
+                { icon: 'user-plus', title: 'New specialist registered', description: 'Dr. Jennifer Smith joined as Orthodontist', time: '2 minutes ago' },
+                { icon: 'calendar-check', title: 'Appointment completed', description: 'Patient consultation with Dr. Wilson', time: '15 minutes ago' },
+                { icon: 'exchange-alt', title: 'New referral created', description: 'Orthodontic referral for Mary Johnson', time: '1 hour ago' },
+                { icon: 'star', title: '5-star review received', description: 'Patient rated Dr. Chen\'s service', time: '3 hours ago' },
+                { icon: 'file-medical', title: 'Medical record updated', description: 'Patient history updated for John Davis', time: '5 hours ago' }
+            ];
+
+            static getReferrals() {
+                return this.sampleReferrals;
+            }
+
+            static getActivities() {
+                return this.sampleActivities;
+            }
+
+            static addReferral(referralData) {
+                const newReferral = {
+                    id: this.sampleReferrals.length + 1,
+                    patient: referralData.patientName,
+                    patientId: referralData.patientId,
+                    provider: this.getProviderName(referralData.referringProvider),
+                    specialty: referralData.specialty,
+                    date: new Date().toISOString().split('T')[0],
+                    status: 'pending'
+                };
+                this.sampleReferrals.unshift(newReferral);
+                return newReferral;
+            }
+
+            static getProviderName(providerId) {
+                const providers = {
+                    'dr-smith': 'Dr. Sarah Smith',
+                    'dr-johnson': 'Dr. Michael Johnson',
+                    'dr-williams': 'Dr. Emily Williams'
+                };
+                return providers[providerId] || 'Unknown Provider';
+            }
+
+            static deleteReferral(id) {
+                const index = this.sampleReferrals.findIndex(r => r.id === id);
+                if (index > -1) {
+                    const referral = this.sampleReferrals[index];
+                    this.sampleReferrals.splice(index, 1);
+                    return referral;
+                }
+                return null;
+            }
+
+            static exportData() {
+                NotificationController.showNotification('Exporting dashboard data...', 'info');
+            }
+
+            static exportReferrals() {
+                NotificationController.showNotification('Exporting referrals data...', 'info');
+            }
+
+            static exportPatients() {
+                NotificationController.showNotification('Exporting patients data...', 'info');
+            }
+        }
+
+        // Application Controller
+        class AppController {
+            static init() {
+                this.appState = new AppState();
+                this.setupEventListeners();
+                this.populateInitialData();
+                ChartController.initializeCharts();
+            }
+
+            static setupEventListeners() {
+                // Menu item clicks
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        const section = e.currentTarget.dataset.section;
+                        if (section) {
+                            this.showSection(section);
+                        }
+                    });
+                });
+
+                // Stat card clicks
+                document.querySelectorAll('.stat-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        const section = e.currentTarget.dataset.section;
+                        if (section) {
+                            this.showSection(section);
+                        }
+                    });
+                });
+
+                // Table header clicks for sorting
+                document.querySelectorAll('#referrals-table th[data-sort]').forEach(header => {
+                    header.addEventListener('click', (e) => {
+                        const column = e.currentTarget.dataset.sort;
+                        TableController.sortTable(column);
+                    });
+                });
+
+                // Chart option clicks
+                document.querySelectorAll('.chart-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        const period = e.currentTarget.dataset.period;
+                        ChartController.updateChart(period);
+                    });
+                });
+
+                // Modal click outside to close
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal')) {
+                        e.target.classList.remove('active');
+                    }
+                });
+
+                // Close mobile sidebar when clicking outside
+                document.addEventListener('click', (e) => {
+                    const sidebar = document.getElementById('sidebar');
+                    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+                    
+                    if (window.innerWidth <= 768 && 
+                        !sidebar.contains(e.target) && 
+                        !mobileMenuBtn.contains(e.target) &&
+                        sidebar.classList.contains('mobile-open')) {
+                        sidebar.classList.remove('mobile-open');
+                    }
+                });
+
+                // Handle window resize
+                window.addEventListener('resize', () => {
+                    const sidebar = document.getElementById('sidebar');
+                    if (window.innerWidth > 768) {
+                        sidebar.classList.remove('mobile-open');
+                    }
+                });
+            }
+
+            static populateInitialData() {
+                TableController.populateReferralsTable(DataManager.getReferrals());
+                ActivityController.populateActivityFeed();
+                StatsController.updateStats();
+            }
+
+            static showSection(sectionName) {
+                // Hide all sections
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Show selected section
+                const targetSection = document.getElementById(sectionName + '-section');
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+                
+                // Update active menu item
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                const activeMenuItem = document.querySelector(`[data-section="${sectionName}"]`);
+                if (activeMenuItem) {
+                    activeMenuItem.classList.add('active');
+                }
+                
+                // Update breadcrumb
+                const breadcrumbText = document.getElementById('breadcrumb-text');
+                if (breadcrumbText) {
+                    breadcrumbText.textContent = sectionName.charAt(0).toUpperCase() + sectionName.slice(1);
+                }
+                
+                this.appState.currentSection = sectionName;
+            }
+
+            static toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const mainContent = document.getElementById('mainContent');
+                
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+            }
+
+            static toggleMobileSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.toggle('mobile-open');
+            }
+
+            static performSearch(query) {
+                if (query.length < 2) return;
+                
+                this.appState.searchQuery = query;
+                NotificationController.showNotification('Searching for: ' + query, 'info');
+                
+                // Filter table data based on search
+                const filteredData = DataManager.getReferrals().filter(referral => 
+                    referral.patient.toLowerCase().includes(query.toLowerCase()) ||
+                    referral.provider.toLowerCase().includes(query.toLowerCase()) ||
+                    referral.specialty.toLowerCase().includes(query.toLowerCase())
+                );
+                
+                TableController.populateReferralsTable(filteredData);
+            }
+
+            static showNotifications() {
+                NotificationController.showNotification('Showing notifications panel', 'info');
+            }
+
+            static showMessages() {
+                NotificationController.showNotification('Showing messages panel', 'info');
+            }
+
+            static showSettings() {
+                this.showSection('settings');
+            }
+
+            static showUserMenu() {
+                NotificationController.showNotification('User menu clicked', 'info');
+            }
+        }
+
+        // Modal Controller
+        class ModalController {
+            static openModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+
+            static closeModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                    
+                    // Reset form if exists
+                    const form = modal.querySelector('form');
+                    if (form) {
+                        form.reset();
+                    }
+                }
+            }
+        }
+
+        // Table Controller
+        class TableController {
+            static populateReferralsTable(data) {
+                const tbody = document.getElementById('referrals-tbody');
+                if (!tbody) return;
+
+                const startIndex = (AppController.appState.currentPage - 1) * AppController.appState.itemsPerPage;
+                const endIndex = startIndex + AppController.appState.itemsPerPage;
+                const pageData = data.slice(startIndex, endIndex);
+                
+                tbody.innerHTML = pageData.map(referral => `
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar" style="font-size: 0.875rem; width: 32px; height: 32px;">
+                                    ${referral.patient.split(' ').map(n => n[0]).join('')}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 0.875rem;">${referral.patient}</div>
+                                    <div style="font-size: 0.75rem; color: var(--gray);">ID: ${referral.patientId}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${referral.provider}</td>
+                        <td>${referral.specialty}</td>
+                        <td>${new Date(referral.date).toLocaleDateString()}</td>
+                        <td><span class="status-badge ${referral.status}">${referral.status}</span></td>
+                        <td>
+                            <div class="table-actions-cell">
+                                <button class="action-btn" onclick="CRUDController.viewReferral(${referral.id})" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="action-btn" onclick="CRUDController.editReferral(${referral.id})" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn" onclick="CRUDController.deleteReferral(${referral.id})" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                PaginationController.updatePagination(data.length);
+            }
+
+            static sortTable(column) {
+                const appState = AppController.appState;
+                
+                if (appState.currentSortColumn === column) {
+                    appState.currentSortDirection = appState.currentSortDirection === 'asc' ? 'desc' : 'asc';
+                } else {
+                    appState.currentSortColumn = column;
+                    appState.currentSortDirection = 'asc';
+                }
+                
+                const sortedData = [...DataManager.getReferrals()].sort((a, b) => {
+                    let aVal = a[column];
+                    let bVal = b[column];
+                    
+                    if (typeof aVal === 'string') {
+                        aVal = aVal.toLowerCase();
+                        bVal = bVal.toLowerCase();
+                    }
+                    
+                    if (appState.currentSortDirection === 'asc') {
+                        return aVal > bVal ? 1 : -1;
+                    } else {
+                        return aVal < bVal ? 1 : -1;
+                    }
+                });
+                
+                this.populateReferralsTable(sortedData);
+                
+                // Update sort indicators
+                document.querySelectorAll('#referrals-table th i').forEach(icon => {
+                    icon.className = 'fas fa-sort';
+                });
+                
+                const currentHeader = document.querySelector(`#referrals-table th[data-sort="${column}"] i`);
+                if (currentHeader) {
+                    currentHeader.className = appState.currentSortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+                }
+            }
+        }
+
+        // Pagination Controller
+        class PaginationController {
+            static updatePagination(totalItems) {
+                const appState = AppController.appState;
+                const totalPages = Math.ceil(totalItems / appState.itemsPerPage);
+                const pagination = document.getElementById('referrals-pagination');
+                
+                if (!pagination) return;
+
+                let paginationHTML = '';
+                
+                // Previous button
+                paginationHTML += `<button class="pagination-btn ${appState.currentPage === 1 ? 'disabled' : ''}" onclick="PaginationController.changePage(${appState.currentPage - 1})" ${appState.currentPage === 1 ? 'disabled' : ''}>Previous</button>`;
+                
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++) {
+                    if (i === appState.currentPage || i === 1 || i === totalPages || (i >= appState.currentPage - 1 && i <= appState.currentPage + 1)) {
+                        paginationHTML += `<button class="pagination-btn ${i === appState.currentPage ? 'active' : ''}" onclick="PaginationController.changePage(${i})">${i}</button>`;
+                    } else if (i === appState.currentPage - 2 || i === appState.currentPage + 2) {
+                        paginationHTML += `<span>...</span>`;
+                    }
+                }
+                
+                // Next button
+                paginationHTML += `<button class="pagination-btn ${appState.currentPage === totalPages ? 'disabled' : ''}" onclick="PaginationController.changePage(${appState.currentPage + 1})" ${appState.currentPage === totalPages ? 'disabled' : ''}>Next</button>`;
+                
+                pagination.innerHTML = paginationHTML;
+            }
+
+            static changePage(page) {
+                const appState = AppController.appState;
+                const totalPages = Math.ceil(DataManager.getReferrals().length / appState.itemsPerPage);
+                
+                if (page >= 1 && page <= totalPages) {
+                    appState.currentPage = page;
+                    TableController.populateReferralsTable(DataManager.getReferrals());
+                }
+            }
+        }
+
+        // Activity Controller
+        class ActivityController {
+            static populateActivityFeed() {
+                const activityList = document.getElementById('activity-list');
+                if (!activityList) return;
+
+                activityList.innerHTML = DataManager.getActivities().map(activity => `
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-${activity.icon}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">${activity.title}</div>
+                            <div class="activity-description">${activity.description}</div>
+                            <div class="activity-time">${activity.time}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Form Controller
+        class FormController {
+            static submitReferral() {
+                const form = document.getElementById('newReferralForm');
+                if (!form) return;
+
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                const formData = new FormData(form);
+                const referralData = Object.fromEntries(formData.entries());
+                
+                // Show loading state
+                const submitBtn = document.querySelector('#newReferralModal .btn-primary');
+                const spinner = submitBtn.querySelector('.loading-spinner');
+                spinner.style.display = 'inline-block';
+                submitBtn.disabled = true;
+                
+                // Simulate API call
+                setTimeout(() => {
+                    const newReferral = DataManager.addReferral(referralData);
+                    
+                    // Update UI
+                    TableController.populateReferralsTable(DataManager.getReferrals());
+                    StatsController.updateStats();
+                    
+                    // Hide loading state
+                    spinner.style.display = 'none';
+                    submitBtn.disabled = false;
+                    
+                    // Close modal and show success
+                    ModalController.closeModal('newReferralModal');
+                    NotificationController.showNotification('Referral created successfully!', 'success');
+                }, 1000);
+            }
+
+            static submitPatient() {
+                const form = document.getElementById('newPatientForm');
+                if (!form) return;
+
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                const formData = new FormData(form);
+                const patientData = Object.fromEntries(formData.entries());
+                
+                // Simulate API call
+                setTimeout(() => {
+                    ModalController.closeModal('newPatientModal');
+                    NotificationController.showNotification('Patient added successfully!', 'success');
+                    StatsController.updateStats();
+                }, 1000);
+            }
+        }
+
+        // CRUD Controller
+        class CRUDController {
+            static viewReferral(id) {
+                const referral = DataManager.getReferrals().find(r => r.id === id);
+                if (referral) {
+                    NotificationController.showNotification(`Viewing referral for ${referral.patient}`, 'info');
+                }
+            }
+
+            static editReferral(id) {
+                const referral = DataManager.getReferrals().find(r => r.id === id);
+                if (referral) {
+                    NotificationController.showNotification(`Editing referral for ${referral.patient}`, 'info');
+                }
+            }
+
+            static deleteReferral(id) {
+                if (confirm('Are you sure you want to delete this referral?')) {
+                    const referral = DataManager.deleteReferral(id);
+                    if (referral) {
+                        TableController.populateReferralsTable(DataManager.getReferrals());
+                        StatsController.updateStats();
+                        NotificationController.showNotification(`Referral for ${referral.patient} deleted`, 'success');
+                    }
+                }
+            }
+        }
+
+        // Filter Controller
+        class FilterController {
+            static toggleFilter(filterId) {
+                const filter = document.getElementById(filterId);
+                if (filter) {
+                    filter.classList.toggle('active');
+                }
+            }
+
+            static filterReferrals() {
+                // Implement filtering logic
+                console.log('Filtering referrals...');
+                TableController.populateReferralsTable(DataManager.getReferrals());
+            }
+
+            static clearFilters() {
+                // Clear all filter inputs
+                document.querySelectorAll('#referrals-filter select, #referrals-filter input').forEach(input => {
+                    input.value = '';
+                });
+                this.filterReferrals();
+            }
+
+            static applyFilters() {
+                this.filterReferrals();
+                NotificationController.showNotification('Filters applied successfully', 'success');
+            }
+        }
+
+        // Stats Controller
+        class StatsController {
+            static updateStats() {
+                // Update dashboard statistics with some randomization
+                const totalPatientsEl = document.getElementById('total-patients');
+                const totalSpecialistsEl = document.getElementById('total-specialists');
+                const totalDentistsEl = document.getElementById('total-dentists');
+                const referralsCountEl = document.getElementById('referrals-count');
+                const appointmentsCountEl = document.getElementById('appointments-count');
+                const notificationCountEl = document.getElementById('notification-count');
+
+                if (totalPatientsEl) totalPatientsEl.textContent = (2847 + Math.floor(Math.random() * 10)).toLocaleString();
+                if (totalSpecialistsEl) totalSpecialistsEl.textContent = (523 + Math.floor(Math.random() * 5)).toLocaleString();
+                if (totalDentistsEl) totalDentistsEl.textContent = (1248 + Math.floor(Math.random() * 20)).toLocaleString();
+                
+                // Update badges
+                if (referralsCountEl) referralsCountEl.textContent = DataManager.getReferrals().length;
+                if (appointmentsCountEl) appointmentsCountEl.textContent = Math.floor(Math.random() * 10) + 1;
+                if (notificationCountEl) notificationCountEl.textContent = Math.floor(Math.random() * 20) + 1;
+            }
+        }
+
+        // Settings Controller
+        class SettingsController {
+            static updateSetting(setting, value) {
+                console.log(`Updating ${setting} to ${value}`);
+                NotificationController.showNotification(`${setting} updated successfully`, 'success');
+            }
+        }
+
+        // Chart Controller
+        class ChartController {
+            static referralChart = null;
+            static appointmentChart = null;
+
+            static initializeCharts() {
+                this.initReferralChart();
+                this.initAppointmentChart();
+            }
+
+            static initReferralChart() {
+                const ctx = document.getElementById('referralChart');
+                if (!ctx) return;
+
+                const chartOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    elements: {
+                        line: {
+                            tension: 0.4
+                        },
+                        point: {
+                            radius: 6,
+                            hoverRadius: 8
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        }
+                    }
+                };
+
+                this.referralChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                        datasets: [{
+                            label: 'Referrals',
+                            data: [120, 135, 125, 145, 160, 175],
+                            borderColor: '#3E92CC',
+                            backgroundColor: 'rgba(62, 146, 204, 0.1)',
+                            borderWidth: 3,
+                            fill: true
+                        }]
+                    },
+                    options: chartOptions
+                });
+            }
+
+            static initAppointmentChart() {
+                const ctx = document.getElementById('appointmentChart');
+                if (!ctx) return;
+
+                this.appointmentChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Scheduled', 'Completed', 'Pending', 'Cancelled'],
+                        datasets: [{
+                            data: [45, 35, 15, 5],
+                            backgroundColor: [
+                                '#0A2463',
+                                '#3E92CC',
+                                '#FFC107',
+                                '#DC3545'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            static updateChart(period) {
+                // Remove active class from all buttons
+                document.querySelectorAll('.chart-option').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active class to clicked button
+                event.target.classList.add('active');
+                
+                NotificationController.showNotification(`Chart updated for ${period} view`, 'info');
+                
+                // Update chart data based on period
+                if (this.referralChart) {
+                    let newData, newLabels;
+                    
+                    switch(period) {
+                        case 'daily':
+                            newLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                            newData = [15, 20, 18, 25, 22, 8, 12];
+                            break;
+                        case 'monthly':
+                            newLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                            newData = [450, 520, 480, 600, 580, 650];
+                            break;
+                        default: // weekly
+                            newLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'];
+                            newData = [120, 135, 125, 145, 160, 175];
+                    }
+                    
+                    this.referralChart.data.labels = newLabels;
+                    this.referralChart.data.datasets[0].data = newData;
+                    this.referralChart.update();
+                }
+            }
+        }
+
+        // Notification Controller
+        class NotificationController {
+            static showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : type === 'warning' ? 'exclamation-circle' : 'info-circle'}"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Show notification
+                setTimeout(() => notification.classList.add('show'), 100);
+                
+                // Hide notification after 3 seconds
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        if (document.body.contains(notification)) {
+                            document.body.removeChild(notification);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+        }
+
+        // Initialize application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            AppController.init();
+        });
+    </script>
+</body>
+</html>

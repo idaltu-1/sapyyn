@@ -1,0 +1,189 @@
+# Netlify redirects for Sapyyn Patient Referral System
+# Complete routing configuration for all pages
+
+# ===========================
+# MAIN PAGES
+# ===========================
+/login /Login.html 200
+/signin /Login.html 200
+/register /signup.html 200
+/signup /signup.html 200
+/forgot-password /forgot_password.html 200
+/reset-password /forgot_password.html 200
+
+# ===========================
+# DASHBOARD & PORTAL
+# ===========================
+/dashboard /Dashboard.html 200
+/portal /sapyyn-portal.html 200
+/portal/* /sapyyn-portal.html 200
+/portal-1 /portal-1.html 200
+/portal-signup /portal-signup.html 200
+/portal-referrals /portal-referrals.html 200
+/portal-integrations /portal_integrations.html 200
+/portal-messaging /portal_messaging.html 200
+/portal-settings /portal_settings.html 200
+
+# ===========================
+# REFERRAL SYSTEM
+# ===========================
+/referrals /referrals.html 200
+/referrals/* /referrals.html 200
+/referrals-page /referrals_page.html 200
+/new-referral /Patient%20Referral.html 200
+/track-referral /Track%20Referral.html 200
+/referral-history /Referral%20History.html 200
+/patient-referral /Patient%20Referral.html 200
+/patient-referral-admin /Patient%20Referrral%20Admin.html 200
+/patient-referral-admin-portal /Patient%20Referrral%20Admin%20portal.html 200
+
+# ===========================
+# APPOINTMENTS
+# ===========================
+/appointments /appointments.html 200
+/appointments/* /appointments.html 200
+/schedule /appointments.html 200
+/booking /appointments.html 200
+/calendar /appointments.html 200
+
+# ===========================
+# REWARDS & LOYALTY
+# ===========================
+/rewards /rewards.html 200
+/loyalty /loyaltyrewards.html 200
+/loyalty-rewards /loyaltyrewards.html 200
+/redeem /redeem%20list.html 200
+/redeem-list /redeem%20list.html 200
+/updated-portal-rewards /updated_portal_rewards.html 200
+
+# ===========================
+# ADMIN PAGES
+# ===========================
+/admin /admin.html 200
+/admin/* /admin.html 200
+/admin-1 /admin-1.html 200
+/admin-2 /admin-2.html 200
+/admin-3 /admin-3.html 200
+/admin-4 /admin-4.html 200
+/admin-users /admin-users.html 200
+/admin-referrals /admin-referrals.html 200
+/sapyyn-admin-panel /sapyyn-admin-panel.html 200
+/corrected-admin /corrected_admin_html.html 200
+
+# ===========================
+# GET STARTED & ONBOARDING
+# ===========================
+/get-started /getstarted_page.html 200
+/getstarted /getstarted_page.html 200
+/start /getstarted_page.html 200
+/onboarding /getstarted_page.html 200
+/welcome /getstarted_page.html 200
+
+# ===========================
+# PRICING & SUBSCRIPTION
+# ===========================
+/pricing /pricing.html 200
+/pricing-page /pricing_page.html 200
+/plans /pricing.html 200
+/subscribe /pricing.html 200
+
+# ===========================
+# ABOUT & COMPANY
+# ===========================
+/about /about.html 200
+/about-us /about_page.html 200
+/about-page /about_page.html 200
+/company /about.html 200
+
+# ===========================
+# CONTACT & SUPPORT
+# ===========================
+/contact /contact.html 200
+/contact-us /contact-us.html 200
+/support /contact.html 200
+/help /contact.html 200
+
+# ===========================
+# BLOG & CONTENT
+# ===========================
+/blog /blog.html 200
+/blog-article /blog-article.html 200
+/news /newsletter.html 200
+/newsletter /newsletter.html 200
+/case-studies /case_studies.html 200
+/case-studies-alt /case%20studies.html 200
+/resources /resources.html 200
+/resources-page /resources_page.html 200
+/tutorials /tutorials.html 200
+/how-to-guide /how_to_guide.html 200
+/how-to /how-to-guide.html 200
+/training /training%20and%20support.html 200
+/training-support /training%20and%20support.html 200
+/educational-content /educational%20content.html 200
+/short-video /short%20video.html 200
+
+# ===========================
+# FORMS & DOCUMENTS
+# ===========================
+/forms /forms.html 200
+/send-documents /sendpatientdocuments.html 200
+/upload-documents /sendpatientdocuments.html 200
+
+# ===========================
+# SPECIALISTS & PROVIDERS
+# ===========================
+/dentist /dentist.html 200
+/specialist /specialist.html 200
+/speciality /speciality.html 200
+/connect-providers /connectproviders.html 200
+/import-dentists /importDentists.html 200
+/import-specialists /importSpecialist.html 200
+/import-patients /importPatients.html 200
+
+# ===========================
+# SURGICAL & MEDICAL
+# ===========================
+/surgical-instructions /surgical-instruction.html 200
+/surgical-instruction /surgical-instruction.html 200
+/surgical-instruction-page /surgical-instruction-page.html 200
+/pre-op-consultation /pre%20op%20consultation.html 200
+/medical-updates /Medical%20Updates.html 200
+
+# ===========================
+# LEGAL & COMPLIANCE
+# ===========================
+/privacy /privacy.html 200
+/terms /terms.html 200
+/hipaa /hipaa.html 200
+/faq /faq.html 200
+
+# ===========================
+# CO-MARKETING & PARTNERSHIPS
+# ===========================
+/co-marketing /co_marketing.html 200
+/partnerships /co_marketing.html 200
+
+# ===========================
+# IMPROVED SITE VERSIONS
+# ===========================
+/improved /improved_sapyyn_site.html 200
+/improved-main /improved_main_site_html.html 200
+/updated-main /updated_main_site_blue.html 200
+/sapyyn-main /sapyyn-main-site.html 200
+/sapyyn-unified /sapyyn_unified_platform.html 200
+/sapyyn-unified-portal /sapyyn_unified_portal.html 200
+
+# ===========================
+# LEGACY & ALTERNATIVE ROUTES
+# ===========================
+/index-1 /index-1.html 200
+/index-2 /index-2.html 200
+/indexold /indexold.html 200
+/sign-up /Sign%20Up.html 200
+/roles /roles.html 200
+/users /users.html 200
+
+# ===========================
+# CATCH-ALL FOR SPA ROUTING
+# ===========================
+/* /index.html 200

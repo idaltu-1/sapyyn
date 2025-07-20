@@ -1,0 +1,2283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapyyn Admin Dashboard</title>
+    <meta name="description" content="Enhanced admin dashboard for managing Sapyyn dental referral platform">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0A2463;
+            --secondary: #3E92CC;
+            --accent: #D8315B;
+            --success: #28A745;
+            --warning: #FFC107;
+            --danger: #DC3545;
+            --light: #F8F9FA;
+            --dark: #1E1B18;
+            --gray: #6C757D;
+            --white: #FFFFFF;
+            --sidebar-width: 280px;
+            --header-height: 70px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+        
+        /* Layout */
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, var(--primary) 0%, #0D2A73 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 4px 0 12px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar.collapsed {
+            width: 80px;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed .sidebar-logo .logo-text {
+            opacity: 0;
+            width: 0;
+        }
+        
+        .sidebar-logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: white;
+            padding: 8px;
+        }
+        
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+            margin-left: auto;
+        }
+        
+        .sidebar-toggle:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .menu-title {
+            padding: 0 1.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed .menu-title {
+            opacity: 0;
+            height: 0;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateX(4px);
+        }
+        
+        .menu-item.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+        
+        .menu-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent);
+        }
+        
+        .menu-item i {
+            width: 20px;
+            margin-right: 0.75rem;
+            text-align: center;
+        }
+        
+        .menu-item .menu-text {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed .menu-item .menu-text {
+            opacity: 0;
+            width: 0;
+        }
+        
+        .menu-badge {
+            margin-left: auto;
+            background: var(--accent);
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed .menu-badge {
+            opacity: 0;
+            width: 0;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .main-content.expanded {
+            margin-left: 80px;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: var(--header-height);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+        
+        .breadcrumb .separator {
+            color: var(--gray);
+        }
+        
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .search-bar {
+            position: relative;
+        }
+        
+        .search-bar input {
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            width: 300px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(62, 146, 204, 0.1);
+            background: white;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.1rem;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+        
+        .header-btn:hover {
+            color: var(--primary);
+            background: rgba(10, 36, 99, 0.1);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: var(--accent);
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .user-menu:hover {
+            background: var(--light);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 2rem;
+        }
+        
+        /* Page Header */
+        .page-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-header h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-header p {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+        
+        .page-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-title {
+            color: var(--gray);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon.primary {
+            background: rgba(10, 36, 99, 0.1);
+            color: var(--primary);
+        }
+        
+        .stat-icon.success {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+        }
+        
+        .stat-icon.warning {
+            background: rgba(255, 193, 7, 0.1);
+            color: var(--warning);
+        }
+        
+        .stat-icon.danger {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+        }
+        
+        .stat-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .stat-change.positive {
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            color: var(--danger);
+        }
+        
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        
+        .chart-options {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--light);
+            padding: 0.25rem;
+            border-radius: 8px;
+        }
+        
+        .chart-option {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            background: none;
+            color: var(--gray);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .chart-option.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .chart-option:hover:not(.active) {
+            background: white;
+            color: var(--primary);
+        }
+        
+        /* Tables */
+        .table-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafbfc;
+        }
+        
+        .table-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: var(--dark);
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background: var(--light);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+        }
+        
+        .data-table th:hover {
+            background: #e9ecef;
+        }
+        
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .data-table tr:hover {
+            background: #fafbfc;
+        }
+        
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .user-cell img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status-badge.active {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+        }
+        
+        .status-badge.pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-badge.completed {
+            background: rgba(62, 146, 204, 0.1);
+            color: var(--secondary);
+        }
+        
+        .status-badge.cancelled {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+        }
+        
+        .table-actions-cell {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            color: var(--primary);
+            background: rgba(10, 36, 99, 0.1);
+        }
+        
+        /* Activity Feed */
+        .activity-feed {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            background: rgba(10, 36, 99, 0.1);
+            color: var(--primary);
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-description {
+            color: var(--gray);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-time {
+            color: var(--gray);
+            font-size: 0.75rem;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: auto;
+            padding: 0;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: var(--light);
+            color: var(--dark);
+        }
+        
+        .modal-body {
+            padding: 2rem;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(62, 146, 204, 0.1);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid;
+            z-index: 1001;
+            min-width: 300px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            border-left-color: var(--success);
+        }
+        
+        .notification.error {
+            border-left-color: var(--danger);
+        }
+        
+        .notification.warning {
+            border-left-color: var(--warning);
+        }
+        
+        .notification.info {
+            border-left-color: var(--secondary);
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 1rem;
+        }
+        
+        .pagination-btn {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e0e0e0;
+            background: white;
+            color: var(--gray);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination-btn:hover:not(.disabled) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .pagination-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Filter Panel */
+        .filter-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+            display: none;
+        }
+        
+        .filter-panel.active {
+            display: block;
+        }
+        
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .header-left {
+                gap: 1rem;
+            }
+            
+            .search-bar input {
+                width: 200px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-content {
+                padding: 1rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+        
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+        
+        /* Content Sections */
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        /* Quick Stats */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .quick-stat {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .quick-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .quick-stat-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230A2463'/%3E%3Ctext x='50' y='60' font-family='Arial' font-size='40' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E" alt="Sapyyn">
+                    <span class="logo-text">Sapyyn Admin</span>
+                </div>
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <h3 class="menu-title">Main</h3>
+                    <div class="menu-item active" onclick="showSection('dashboard')">
+                        <i class="fas fa-dashboard"></i>
+                        <span class="menu-text">Dashboard</span>
+                    </div>
+                    <div class="menu-item" onclick="showSection('referrals')">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span class="menu-text">Referrals</span>
+                        <span class="menu-badge" id="referrals-count">12</span>
+                    </div>
+                    <div class="menu-item" onclick="showSection('appointments')">
+                        <i class="fas fa-calendar-check"></i>
+                        <span class="menu-text">Appointments</span>
+                        <span class="menu-badge" id="appointments-count">3</span>
+                    </div>
+                </div>
+                <div class="menu-section">
+                    <h3 class="menu-title">Users</h3>
+                    <div class="menu-item" onclick="showSection('patients')">
+                        <i class="fas fa-users"></i>
+                        <span class="menu-text">Patients</span>
+                    </div>
+                    <div class="menu-item" onclick="showSection('specialists')">
+                        <i class="fas fa-user-md"></i>
+                        <span class="menu-text">Specialists</span>
+                    </div>
+                    <div class="menu-item" onclick="showSection('dentists')">
+                        <i class="fas fa-tooth"></i>
+                        <span class="menu-text">Dentists</span>
+                    </div>
+                    <div class="menu-item" onclick="showSection('practices')">
+                        <i class="fas fa-hospital"></i>
+                        <span class="menu-text">Healthcare Practices</span>
+                    </div>
+                </div>
+                <div class="menu-section">
+                    <h3 class="menu-title">Management</h3>
+                    <div class="menu-item" onclick="showSection('rewards')">
+                        <i class="fas fa-gift"></i>
+                        <span class="menu-text">Rewards</span>
+                    </div>
+                    <div class="menu-item" onclick="showSection('marketing')">
+                        <i class="fas fa-bullhorn"></i>
+                        <span class="menu-text">Co-Marketing</span>
+                    </div>
+                    <div class="menu-item" onclick="showSection('newsletter')">
+                        <i class="fas fa-envelope"></i>
+                        <span class="menu-text">Newsletter</span>
+                        <span class="menu-badge">5</span>
+                    </div>
+                    <div class="menu-item" onclick="showSection('analytics')">
+                        <i class="fas fa-chart-bar"></i>
+                        <span class="menu-text">Analytics</span>
+                    </div>
+                </div>
+                <div class="menu-section">
+                    <h3 class="menu-title">Content</h3>
+                    <div class="menu-item" onclick="showSection('education')">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span class="menu-text">Educational Content</span>
+                    </div>
+                    <div class="menu-item" onclick="showSection('training')">
+                        <i class="fas fa-video"></i>
+                        <span class="menu-text">Training Videos</span>
+                    </div>
+                    <div class="menu-item" onclick="showSection('cases')">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span class="menu-text">Case Studies</span>
+                    </div>
+                    <div class="menu-item" onclick="showSection('guides')">
+                        <i class="fas fa-question-circle"></i>
+                        <span class="menu-text">How-To Guides</span>
+                    </div>
+                </div>
+                <div class="menu-section">
+                    <h3 class="menu-title">System</h3>
+                    <div class="menu-item" onclick="showSection('settings')">
+                        <i class="fas fa-cog"></i>
+                        <span class="menu-text">Settings</span>
+                    </div>
+                    <div class="menu-item" onclick="showSection('security')">
+                        <i class="fas fa-shield-alt"></i>
+                        <span class="menu-text">Security</span>
+                    </div>
+                    <div class="menu-item" onclick="showSection('billing')">
+                        <i class="fas fa-file-invoice"></i>
+                        <span class="menu-text">Billing</span>
+                    </div>
+                    <div class="menu-item" onclick="showSection('audit')">
+                        <i class="fas fa-history"></i>
+                        <span class="menu-text">Audit Log</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="breadcrumb">
+                        <i class="fas fa-home"></i>
+                        <span class="separator">/</span>
+                        <span id="breadcrumb-text">Dashboard</span>
+                    </div>
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search patients, providers, clinics..." onkeyup="performSearch(this.value)">
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="header-btn" onclick="showNotifications()">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notification-count">8</span>
+                    </button>
+                    <button class="header-btn" onclick="showMessages()">
+                        <i class="fas fa-envelope"></i>
+                        <span class="notification-badge">5</span>
+                    </button>
+                    <button class="header-btn" onclick="showSettings()">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <div class="user-menu" onclick="showUserMenu()">
+                        <div class="user-avatar">JA</div>
+                        <div class="user-info">
+                            <div style="font-weight: 600; font-size: 0.875rem;">John Admin</div>
+                            <div style="font-size: 0.75rem; color: var(--gray);">Super Admin</div>
+                        </div>
+                        <i class="fas fa-chevron-down" style="color: var(--gray);"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section" class="content-section active">
+                    <!-- Page Header -->
+                    <div class="page-header">
+                        <div>
+                            <h2>Dashboard Overview</h2>
+                            <p>Welcome back! Here's what's happening with your dental referral network today.</p>
+                        </div>
+                        <div class="page-actions">
+                            <button class="btn btn-secondary" onclick="exportData()">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                            <button class="btn btn-primary" onclick="openModal('newReferralModal')">
+                                <i class="fas fa-plus"></i> New Referral
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card" onclick="showSection('patients')">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-title">Total Patients</div>
+                                    <div class="stat-value" id="total-patients">2,847</div>
+                                    <div class="stat-change positive">
+                                        <i class="fas fa-arrow-up"></i>
+                                        12.5% from last month
+                                    </div>
+                                </div>
+                                <div class="stat-icon primary">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card" onclick="showSection('specialists')">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-title">Active Specialists</div>
+                                    <div class="stat-value" id="total-specialists">523</div>
+                                    <div class="stat-change positive">
+                                        <i class="fas fa-arrow-up"></i>
+                                        8.3% from last month
+                                    </div>
+                                </div>
+                                <div class="stat-icon success">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card" onclick="showSection('dentists')">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-title">Total Dentists</div>
+                                    <div class="stat-value" id="total-dentists">1,248</div>
+                                    <div class="stat-change positive">
+                                        <i class="fas fa-arrow-up"></i>
+                                        15.2% from last month
+                                    </div>
+                                </div>
+                                <div class="stat-icon warning">
+                                    <i class="fas fa-tooth"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card" onclick="showSection('billing')">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-title">Monthly Revenue</div>
+                                    <div class="stat-value">$184.5K</div>
+                                    <div class="stat-change positive">
+                                        <i class="fas fa-arrow-up"></i>
+                                        18.2% from last month
+                                    </div>
+                                </div>
+                                <div class="stat-icon danger">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="charts-section">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Referral Trends</h3>
+                                <div class="chart-options">
+                                    <button class="chart-option" onclick="updateChart('daily')">Daily</button>
+                                    <button class="chart-option active" onclick="updateChart('weekly')">Weekly</button>
+                                    <button class="chart-option" onclick="updateChart('monthly')">Monthly</button>
+                                </div>
+                            </div>
+                            <canvas id="referralChart" height="100"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Appointment Status</h3>
+                            </div>
+                            <canvas id="appointmentChart" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Tables and Activity Grid -->
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                        <!-- Recent Referrals Table -->
+                        <div class="table-card">
+                            <div class="table-header">
+                                <h3 class="table-title">Recent Referrals</h3>
+                                <div class="table-actions">
+                                    <button class="btn btn-secondary" onclick="toggleFilter('referrals-filter')">
+                                        <i class="fas fa-filter"></i> Filter
+                                    </button>
+                                    <button class="btn btn-primary" onclick="openModal('newReferralModal')">
+                                        <i class="fas fa-plus"></i> New Referral
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Filter Panel -->
+                            <div id="referrals-filter" class="filter-panel">
+                                <div class="filter-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Status</label>
+                                        <select class="form-select" onchange="filterReferrals()">
+                                            <option value="">All Status</option>
+                                            <option value="active">Active</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="completed">Completed</option>
+                                            <option value="cancelled">Cancelled</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Specialty</label>
+                                        <select class="form-select" onchange="filterReferrals()">
+                                            <option value="">All Specialties</option>
+                                            <option value="orthodontics">Orthodontics</option>
+                                            <option value="endodontics">Endodontics</option>
+                                            <option value="periodontics">Periodontics</option>
+                                            <option value="oral-surgery">Oral Surgery</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Date Range</label>
+                                        <input type="date" class="form-control" onchange="filterReferrals()">
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 1rem;">
+                                    <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+                                    <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                                </div>
+                            </div>
+                            
+                            <table class="data-table" id="referrals-table">
+                                <thead>
+                                    <tr>
+                                        <th onclick="sortTable('patient')">Patient <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('provider')">Provider <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('specialty')">Specialty <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('date')">Date <i class="fas fa-sort"></i></th>
+                                        <th onclick="sortTable('status')">Status <i class="fas fa-sort"></i></th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="referrals-tbody">
+                                    <!-- Table content will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                            
+                            <!-- Pagination -->
+                            <div class="pagination" id="referrals-pagination">
+                                <!-- Pagination will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="activity-feed">
+                            <h3 style="margin-bottom: 1rem; font-size: 1.125rem; font-weight: 600;">Recent Activity</h3>
+                            <div id="activity-list">
+                                <!-- Activity items will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Sections (will be shown/hidden based on navigation) -->
+                <div id="referrals-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Referral Management</h2>
+                            <p>Manage all patient referrals and track their status</p>
+                        </div>
+                        <div class="page-actions">
+                            <button class="btn btn-secondary" onclick="exportReferrals()">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button class="btn btn-primary" onclick="openModal('newReferralModal')">
+                                <i class="fas fa-plus"></i> New Referral
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-stats">
+                        <div class="quick-stat">
+                            <div class="quick-stat-value">156</div>
+                            <div class="quick-stat-label">This Month</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="quick-stat-value">23</div>
+                            <div class="quick-stat-label">Today</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="quick-stat-value">89%</div>
+                            <div class="quick-stat-label">Success Rate</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="quick-stat-value">2.3</div>
+                            <div class="quick-stat-label">Avg Days</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Referrals content here -->
+                    <div class="table-card">
+                        <div class="table-header">
+                            <h3 class="table-title">All Referrals</h3>
+                            <div class="table-actions">
+                                <button class="btn btn-secondary" onclick="toggleFilter('all-referrals-filter')">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <button class="btn btn-primary" onclick="openModal('newReferralModal')">
+                                    <i class="fas fa-plus"></i> New Referral
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Table content similar to dashboard but with more detailed view -->
+                    </div>
+                </div>
+
+                <!-- Additional sections for other menu items -->
+                <div id="patients-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Patient Management</h2>
+                            <p>View and manage patient records and information</p>
+                        </div>
+                        <div class="page-actions">
+                            <button class="btn btn-secondary" onclick="exportPatients()">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button class="btn btn-primary" onclick="openModal('newPatientModal')">
+                                <i class="fas fa-plus"></i> Add Patient
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Patients content here -->
+                </div>
+
+                <!-- Similar sections for other menu items -->
+                <div id="specialists-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>Specialist Management</h2>
+                            <p>Manage specialist profiles and availability</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="settings-section" class="content-section">
+                    <div class="page-header">
+                        <div>
+                            <h2>System Settings</h2>
+                            <p>Configure system preferences and options</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div class="table-card">
+                            <div class="table-header">
+                                <h3 class="table-title">General Settings</h3>
+                            </div>
+                            <div style="padding: 2rem;">
+                                <div class="form-group">
+                                    <label class="form-label">Site Name</label>
+                                    <input type="text" class="form-control" value="Sapyyn Admin" onchange="updateSetting('siteName', this.value)">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Timezone</label>
+                                    <select class="form-select" onchange="updateSetting('timezone', this.value)">
+                                        <option value="UTC">UTC</option>
+                                        <option value="EST" selected>Eastern Time</option>
+                                        <option value="PST">Pacific Time</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email Notifications</label>
+                                    <select class="form-select" onchange="updateSetting('emailNotifications', this.value)">
+                                        <option value="all" selected>All Notifications</option>
+                                        <option value="important">Important Only</option>
+                                        <option value="none">None</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-card">
+                            <div class="table-header">
+                                <h3 class="table-title">Security Settings</h3>
+                            </div>
+                            <div style="padding: 2rem;">
+                                <div class="form-group">
+                                    <label class="form-label">Two-Factor Authentication</label>
+                                    <select class="form-select" onchange="updateSetting('twoFactor', this.value)">
+                                        <option value="enabled" selected>Enabled</option>
+                                        <option value="disabled">Disabled</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Session Timeout (minutes)</label>
+                                    <input type="number" class="form-control" value="30" onchange="updateSetting('sessionTimeout', this.value)">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Password Policy</label>
+                                    <select class="form-select" onchange="updateSetting('passwordPolicy', this.value)">
+                                        <option value="strong" selected>Strong</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="basic">Basic</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- New Referral Modal -->
+    <div id="newReferralModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Create New Referral</h3>
+                <button class="modal-close" onclick="closeModal('newReferralModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="newReferralForm" onsubmit="submitReferral(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Patient Name</label>
+                            <input type="text" class="form-control" name="patientName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Patient ID</label>
+                            <input type="text" class="form-control" name="patientId" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Referring Provider</label>
+                            <select class="form-select" name="referringProvider" required>
+                                <option value="">Select Provider</option>
+                                <option value="dr-smith">Dr. Sarah Smith</option>
+                                <option value="dr-johnson">Dr. Michael Johnson</option>
+                                <option value="dr-williams">Dr. Emily Williams</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Specialty</label>
+                            <select class="form-select" name="specialty" required>
+                                <option value="">Select Specialty</option>
+                                <option value="orthodontics">Orthodontics</option>
+                                <option value="endodontics">Endodontics</option>
+                                <option value="periodontics">Periodontics</option>
+                                <option value="oral-surgery">Oral Surgery</option>
+                                <option value="prosthodontics">Prosthodontics</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Reason for Referral</label>
+                        <textarea class="form-control" name="reason" rows="3" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Priority</label>
+                            <select class="form-select" name="priority" required>
+                                <option value="routine">Routine</option>
+                                <option value="urgent">Urgent</option>
+                                <option value="emergency">Emergency</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Preferred Date</label>
+                            <input type="date" class="form-control" name="preferredDate">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('newReferralModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="document.getElementById('newReferralForm').requestSubmit()">
+                    <span class="loading-spinner" style="display: none;"></span>
+                    Create Referral
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Patient Modal -->
+    <div id="newPatientModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Patient</h3>
+                <button class="modal-close" onclick="closeModal('newPatientModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="newPatientForm" onsubmit="submitPatient(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" name="lastName" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" name="phone" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" name="dateOfBirth" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Insurance Provider</label>
+                            <input type="text" class="form-control" name="insurance">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <textarea class="form-control" name="address" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('newPatientModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="document.getElementById('newPatientForm').requestSubmit()">
+                    Add Patient
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentSection = 'dashboard';
+        let currentSortColumn = '';
+        let currentSortDirection = 'asc';
+        let currentPage = 1;
+        let itemsPerPage = 10;
+
+        // Sample data
+        const sampleReferrals = [
+            { id: 1, patient: 'Mary Johnson', patientId: '#28471', provider: 'Dr. Sarah Miller', specialty: 'Orthodontics', date: '2024-12-15', status: 'active' },
+            { id: 2, patient: 'John Davis', patientId: '#28470', provider: 'Dr. Michael Chen', specialty: 'Endodontics', date: '2024-12-15', status: 'pending' },
+            { id: 3, patient: 'Emma Brown', patientId: '#28469', provider: 'Dr. James Wilson', specialty: 'Periodontics', date: '2024-12-14', status: 'completed' },
+            { id: 4, patient: 'Robert Miller', patientId: '#28468', provider: 'Dr. Lisa Anderson', specialty: 'Oral Surgery', date: '2024-12-14', status: 'active' },
+            { id: 5, patient: 'Sarah Wilson', patientId: '#28467', provider: 'Dr. David Thompson', specialty: 'Orthodontics', date: '2024-12-13', status: 'cancelled' }
+        ];
+
+        const sampleActivities = [
+            { icon: 'user-plus', title: 'New specialist registered', description: 'Dr. Jennifer Smith joined as Orthodontist', time: '2 minutes ago' },
+            { icon: 'calendar-check', title: 'Appointment completed', description: 'Patient consultation with Dr. Wilson', time: '15 minutes ago' },
+            { icon: 'exchange-alt', title: 'New referral created', description: 'Orthodontic referral for Mary Johnson', time: '1 hour ago' },
+            { icon: 'star', title: '5-star review received', description: 'Patient rated Dr. Chen\'s service', time: '3 hours ago' },
+            { icon: 'file-medical', title: 'Medical record updated', description: 'Patient history updated for John Davis', time: '5 hours ago' }
+        ];
+
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('mobile-open');
+        }
+
+        // Navigation functionality
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionName + '-section');
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // Update active menu item
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Update breadcrumb
+            document.getElementById('breadcrumb-text').textContent = sectionName.charAt(0).toUpperCase() + sectionName.slice(1);
+            
+            currentSection = sectionName;
+        }
+
+        // Modal functionality
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Search functionality
+        function performSearch(query) {
+            if (query.length < 2) return;
+            
+            console.log('Searching for:', query);
+            showNotification('Searching for: ' + query, 'info');
+            
+            // Implement actual search logic here
+            // Filter tables, highlight results, etc.
+        }
+
+        // Filter functionality
+        function toggleFilter(filterId) {
+            const filter = document.getElementById(filterId);
+            filter.classList.toggle('active');
+        }
+
+        function filterReferrals() {
+            // Implement filtering logic
+            console.log('Filtering referrals...');
+            populateReferralsTable(sampleReferrals);
+        }
+
+        function clearFilters() {
+            // Clear all filter inputs
+            document.querySelectorAll('#referrals-filter select, #referrals-filter input').forEach(input => {
+                input.value = '';
+            });
+            filterReferrals();
+        }
+
+        function applyFilters() {
+            filterReferrals();
+            showNotification('Filters applied successfully', 'success');
+        }
+
+        // Table functionality
+        function sortTable(column) {
+            if (currentSortColumn === column) {
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortColumn = column;
+                currentSortDirection = 'asc';
+            }
+            
+            const sortedData = [...sampleReferrals].sort((a, b) => {
+                let aVal = a[column];
+                let bVal = b[column];
+                
+                if (typeof aVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
+                }
+                
+                if (currentSortDirection === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+            
+            populateReferralsTable(sortedData);
+            
+            // Update sort indicators
+            document.querySelectorAll('#referrals-table th i').forEach(icon => {
+                icon.className = 'fas fa-sort';
+            });
+            
+            const currentHeader = document.querySelector(`#referrals-table th[onclick="sortTable('${column}')"] i`);
+            if (currentHeader) {
+                currentHeader.className = currentSortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+            }
+        }
+
+        function populateReferralsTable(data) {
+            const tbody = document.getElementById('referrals-tbody');
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = data.slice(startIndex, endIndex);
+            
+            tbody.innerHTML = pageData.map(referral => `
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-avatar" style="font-size: 0.875rem; width: 32px; height: 32px;">
+                                ${referral.patient.split(' ').map(n => n[0]).join('')}
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.875rem;">${referral.patient}</div>
+                                <div style="font-size: 0.75rem; color: var(--gray);">ID: ${referral.patientId}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${referral.provider}</td>
+                    <td>${referral.specialty}</td>
+                    <td>${new Date(referral.date).toLocaleDateString()}</td>
+                    <td><span class="status-badge ${referral.status}">${referral.status.charAt(0).toUpperCase() + referral.status.slice(1)}</span></td>
+                    <td>
+                        <div class="table-actions-cell">
+                            <button class="action-btn" onclick="viewReferral(${referral.id})" title="View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn" onclick="editReferral(${referral.id})" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" onclick="deleteReferral(${referral.id})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            updatePagination(data.length);
+        }
+
+        function updatePagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const pagination = document.getElementById('referrals-pagination');
+            
+            let paginationHTML = '';
+            
+            // Previous button
+            paginationHTML += `<button class="pagination-btn ${currentPage === 1 ? 'disabled' : ''}" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>`;
+            
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage || i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    paginationHTML += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    paginationHTML += `<span>...</span>`;
+                }
+            }
+            
+            // Next button
+            paginationHTML += `<button class="pagination-btn ${currentPage === totalPages ? 'disabled' : ''}" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>`;
+            
+            pagination.innerHTML = paginationHTML;
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(sampleReferrals.length / itemsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                populateReferralsTable(sampleReferrals);
+            }
+        }
+
+        function populateActivityFeed() {
+            const activityList = document.getElementById('activity-list');
+            activityList.innerHTML = sampleActivities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-${activity.icon}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">${activity.title}</div>
+                        <div class="activity-description">${activity.description}</div>
+                        <div class="activity-time">${activity.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Form submission handlers
+        function submitReferral(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const referralData = Object.fromEntries(formData.entries());
+            
+            console.log('Submitting referral:', referralData);
+            
+            // Show loading state
+            const submitBtn = event.target.closest('.modal').querySelector('.btn-primary');
+            const spinner = submitBtn.querySelector('.loading-spinner');
+            spinner.style.display = 'inline-block';
+            submitBtn.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Add to sample data
+                const newReferral = {
+                    id: sampleReferrals.length + 1,
+                    patient: referralData.patientName,
+                    patientId: referralData.patientId,
+                    provider: referralData.referringProvider,
+                    specialty: referralData.specialty,
+                    date: new Date().toISOString().split('T')[0],
+                    status: 'pending'
+                };
+                
+                sampleReferrals.unshift(newReferral);
+                
+                // Update UI
+                populateReferralsTable(sampleReferrals);
+                updateStats();
+                
+                // Hide loading state
+                spinner.style.display = 'none';
+                submitBtn.disabled = false;
+                
+                // Close modal and show success
+                closeModal('newReferralModal');
+                showNotification('Referral created successfully!', 'success');
+                
+                // Reset form
+                event.target.reset();
+            }, 1000);
+        }
+
+        function submitPatient(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const patientData = Object.fromEntries(formData.entries());
+            
+            console.log('Submitting patient:', patientData);
+            
+            // Simulate API call
+            setTimeout(() => {
+                closeModal('newPatientModal');
+                showNotification('Patient added successfully!', 'success');
+                updateStats();
+                event.target.reset();
+            }, 1000);
+        }
+
+        // CRUD operations
+        function viewReferral(id) {
+            const referral = sampleReferrals.find(r => r.id === id);
+            if (referral) {
+                console.log('Viewing referral:', referral);
+                showNotification(`Viewing referral for ${referral.patient}`, 'info');
+            }
+        }
+
+        function editReferral(id) {
+            const referral = sampleReferrals.find(r => r.id === id);
+            if (referral) {
+                console.log('Editing referral:', referral);
+                showNotification(`Editing referral for ${referral.patient}`, 'info');
+                // Open edit modal with pre-filled data
+            }
+        }
+
+        function deleteReferral(id) {
+            if (confirm('Are you sure you want to delete this referral?')) {
+                const index = sampleReferrals.findIndex(r => r.id === id);
+                if (index > -1) {
+                    const referral = sampleReferrals[index];
+                    sampleReferrals.splice(index, 1);
+                    populateReferralsTable(sampleReferrals);
+                    updateStats();
+                    showNotification(`Referral for ${referral.patient} deleted`, 'success');
+                }
+            }
+        }
+
+        // Utility functions
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : type === 'warning' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 3000);
+        }
+
+        function updateStats() {
+            // Update dashboard statistics
+            document.getElementById('total-patients').textContent = (2847 + Math.floor(Math.random() * 10)).toLocaleString();
+            document.getElementById('total-specialists').textContent = (523 + Math.floor(Math.random() * 5)).toLocaleString();
+            document.getElementById('total-dentists').textContent = (1248 + Math.floor(Math.random() * 20)).toLocaleString();
+            
+            // Update badges
+            document.getElementById('referrals-count').textContent = sampleReferrals.length;
+            document.getElementById('appointments-count').textContent = Math.floor(Math.random() * 10) + 1;
+            document.getElementById('notification-count').textContent = Math.floor(Math.random() * 20) + 1;
+        }
+
+        // Header button handlers
+        function showNotifications() {
+            showNotification('Showing notifications panel', 'info');
+        }
+
+        function showMessages() {
+            showNotification('Showing messages panel', 'info');
+        }
+
+        function showSettings() {
+            showSection('settings');
+        }
+
+        function showUserMenu() {
+            showNotification('User menu clicked', 'info');
+        }
+
+        // Export functions
+        function exportData() {
+            showNotification('Exporting dashboard data...', 'info');
+            // Implement export logic
+        }
+
+        function exportReferrals() {
+            showNotification('Exporting referrals data...', 'info');
+            // Implement export logic
+        }
+
+        function exportPatients() {
+            showNotification('Exporting patients data...', 'info');
+            // Implement export logic
+        }
+
+        // Settings functions
+        function updateSetting(setting, value) {
+            console.log(`Updating ${setting} to ${value}`);
+            showNotification(`${setting} updated successfully`, 'success');
+        }
+
+        // Chart functionality
+        function updateChart(period) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.chart-option').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            console.log('Updating chart for period:', period);
+            showNotification(`Chart updated for ${period} view`, 'info');
+            
+            // Update chart data based on period
+            // This would typically involve updating the Chart.js instance
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Populate initial data
+            populateReferralsTable(sampleReferrals);
+            populateActivityFeed();
+            updateStats();
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Close modals when clicking outside
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal')) {
+                    e.target.classList.remove('active');
+                }
+            });
+            
+            // Close mobile sidebar when clicking outside
+            document.addEventListener('click', function(e) {
+                const sidebar = document.getElementById('sidebar');
+                const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+                
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(e.target) && 
+                    !mobileMenuBtn.contains(e.target) &&
+                    sidebar.classList.contains('mobile-open')) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                const sidebar = document.getElementById('sidebar');
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            });
+        });
+
+        function initializeCharts() {
+            // Chart options
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                elements: {
+                    line: {
+                        tension: 0.4
+                    },
+                    point: {
+                        radius: 6,
+                        hoverRadius: 8
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    }
+                }
+            };
+
+            // Referral Chart
+            const referralCtx = document.getElementById('referralChart').getContext('2d');
+            new Chart(referralCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                    datasets: [{
+                        label: 'Referrals',
+                        data: [120, 135, 125, 145, 160, 175],
+                        borderColor: '#3E92CC',
+                        backgroundColor: 'rgba(62, 146, 204, 0.1)',
+                        borderWidth: 3,
+                        fill: true
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // Appointment Chart
+            const appointmentCtx = document.getElementById('appointmentChart').getContext('2d');
+            new Chart(appointmentCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Scheduled', 'Completed', 'Pending', 'Cancelled'],
+                    datasets: [{
+                        data: [45, 35, 15, 5],
+                        backgroundColor: [
+                            '#0A2463',
+                            '#3E92CC',
+                            '#FFC107',
+                            '#DC3545'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

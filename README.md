@@ -1,121 +1,495 @@
-# Sapyyn Patient Referral System
 
-A web-based patient referral management system designed for healthcare providers to efficiently manage and track patient referrals.
+# Sapyyn - Patient Referral System
 
-## Features
+A comprehensive web-based patient referral management system built with Flask, featuring secure document handling, QR code generation, and HIPAA-compliant data management.
 
-- **Patient Referral Submission**: Create new patient referrals with detailed information
-- **Referral Management**: View and track all submitted referrals
-- **File Upload System**: Upload and manage various document types including:
-  - Medical reports
-  - Insurance documents  
-  - Experience documents
-  - Qualification documents
-  - Supporting documents
-  - Profile pictures
-  - Testimonial images
-- **Multiple Urgency Levels**: Routine, Urgent, Emergency
-- **Referral Types**: Specialist consultation, Diagnostic testing, Emergency care, Surgical consultation, Rehabilitation, Second opinion
-- **Responsive Design**: Works on desktop and mobile devices
+**Copyright © 2025 Sapyyn. All rights reserved.**
 
-## Getting Started
+## 🚀 Features
+
+### Core Functionality
+- **User Authentication & Authorization** - Secure login system with role-based access (Doctor, Patient, Admin)
+- **Patient Referral Management** - Create, track, and manage patient referrals with unique IDs
+- **Document Management** - Upload and organize medical documents by category
+- **QR Code Generation** - Automatic QR code creation for easy referral tracking
+- **Dashboard Analytics** - Real-time statistics and referral status tracking
+- **Responsive Design** - Mobile-friendly interface using Bootstrap 5
+
+### 🏆 Referral Rewards System
+- **Comprehensive Reward Programs** - Customizable reward programs with tiered structures
+- **HIPAA & Stark Law Compliant** - Full regulatory compliance for healthcare environments
+- **Gamification Features** - Achievements, leaderboards, and progress tracking
+- **Automated Reward Processing** - Intelligent trigger system for reward allocation
+- **Compliance Audit Trail** - Complete logging for regulatory requirements
+- **Flexible Fulfillment Options** - Manual, automatic, and external system integration
+- **Advanced Analytics** - Performance metrics and reward program insights
+- **Role-Based Administration** - Granular control for program management
+
+### Document Categories Supported
+- Medical Reports
+- Insurance Documents
+- Experience Documents
+- Qualification Documents
+- Supporting Documents
+- Profile Pictures
+- Testimonial Images
+- Broadcast Files
+- General Uploads
+
+### Security & Compliance
+- HIPAA-compliant data handling
+- Encrypted file storage
+- Secure user sessions
+- Access control and audit trails
+- Input validation and sanitization
+
+## 🛠️ Technology Stack
+
+- **Backend**: Python Flask 3.1.1
+- **Database**: SQLite (with SQLAlchemy ORM)
+- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **UI Framework**: Bootstrap 5.1.3 with Bootstrap Icons
+- **File Handling**: Werkzeug for secure uploads
+- **QR Codes**: qrcode library with Pillow
+- **Security**: Werkzeug password hashing
+
+## 📦 Installation
 
 ### Prerequisites
+- Python 3.8 or higher
+- pip package manager
+- Node.js 16 or higher (for frontend build)
+- npm package manager
 
-- Node.js (version 14 or higher)
-- npm (comes with Node.js)
+### Setup Instructions
 
-### Installation
-
-1. Clone the repository:
+1. **Clone the repository**
    ```bash
    git clone https://github.com/idaltu-1/sapyyn.git
    cd sapyyn
    ```
 
-2. Install dependencies:
+
+2. **Quick Build (Recommended)**
    ```bash
+   chmod +x build.sh
+   ./build.sh
+   ```
+
+3. **Manual Installation**
+   ```bash
+   # Install Python dependencies
+   pip install -r requirements.txt
+   
+   # Install Node.js dependencies and build frontend assets
    npm install
+   npm run build
    ```
 
-3. Start the development server:
+4. **Initialize the database and demo users**
    ```bash
-   npm start
+   python3 create_demo_users.py
    ```
 
-4. Open your browser and navigate to:
+5. **Initialize the rewards system**
+   ```bash
+   python3 init_rewards_sample_data.py
    ```
-   http://localhost:3000
+
+6. **Run the application**
+   ```bash
+   python3 app.py
    ```
 
-### Usage
+6. **Access the application**
+   - Open your browser and navigate to `http://localhost:5001`
+   - Use demo credentials or register a new account
 
-1. **Creating a New Referral**:
-   - Fill in patient information (name, ID)
-   - Select referral type and urgency level
-   - Add clinical notes
-   - Optionally attach supporting documents
-   - Click "Submit Referral"
+## 👥 Demo Accounts
 
-2. **Viewing Referrals**:
-   - Switch to the "View Referrals" tab
-   - Click "Refresh" to load the latest referrals
-   - Review patient details, referral types, and urgency levels
+For testing purposes, the following demo accounts are available:
 
-3. **File Upload**:
-   - Use the "File Upload" tab for standalone file uploads
-   - Select document type from dropdown
-   - Choose file and upload
+| Role | Username | Password | Description |
+|------|----------|----------|-------------|
+| Doctor | `doctor1` | `password123` | Healthcare provider account |
+| Patient | `patient1` | `password123` | Patient account |
+| Admin | `admin1` | `password123` | Administrator account |
 
-## Technical Details
+## 🎯 Usage Guide
 
-- **Backend**: Node.js with Express
-- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **File Storage**: Local filesystem with organized naming convention
-- **Data Storage**: JSON files (suitable for testing/development)
+### Creating a New Referral
 
-## File Structure
+1. **Login** with your credentials
+2. **Navigate** to the dashboard
+3. **Click** "New Referral" button
+4. **Fill in** patient information:
+   - Patient full name
+   - Medical condition
+   - Referring doctor
+   - Target specialist
+   - Urgency level
+   - Clinical notes
+5. **Submit** the form to generate a unique referral ID and QR code
+
+### Uploading Documents
+
+1. **Go to** "Upload Documents" page
+2. **Select** document type from dropdown
+3. **Choose** file (PDF, DOC, images, etc.)
+4. **Upload** the document with automatic categorization
+
+### Managing Referrals
+
+- **View** all referrals on the dashboard
+- **Track** referral status (Pending, Approved, Completed, Rejected)
+- **Generate** QR codes for easy sharing
+- **Monitor** progress through the referral lifecycle
+
+## 🏗️ Project Structure
 
 ```
 sapyyn/
-├── server.js              # Express server
-├── package.json           # Node.js dependencies
-├── public/                # Frontend assets
-│   ├── index.html        # Main application page
-│   ├── styles.css        # Application styling
-│   └── script.js         # Frontend JavaScript
-├── patient-referral/     # File storage and data
-└── README.md            # This file
+├── app.py                      # Main Flask application
+├── requirements.txt            # Python dependencies
+├── create_demo_users.py       # Demo user setup script
+├── sapyyn.db                  # SQLite database (auto-generated)
+├── templates/                 # HTML templates
+│   ├── base.html             # Base template with navigation
+│   ├── index.html            # Homepage
+│   ├── login.html            # Login page
+│   ├── register.html         # Registration page
+│   ├── dashboard.html        # User dashboard
+│   ├── new_referral.html     # Create referral form
+│   ├── upload.html           # File upload page
+│   └── documents.html        # Document management
+├── static/                   # Static assets
+│   ├── css/
+│   │   └── style.css        # Custom styles
+│   └── js/
+│       └── main.js          # Client-side JavaScript
+├── patient-referral/        # Document storage directory
+└── README.md               # This file
 ```
 
-## API Endpoints
+## 🔧 Configuration
 
-- `GET /` - Serve main application page
-- `POST /submit-referral` - Submit new patient referral
-- `GET /referrals` - Retrieve all referrals
-- `POST /upload` - Upload single file
+### Environment Variables
 
-## Development
+The application can be configured using the following variables:
 
-To contribute to this project:
+- `FLASK_ENV`: Set to `development` for debug mode
+- `SECRET_KEY`: Application secret key (auto-generated)
+- `UPLOAD_FOLDER`: Directory for file uploads (default: `patient-referral/`)
+- `MAX_CONTENT_LENGTH`: Maximum file upload size (default: 16MB)
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test the application thoroughly
-5. Submit a pull request
+### Database Configuration
 
-## Security Considerations
+The application uses SQLite by default. The database schema includes:
 
-This is a development/testing version. For production use, consider:
+- **Users** table for authentication
+- **Referrals** table for patient referrals
+- **Documents** table for file management
 
-- Implementing proper authentication and authorization
-- Using a secure database instead of JSON files
-- Adding HTTPS encryption
-- Implementing proper file validation and scanning
-- Adding audit logging
-- Following HIPAA compliance requirements for patient data
+## 🚀 Deployment
 
-## License
+### Production Deployment
 
-MIT License - see LICENSE file for details
+For production deployment, consider:
+
+1. **Use a production WSGI server** (e.g., Gunicorn, uWSGI)
+2. **Configure a reverse proxy** (e.g., Nginx, Apache)
+3. **Use a production database** (e.g., PostgreSQL, MySQL)
+4. **Set up SSL/TLS encryption**
+5. **Configure environment variables**
+6. **Set up backup and monitoring**
+
+### Docker Deployment
+
+A Dockerfile can be created for containerized deployment:
+
+```dockerfile
+FROM python:3.9-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 5000
+CMD ["python", "app.py"]
+```
+
+## 🧪 Testing
+
+### Manual Testing
+
+1. **User Registration & Login**
+   - Test account creation with different roles
+   - Verify password validation and security
+
+2. **Referral Management**
+   - Create referrals with various urgency levels
+   - Test QR code generation and display
+
+3. **File Upload**
+   - Upload different file types and sizes
+   - Test document categorization
+
+4. **Dashboard Functionality**
+   - Verify statistics accuracy
+   - Test responsive design on mobile devices
+
+### Automated Testing
+
+Future enhancements could include:
+- Unit tests with pytest
+- Integration tests for API endpoints
+- Frontend tests with Selenium
+- Performance testing with locust
+
+## 🔐 Security Considerations
+
+### Implemented Security Measures
+
+- **Password Hashing**: Using Werkzeug's secure password hashing
+- **File Upload Validation**: Restricted file types and size limits
+- **SQL Injection Prevention**: Using parameterized queries
+- **XSS Prevention**: Template escaping and input sanitization
+- **Session Management**: Secure session handling with Flask
+
+### Additional Security Recommendations
+
+- Implement rate limiting for login attempts
+- Add two-factor authentication (2FA)
+- Set up comprehensive logging and monitoring
+- Regular security audits and penetration testing
+- HTTPS enforcement in production
+
+## 🎨 Customization
+
+### Themes and Styling
+
+The application uses a modular CSS approach:
+
+- **Custom CSS**: Located in `static/css/style.css`
+- **Bootstrap Variables**: Can be customized for branding
+- **Responsive Design**: Mobile-first approach with breakpoints
+
+#### Visual Design Guidelines
+
+The overall look and feel should convey professionalism while remaining friendly
+and approachable:
+
+- **Use authentic imagery** such as photos of real dental professionals or
+  patients (with consent) to build trust. High-quality 3D graphics can also be
+  effective.
+- **Color scheme** should lean toward calming medical greens and avoid overly
+  cartoonish palettes.
+- **Modern illustrations only**; avoid outdated clip-art that makes the product
+  appear less sophisticated.
+- **Clean layouts with ample whitespace** keep the interface focused and easy to
+  navigate.
+
+
+### Feature Extensions
+
+The system is designed for extensibility:
+
+- **API Endpoints**: RESTful API for mobile app integration
+- **Notification System**: Email and SMS notifications
+- **Reporting**: Advanced analytics and reporting features
+- **Integration**: Connect with EMR/EHR systems
+- **Multi-language**: Internationalization support
+
+## 📊 Analytics and Reporting
+
+### Dashboard Metrics
+
+- Total referrals count
+- Referrals by status (Pending, Approved, etc.)
+- Document upload statistics
+- User activity metrics
+
+### Export Capabilities
+
+- PDF reports generation
+- CSV data export
+- QR code downloads
+- Document archiving
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. **Fork** the repository
+2. **Create** a feature branch
+3. **Make** your changes with tests
+4. **Submit** a pull request with detailed description
+
+### Development Setup
+
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install development dependencies
+pip install -r requirements.txt
+pip install pytest flask-testing
+
+# Run tests
+pytest
+
+# Start development server
+python app.py
+```
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+> **Note:** If the LICENSE file is missing, please create one in the root directory with the MIT License text.
+
+## 📞 Support
+
+For support and questions:
+
+- **Issues**: Create an issue on GitHub
+- **Documentation**: Check the project wiki
+- **Security**: Report security issues privately
+
+## 🗺️ Roadmap
+
+### Version 2.0 Planning
+
+- [ ] RESTful API development
+- [ ] Mobile application (React Native/Flutter)
+- [ ] Advanced analytics dashboard
+- [ ] Integration with popular EMR systems
+- [ ] Multi-tenant architecture
+- [ ] Advanced user roles and permissions
+- [ ] Automated referral routing
+- [ ] Telemedicine integration
+
+### Version 1.1 Enhancements
+
+- [ ] Email notifications
+- [ ] PDF report generation
+- [ ] Advanced search and filtering
+- [ ] Bulk operations
+- [ ] Data export functionality
+- [ ] Performance optimizations
+
+---
+
+## 📸 Screenshots
+
+### Homepage
+[![Demo Screenshot](https://via.placeholder.com/600x400?text=Demo+Screenshot)](https://via.placeholder.com/600x400?text=Demo+Screenshot)
+
+> **Note:** Some images previously linked here were unavailable. Please update with your own screenshots or assets as needed.
+
+### Dashboard
+[![Dashboard Screenshot](https://via.placeholder.com/600x400?text=Dashboard+Screenshot)](https://via.placeholder.com/600x400?text=Dashboard+Screenshot)
+
+> **Note:** Some images previously linked here were unavailable. Please update with your own screenshots or assets as needed.
+
+### Dashboard with Referral
+[![Referral Screenshot](https://via.placeholder.com/600x400?text=Referral+Screenshot)](https://via.placeholder.com/600x400?text=Referral+Screenshot)
+
+> **Note:** Some images previously linked here were unavailable. Please update with your own screenshots or assets as needed.
+
+---
+
+*Built with ❤️ for healthcare professionals to streamline patient referral management.*
+
+## 🏆 Rewards System
+
+The Sapyyn platform includes a comprehensive referral rewards system designed to incentivize quality patient referrals while maintaining strict compliance with healthcare regulations.
+
+### Key Features
+
+- **HIPAA & Stark Law Compliant**: Full regulatory compliance for healthcare environments
+- **Customizable Programs**: Create and manage multiple reward programs with flexible configurations
+- **Tiered Rewards**: Progressive reward structure (Bronze, Silver, Gold, Platinum)
+- **Gamification**: Achievements, leaderboards, and progress tracking
+- **Automated Processing**: Intelligent trigger system for reward allocation
+- **Audit Trail**: Complete logging for compliance and regulatory requirements
+- **Role-Based Access**: Different interfaces for patients, doctors, and administrators
+
+### Using the Rewards System
+
+#### For Healthcare Professionals
+1. **Access Rewards Dashboard**: Navigate to "Rewards" in the main menu
+2. **View Progress**: Track your points, tier status, and achievements
+3. **Check Leaderboard**: See your ranking among peers (anonymized for privacy)
+4. **Earn Rewards**: Complete quality referrals to earn points and advance tiers
+
+#### For Administrators
+1. **Manage Programs**: Create and configure reward programs
+2. **Set Tiers**: Define reward tiers and requirements
+3. **Monitor Compliance**: Access audit trails and compliance reports
+4. **Configure Triggers**: Set up automated reward conditions
+
+### Compliance Features
+
+- **Privacy Protection**: All leaderboards anonymized to protect user privacy
+- **Audit Logging**: Comprehensive logging of all system actions
+- **Legal Framework**: Customizable terms and conditions
+- **Regulatory Adherence**: Built-in HIPAA and Stark Law compliance
+
+For detailed information, see [REWARDS_SYSTEM_DOCUMENTATION.md](REWARDS_SYSTEM_DOCUMENTATION.md).
+
+## NoCodeBackend Integration
+
+This project integrates two NoCodeBackend database instances to store referrals and website uploads.
+
+### Setup
+
+1. Ensure you have environment variables configured in your `.env` file or deployment environment:
+
+```
+NOCODEBACKEND_SECRET_KEY=<your secret key>
+NOCODEBACKEND_REFERRAL_INSTANCE=35557_referralomsdb
+NOCODEBACKEND_UPLOADS_INSTANCE=35557_website_uploads
+```
+
+The secret key must **never** be committed to version control. Set it via GitHub repository secrets or your deployment platform's environment configuration.
+
+2. Install the Python dependencies (if running locally) and ensure `requests` is available.
+
+### Usage
+
+A helper module `nocodebackend_client.py` encapsulates interactions with the NoCodeBackend API. It uses the environment variables above to authenticate and send requests.
+
+Example usage:
+
+```python
+from nocodebackend_client import NoCodeBackendClient
+
+client = NoCodeBackendClient()
+
+# Create a referral record
+referral_data = {
+    "patient_name": "John Doe",
+    "contact": "john@example.com",
+    "procedure_type": "implant",
+    "notes": "Example referral"
+}
+client.create_referral(referral_data)
+
+# Create a website upload record
+upload_data = {
+    "file_name": "report.pdf",
+    "category": "Reports",
+    "notes": "Initial consultation report"
+}
+client.create_upload(upload_data)
+```
+
+The application also exposes an example Flask route at `/api/nocodebackend/referrals` which demonstrates how to create a referral via an HTTP POST request. You can extend this to handle uploads or other operations.
+
+For more details on the API endpoints, refer to the NoCodeBackend documentation for the relevant instances:
+
+- Referral database: https://api.nocodebackend.com/api-docs/?Instance=35557_referralomsdb
+- Website uploads database: https://api.nocodebackend.com/api-docs/?Instance=35557_website_uploads
+- Sapyyn referral database (sapyynreferral_db): https://api.nocodebackend.com/api-docs/?Instance=35557_sapyynreferral_db
+

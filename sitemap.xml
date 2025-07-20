@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+    
+    <!-- Main pages -->
+    <url>
+        <loc>https://sapyyn.com/</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/login</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/register</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/dashboard</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/referrals</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/appointments</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/rewards</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <!-- Static pages -->
+    <url>
+        <loc>https://sapyyn.com/about</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/contact</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/privacy</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/terms</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/faq</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/blog</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/get-started</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/pricing</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/features</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/how-it-works</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/forgot-password</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.4</priority>
+    </url>
+    
+    <!-- Portal pages -->
+    <url>
+        <loc>https://sapyyn.com/portal</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/portal/appointments</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/portal/messages</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/portal/settings</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <!-- Rewards pages -->
+    <url>
+        <loc>https://sapyyn.com/rewards/dashboard</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/rewards/leaderboard</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/rewards/admin</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    
+    <!-- Promotions pages -->
+    <url>
+        <loc>https://sapyyn.com/promotions</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/promotions/create</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    
+    <!-- Admin pages -->
+    <url>
+        <loc>https://sapyyn.com/admin</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.4</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/admin/promotions</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.4</priority>
+    </url>
+    
+    <!-- Educational content -->
+    <url>
+        <loc>https://sapyyn.com/surgical-instructions</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/how-to-guides</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/resources</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/case-studies</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/educational-content</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <url>
+        <loc>https://sapyyn.com/training-and-support</loc>
+        <lastmod>2025-07-19</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    
+    <url>
+        <loc>https://s

@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapyyn Portal - Your Dental Referral Dashboard</title>
+    <meta name="description" content="Access your dental referrals, appointments, and medical records securely">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --secondary-blue: #3B82F6;
+            --light-blue: #DBEAFE;
+            --accent-yellow: #FCD34D;
+            --warning-yellow: #F59E0B;
+            --white: #FFFFFF;
+            --light-grey: #F8FAFC;
+            --medium-grey: #64748B;
+            --dark-grey: #334155;
+            --black: #0F172A;
+            --success: #10B981;
+            --danger: #EF4444;
+            --glass: rgba(255, 255, 255, 0.25);
+            --shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+            --shadow-hover: 0 16px 64px rgba(37, 99, 235, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+            color: var(--black);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .shape {
+            position: absolute;
+            background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 70%;
+            right: 10%;
+            animation-delay: 5s;
+        }
+        
+        .shape:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            bottom: 20%;
+            left: 80%;
+            animation-delay: 10s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            33% {
+                transform: translateY(-30px) rotate(120deg);
+            }
+            66% {
+                transform: translateY(-60px) rotate(240deg);
+            }
+        }
+        
+        /* Portal Header */
+        .portal-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--light-blue);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .portal-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .portal-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--primary-blue);
+            font-size: 1.25rem;
+            font-weight: 800;
+            transition: transform 0.3s ease;
+        }
+        
+        .portal-logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .portal-logo img {
+            height: 40px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .portal-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .portal-menu a {
+            text-decoration: none;
+            color: var(--dark-grey);
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .portal-menu a:hover {
+            color: var(--secondary-blue);
+            background: var(--light-blue);
+            transform: translateY(-2px);
+        }
+        
+        .portal-menu a.active {
+            color: var(--white);
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            box-shadow: var(--shadow);
+        }
+        
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .notification-btn {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--medium-grey);
+            cursor: pointer;
+            position: relative;
+            padding: 0.75rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .notification-btn:hover {
+            color: var(--primary-blue);
+            background: var(--light-blue);
+            transform: scale(1.1);
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(45deg, var(--accent-yellow), var(--warning-yellow));
+            border-radius: 50%;
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--light-blue);
+        }
+        
+        .user-profile:hover {
+            background: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        /* Dashboard Container */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Welcome Section */
+        .welcome-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: breathe 4s ease-in-out infinite;
+        }
+        
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .welcome-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+        
+        .welcome-content p {
+            opacity: 0.9;
+            font-size: 1.25rem;
+            font-weight: 400;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .action-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--black);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--light-blue);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .action-card:hover::before {
+            left: 100%;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--secondary-blue);
+        }
+        
+        .action-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.75rem;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .action-card:hover .action-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
+        }
+        
+        .action-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: var(--black);
+        }
+        
+        .action-card p {
+            font-size: 0.95rem;
+            color: var(--medium-grey);
+            line-height: 1.6;
+        }
+        
+        /* Main Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        /* Card Styles */
+        .card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--light-blue);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light-blue);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+        
+        .view-all-btn {
+            color: var(--secondary-blue);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: var(--light-blue);
+        }
+        
+        .view-all-btn:hover {
+            background: var(--secondary-blue);
+            color: white;
+            transform: translateX(4px);
+        }
+        
+        /* Referral Items */
+        .referral-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .referral-item {
+            padding: 1.5rem;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            background: var(--light-grey);
+        }
+        
+        .referral-item:hover {
+            border-color: var(--secondary-blue);
+            transform: translateX(8px);
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.1);
+            background: var(--white);
+        }
+        
+        .referral-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--black);
+        }
+        
+        .referral-info p {
+            font-size: 0.9rem;
+            color: var(--medium-grey);
+        }
+        
+        .referral-status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .status-active {
+            background: linear-gradient(135deg, var(--success), #0D9488);
+            color: white;
+        }
+        
+        .status-pending {
+            background: linear-gradient(135deg, var(--accent-yellow), var(--warning-yellow));
+            color: var(--black);
+        }
+        
+        .status-scheduled {
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+            color: white;
+        }
+        
+        /* Rewards Management Section */
+        .rewards-section {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, var(--accent-yellow) 0%, var(--warning-yellow) 100%);
+            color: var(--black);
+            margin-bottom: 2rem;
+        }
+        
+        .rewards-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .rewards-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .rewards-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .reward-stat {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .reward-stat:hover {
+            transform: translateY(-5px);
+            background: var(--white);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--dark-grey);
+            font-weight: 500;
+        }
+        
+        .rewards-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .reward-action {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .reward-action:hover {
+            background: var(--white);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .reward-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .reward-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--black);
+        }
+        
+        .reward-content p {
+            font-size: 0.9rem;
+            color: var(--medium-grey);
+        }
+        
+        /* Appointments */
+        .appointment-item {
+            padding: 1.5rem 0;
+            border-bottom: 2px solid var(--light-grey);
+            transition: all 0.3s ease;
+        }
+        
+        .appointment-item:last-child {
+            border-bottom: none;
+        }
+        
+        .appointment-item:hover {
+            transform: translateX(8px);
+            background: var(--light-blue);
+            margin: 0 -1rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            border-radius: 8px;
+        }
+        
+        .appointment-date {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--secondary-blue);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        
+        .appointment-details {
+            font-size: 0.95rem;
+            color: var(--medium-grey);
+            line-height: 1.6;
+        }
+        
+        /* Documents Section */
+        .documents-section {
+            grid-column: 1 / -1;
+        }
+        
+        .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .document-card {
+            border: 2px solid var(--light-blue);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            background: var(--white);
+        }
+        
+        .document-card:hover {
+            border-color: var(--secondary-blue);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .document-icon {
+            font-size: 3rem;
+            color: var(--secondary-blue);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .document-card:hover .document-icon {
+            transform: scale(1.2) rotate(5deg);
+            color: var(--primary-blue);
+        }
+        
+        .document-name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--black);
+        }
+        
+        .document-date {
+            font-size: 0.85rem;
+            color: var(--medium-grey);
+        }
+        
+        /* Upload Button */
+        .upload-btn {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
+        }
+        
+        /* Messages Widget */
+        .messages-widget {
+            margin-top: 3rem;
+        }
+        
+        .message-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem 0;
+            border-bottom: 2px solid var(--light-grey);
+            transition: all 0.3s ease;
+        }
+        
+        .message-item:last-child {
+            border-bottom: none;
+        }
+        
+        .message-item:hover {
+            transform: translateX(8px);
+            background: var(--light-blue);
+            margin: 0 -1.5rem;
+            padding-left: 2.5rem;
+            padding-right: 2.5rem;
+            border-radius: 8px;
+        }
+        
+        .message-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            flex-shrink: 0;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+        }
+        
+        .message-content {
+            flex: 1;
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .message-sender {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--primary-blue);
+        }
+        
+        .message-time {
+            font-size: 0.85rem;
+            color: var(--medium-grey);
+        }
+        
+        .message-text {
+            font-size: 0.95rem;
+            color: var(--dark-grey);
+            line-height: 1.6;
+        }
+        
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-toggle:hover {
+            background: var(--light-blue);
+            transform: scale(1.1);
+        }
+        
+        /* Success Message */
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--success), #0D9488);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .success-message.show {
+            transform: translateX(0);
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .portal-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: var(--shadow);
+                border-radius: 0 0 16px 16px;
+            }
+            
+            .portal-menu.show {
+                display: flex;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .welcome-content h1 {
+                font-size: 2rem;
+            }
+            
+            .rewards-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .portal-nav {
+                padding: 1rem;
+            }
+            
+            .dashboard-container {
+                padding: 1rem;
+            }
+            
+            .welcome-section {
+                padding: 2rem 1.5rem;
+            }
+            
+            .documents-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-card {
+                padding: 1.5rem;
+            }
+            
+            .rewards-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Animation -->
+    <div class="background-animation">
+        <div class="floating-shapes">
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+    </div>
+
+    <!-- Portal Header -->
+    <header class="portal-header">
+        <nav class="portal-nav">
+            <a href="./sapyyn-portal.html" class="portal-logo">
+                <img src="./assets/logo.svg" alt="Sapyyn">
+                <span>Portal</span>
+            </a>
+            
+            <ul class="portal-menu">
+                <li><a href="./sapyyn-portal.html" class="active">Dashboard</a></li>
+                <li><a href="./portal-referrals.html">My Referrals</a></li>
+                <li><a href="./portal-appointments.html">Appointments</a></li>
+                <li><a href="./portal-documents.html">Documents</a></li>
+                <li><a href="./portal-messages.html">Messages</a></li>
+            </ul>
+            
+            <div class="user-controls">
+                <button class="notification-btn" onclick="showNotifications()">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-dot"></span>
+                </button>
+                <div class="user-profile" onclick="toggleUserMenu()">
+                    <div class="user-avatar">JD</div>
+                    <div class="user-info">
+                        <div style="font-weight: 600; font-size: 0.9rem;">John Doe</div>
+                        <div style="font-size: 0.8rem; color: var(--medium-grey);">Patient #12345</div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: var(--medium-grey);"></i>
+                </div>
+            </div>
+            
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Dashboard Content -->
+    <main class="dashboard-container">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <div class="welcome-content">
+                <h1>Welcome back, John!</h1>
+                <p>You have 2 upcoming appointments, 1 pending referral, and 250 reward points available</p>
+            </div>
+        </section>
+
+        <!-- Rewards Management Section -->
+        <section class="card rewards-section">
+            <div class="rewards-header">
+                <h2 class="rewards-title">
+                    <i class="fas fa-star"></i>
+                    Rewards Management
+                </h2>
+                <button class="upload-btn" onclick="showRewardDetails()">
+                    <i class="fas fa-trophy"></i>
+                    View Details
+                </button>
+            </div>
+            
+            <div class="rewards-stats">
+                <div class="reward-stat">
+                    <div class="stat-value">250</div>
+                    <div class="stat-label">Total Points</div>
+                </div>
+                <div class="reward-stat">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Referrals Made</div>
+                </div>
+                <div class="reward-stat">
+                    <div class="stat-value">$50</div>
+                    <div class="stat-label">Rewards Earned</div>
+                </div>
+                <div class="reward-stat">
+                    <div class="stat-value">Gold</div>
+                    <div class="stat-label">Current Tier</div>
+                </div>
+            </div>
+            
+            <div class="rewards-actions">
+                <div class="reward-action" onclick="redeemRewards()">
+                    <div class="reward-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div class="reward-content">
+                        <h4>Redeem Rewards</h4>
+                        <p>Exchange points for benefits</p>
+                    </div>
+                </div>
+                <div class="reward-action" onclick="trackProgress()">
+                    <div class="reward-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="reward-content">
+                        <h4>Track Progress</h4>
+                        <p>Monitor your referral activity</p>
+                    </div>
+                </div>
+                <div class="reward-action" onclick="shareReferral()">
+                    <div class="reward-icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <div class="reward-content">
+                        <h4>Share Referral</h4>
+                        <p>Earn more points by referring</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions">
+            <a href="./portal-new-referral.html" class="action-card" onclick="showLoading()">
+                <div class="action-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <h3>New Referral</h3>
+                <p>Request a specialist referral quickly and securely</p>
+            </a>
+            <a href="./portal-find-provider.html" class="action-card" onclick="showLoading()">
+                <div class="action-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>Find Provider</h3>
+                <p>Search our extensive network of specialists</p>
+            </a>
+            <a href="./portal-upload-document.html" class="action-card" onclick="showLoading()">
+                <div class="action-icon">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <h3>Upload Document</h3>
+                <p>Share medical records and files securely</p>
+            </a>
+            <a href="./portal-schedule.html" class="action-card" onclick="showLoading()">
+                <div class="action-icon">
+                    <i class="fas fa-calendar-plus"></i>
+                </div>
+                <h3>Schedule Visit</h3>
+                <p>Book appointments with your providers</p>
+            </a>
+        </section>
+
+        <!-- Main Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Referral Status -->
+            <section class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Referrals</h2>
+                    <a href="./portal-referrals.html" class="view-all-btn">View All →</a>
+                </div>
+                <div class="referral-list">
+                    <div class="referral-item">
+                        <div class="referral-info">
+                            <h4>Orthodontic Consultation</h4>
+                            <p>Dr. Sarah Miller • Requested Dec 10, 2024</p>
+                        </div>
+                        <span class="referral-status-badge status-active">Active</span>
+                    </div>
+                    <div class="referral-item">
+                        <div class="referral-info">
+                            <h4>Root Canal Treatment</h4>
+                            <p>Dr. Michael Chen • Requested Dec 5, 2024</p>
+                        </div>
+                        <span class="referral-status-badge status-scheduled">Scheduled</span>
+                    </div>
+                    <div class="referral-item">
+                        <div class="referral-info">
+                            <h4>Periodontal Evaluation</h4>
+                            <p>Dr. James Wilson • Requested Nov 28, 2024</p>
+                        </div>
+                        <span class="referral-status-badge status-pending">Pending</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Appointments -->
+            <section class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Upcoming Appointments</h2>
+                </div>
+                <div class="appointment-item">
+                    <div class="appointment-date">
+                        <i class="fas fa-calendar"></i>
+                        <span>Dec 18, 2024</span>
+                    </div>
+                    <div class="appointment-details">
+                        <strong>Dr. Sarah Miller</strong><br>
+                        Orthodontic Consultation<br>
+                        <span style="color: var(--secondary-blue); font-weight: 600;">2:30 PM</span>
+                    </div>
+                </div>
+                <div class="appointment-item">
+                    <div class="appointment-date">
+                        <i class="fas fa-calendar"></i>
+                        <span>Dec 22, 2024</span>
+                    </div>
+                    <div class="appointment-details">
+                        <strong>Dr. Michael Chen</strong><br>
+                        Root Canal - Session 1<br>
+                        <span style="color: var(--secondary-blue); font-weight: 600;">10:00 AM</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Documents Section -->
+        <section class="card documents-section">
+            <div class="card-header">
+                <h2 class="card-title">Recent Documents</h2>
+                <button class="upload-btn" onclick="showUploadSuccess()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    Upload New
+                </button>
+            </div>
+            <div class="documents-grid">
+                <div class="document-card" onclick="openDocument('xray')">
+                    <i class="fas fa-file-medical document-icon"></i>
+                    <div class="document-name">X-Ray Results</div>
+                    <div class="document-date">Dec 10, 2024</div>
+                </div>
+                <div class="document-card" onclick="openDocument('treatment')">
+                    <i class="fas fa-file-pdf document-icon"></i>
+                    <div class="document-name">Treatment Plan</div>
+                    <div class="document-date">Dec 8, 2024</div>
+                </div>
+                <div class="document-card" onclick="openDocument('insurance')">
+                    <i class="fas fa-file-invoice document-icon"></i>
+                    <div class="document-name">Insurance Claim</div>
+                    <div class="document-date">Dec 5, 2024</div>
+                </div>
+                <div class="document-card" onclick="openDocument('prescription')">
+                    <i class="fas fa-file-prescription document-icon"></i>
+                    <div class="document-name">Prescription</div>
+                    <div class="document-date">Nov 30, 2024</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Messages Widget -->
+        <section class="card messages-widget">
+            <div class="card-header">
+                <h2 class="card-title">Recent Messages</h2>
+                <a href="./portal-messages.html" class="view-all-btn">View All →</a>
+            </div>
+            <div class="message-item">
+                <div class="message-avatar">SM</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-sender">Dr. Sarah Miller</span>
+                        <span class="message-time">2 hours ago</span>
+                    </div>
+                    <p class="message-text">Your orthodontic consultation has been confirmed for Dec 18 at 2:30 PM. Please arrive 15 minutes early and bring your insurance card.</p>
+                </div>
+            </div>
+            <div class="message-item">
+                <div class="message-avatar">SA</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-sender">Support Admin</span>
+                        <span class="message-time">1 day ago</span>
+                    </div>
+                    <p class="message-text">Congratulations! You've earned 25 reward points for your recent referral. Your points will be available for redemption within 24 hours.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Success Message -->
+    <div class="success-message" id="successMessage">
+        <i class="fas fa-check-circle"></i> Action completed successfully!
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.querySelector('.portal-menu');
+            menu.classList.toggle('show');
+        }
+
+        // Show loading animation
+        function showLoading() {
+            showSuccessMessage('⏳ Loading page...');
+        }
+
+        // Show upload success message
+        function showUploadSuccess() {
+            showSuccessMessage('📁 File uploaded successfully!');
+        }
+
+        // Show notifications
+        function showNotifications() {
+            showSuccessMessage('🔔 3 new notifications');
+        }
+
+        // Toggle user menu
+        function toggleUserMenu() {
+            showSuccessMessage('👤 User menu opened');
+        }
+
+        // Open document
+        function openDocument(type) {
+            showSuccessMessage(`📄 Opening ${type} document...`);
+        }
+
+        // Reward functions
+        function showRewardDetails() {
+            showSuccessMessage('🏆 Opening rewards dashboard...');
+        }
+
+        function redeemRewards() {
+            showSuccessMessage('🎁 Rewards redemption started...');
+        }
+
+        function trackProgress() {
+            showSuccessMessage('📊 Loading progress tracker...');
+        }
+
+        function shareReferral() {
+            showSuccessMessage('📤 Opening referral share options...');
+        }
+
+        // Success message display
+        function showSuccessMessage(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.innerHTML = message;
+            successDiv.classList.add('show');
+            
+            setTimeout(() => {
+                successDiv.classList.remove('show');
+            }, 3000);
+        }
+
+        // Auto-close mobile menu on window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 968) {
+                document.querySelector('.portal-menu').classList.remove('show');
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add fade-in animation to cards
+            const cards = document.querySelectorAll('.card, .action-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

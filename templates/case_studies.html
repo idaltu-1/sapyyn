@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Case Studies - Sapyyn Patient Referral System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <h1 class="text-center mb-5">Case Studies</h1>
+            <p class="lead text-center mb-5">
+                Discover how healthcare providers are using Sapyyn to improve patient outcomes and streamline referral processes.
+            </p>
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">Dental Practice Network</h4>
+                            <p class="card-text">
+                                A multi-location dental practice improved referral efficiency by 75% using Sapyyn's 
+                                QR code system and secure document sharing.
+                            </p>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-arrow-right text-primary me-2"></i>75% faster referrals</li>
+                                <li><i class="bi bi-arrow-right text-primary me-2"></i>Reduced paperwork by 90%</li>
+                                <li><i class="bi bi-arrow-right text-primary me-2"></i>Improved patient satisfaction</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">Specialist Referral Center</h4>
+                            <p class="card-text">
+                                A specialist center reduced patient wait times and improved communication 
+                                between referring doctors and specialists.
+                            </p>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-arrow-right text-primary me-2"></i>50% reduction in wait times</li>
+                                <li><i class="bi bi-arrow-right text-primary me-2"></i>Better care coordination</li>
+                                <li><i class="bi bi-arrow-right text-primary me-2"></i>Enhanced tracking</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">Rural Healthcare Network</h4>
+                            <p class="card-text">
+                                Rural clinics connected with urban specialists to provide better care 
+                                for patients in remote areas.
+                            </p>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-arrow-right text-primary me-2"></i>Improved access to specialists</li>
+                                <li><i class="bi bi-arrow-right text-primary me-2"></i>Reduced travel for patients</li>
+                                <li><i class="bi bi-arrow-right text-primary me-2"></i>Better outcomes</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">Emergency Dental Services</h4>
+                            <p class="card-text">
+                                Emergency dental services used Sapyyn to quickly connect patients with 
+                                appropriate specialists during urgent cases.
+                            </p>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-arrow-right text-primary me-2"></i>Faster emergency response</li>
+                                <li><i class="bi bi-arrow-right text-primary me-2"></i>Better triage</li>
+                                <li><i class="bi bi-arrow-right text-primary me-2"></i>Improved patient outcomes</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-5">
+                <p class="mb-4">Want to see how Sapyyn can transform your practice?</p>
+                {% if not session.user_id %}
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-rocket-takeoff"></i> Get Started Today
+                </a>
+                {% else %}
+                <a href="{{ url_for('new_referral') }}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-plus-circle"></i> Create Your First Referral
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

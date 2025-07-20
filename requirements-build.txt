@@ -1,0 +1,34 @@
+# Sapyyn Platform - Build Dependencies
+# Compatible with Python 3.13+ and resolves gevent issues
+
+# Core Flask dependencies (updated for Python 3.13 compatibility)
+Flask==3.0.0
+Werkzeug==3.0.1
+Flask-WTF==1.2.1
+Flask-Limiter==3.5.0
+Flask-Mail==0.9.1
+Flask-SQLAlchemy==3.1.1
+
+# Use compatible gevent version for Python 3.13
+gevent==24.2.1
+greenlet==3.0.3
+
+# Core dependencies
+stripe==6.6.0
+qrcode[pil]==7.4.2
+Pillow==11.0.0
+python-dotenv==1.0.0
+requests==2.31.0
+jsonschema==4.19.2
+
+# Testing
+pytest==7.4.3
+pytest-flask==1.3.0
+
+# Development tools
+black==23.11.0
+flake8==6.1.0
+selenium==4.15.2
+
+# Production server
+gunicorn==21.2.0
