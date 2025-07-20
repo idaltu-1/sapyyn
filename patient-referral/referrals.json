@@ -1,0 +1,11 @@
+[
+  {
+    "patientName": "John Doe",
+    "patientId": "P12345",
+    "referralType": "specialist_consultation",
+    "urgency": "routine",
+    "notes": "Test referral for system validation. Patient needs specialist consultation for routine checkup.",
+    "uploadedFiles": [],
+    "timestamp": "2025-07-12T23:59:10.105Z"
+  }
+]

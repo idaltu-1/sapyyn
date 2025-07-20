@@ -1,0 +1,37 @@
+# SuperClaude MCP Integration Details
+# Content from MCP.md not in global patterns
+
+## Server_Capabilities_Extended
+Context7:
+  Purpose: "Official library documentation & code examples | Research standards"
+  Capabilities: "resolve-library-id | get-library-docs | version-specific documentation"
+  Best_For: "API integration | Framework patterns | Library adoption | Official standards"
+  Use: "Research-first methodology | Evidence-based implementation"
+  Token_Cost: "Low-Medium | High accuracy | Authoritative sources"
+  Workflows: "Library detection → resolve-id → get-docs → implement with citations"
+
+Sequential:
+  Purpose: "Multi-step complex problem solving | Architectural thinking | Analysis"
+  Capabilities: "sequentialthinking | adaptive reasoning | systematic problem decomposition"
+  Best_For: "System design | Root cause analysis | Complex debugging | Architecture review"
+  Use: "Deep technical analysis | Evidence-based reasoning | Quality investigation"
+  Token_Cost: "Medium-High | Comprehensive analysis | Insights"
+  Workflows: "Problem → decompose → analyze → synthesize → recommend"
+
+Magic:
+  Purpose: "UI component generation | Design system integration"
+  Capabilities: "component-builder | component-refiner | component-inspiration | logo-search"
+  Best_For: "React/Vue components | Design systems | UI patterns | Rapid prototyping"
+  Use: "Consistent design implementation | Pattern adherence | Quality components"
+  Token_Cost: "Medium | High-quality output | Design system compliance"
+  Workflows: "Requirements → generate → refine → integrate → validate"
+
+Puppeteer:
+  Purpose: "Browser automation | E2E testing | Performance validation"
+  Capabilities: "browser-connect | navigation | testing | screenshots | performance-monitoring"
+  Best_For: "E2E testing | Performance monitoring | Visual validation | User interaction testing"
+  Use: "Quality assurance | Performance validation | User experience testing"
+  Token_Cost: "Low (action-based) | High reliability | Testing"
+  Workflows: "Connect → navigate → interact → validate → report"
+
+## Token_Economics

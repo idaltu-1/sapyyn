@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Promotion Statistics{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Promotion Statistics</h1>
+        <a href="{{ url_for('admin_promotions.list_promotions') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Promotion Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <img src="{{ promotion.image_url }}" alt="{{ promotion.title }}" class="img-fluid promotion-preview mb-3">
+                        <h4>{{ promotion.title }}</h4>
+                        {% if promotion.description %}
+                        <p class="text-muted">{{ promotion.description }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Location:</strong> {{ promotion.location.value.replace('_', ' ').title() }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Target URL:</strong>
+                        <a href="{{ promotion.target_url }}" target="_blank" rel="noopener noreferrer">
+                            {{ promotion.target_url|truncate(30) }}
+                            <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Date Range:</strong> {{ stats.start_date }} to {{ stats.end_date }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Status:</strong>
+                        <span class="badge {% if promotion.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ stats.status }}
+                        </span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Days Remaining:</strong> {{ stats.days_remaining }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Target Audience:</strong>
+                        {% if promotion.allowed_roles %}
+                            {% for role in promotion.allowed_roles %}
+                                <span class="badge bg-info me-1">{{ role.role.title() }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-muted">All users</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Performance Metrics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="stat-card text-center p-3 mb-4">
+                                <h2 class="stat-value">{{ stats.impressions }}</h2>
+                                <p class="stat-label mb-0">Impressions</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card text-center p-3 mb-4">
+                                <h2 class="stat-value">{{ stats.clicks }}</h2>
+                                <p class="stat-label mb-0">Clicks</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card text-center p-3 mb-4">
+                                <h2 class="stat-value">{{ stats.ctr }}</h2>
+                                <p class="stat-label mb-0">Click-Through Rate</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container mt-4">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Actions</h5>
+                    <div class="btn-group">
+                        <a href="{{ url_for('admin_promotions.edit_promotion', promotion_id=promotion.id) }}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                        <button type="button" class="btn btn-sm btn-{% if promotion.is_active %}warning{% else %}success{% endif %}" 
+                                data-bs-toggle="modal" data-bs-target="#toggleStatusModal">
+                            <i class="bi bi-{% if promotion.is_active %}pause-fill{% else %}play-fill{% endif %}"></i>
+                            {{ 'Deactivate' if promotion.is_active else 'Activate' }}
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deletePromotionModal">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Export Data</label>
+                        <div class="d-flex">
+                            <button type="button" class="btn btn-outline-secondary me-2" id="exportCSV">
+                                <i class="bi bi-file-earmark-spreadsheet"></i> Export as CSV
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="exportPDF">
+                                <i class="bi bi-file-earmark-pdf"></i> Export as PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toggle Status Modal -->
+<div class="modal fade" id="toggleStatusModal" tabindex="-1" aria-labelledby="toggleStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="toggleStatusModalLabel">
+                    {{ 'Deactivate' if promotion.is_active else 'Activate' }} Promotion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to {{ 'deactivate' if promotion.is_active else 'activate' }} this promotion?</p>
+                {% if promotion.is_active %}
+                <p class="text-warning">The promotion will no longer be displayed to users.</p>
+                {% else %}
+                <p class="text-success">The promotion will be displayed to users if within the date range.</p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" action="{{ url_for('admin_promotions.toggle_status', promotion_id=promotion.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="is_active" value="{{ 'false' if promotion.is_active else 'true' }}">
+                    <button type="submit" class="btn btn-{% if promotion.is_active %}warning{% else %}success{% endif %}">
+                        {{ 'Deactivate' if promotion.is_active else 'Activate' }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deletePromotionModal" tabindex="-1" aria-labelledby="deletePromotionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletePromotionModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the promotion "{{ promotion.title }}"?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" action="{{ url_for('admin_promotions.delete_promotion', promotion_id=promotion.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sample data for the chart - in a real implementation, this would come from the backend
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
+                datasets: [{
+                    label: 'Impressions',
+                    data: [
+                        Math.floor({{ stats.impressions }} * 0.1),
+                        Math.floor({{ stats.impressions }} * 0.15),
+                        Math.floor({{ stats.impressions }} * 0.2),
+                        Math.floor({{ stats.impressions }} * 0.12),
+                        Math.floor({{ stats.impressions }} * 0.18),
+                        Math.floor({{ stats.impressions }} * 0.15),
+                        Math.floor({{ stats.impressions }} * 0.1)
+                    ],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.4
+                }, {
+                    label: 'Clicks',
+                    data: [
+                        Math.floor({{ stats.clicks }} * 0.1),
+                        Math.floor({{ stats.clicks }} * 0.15),
+                        Math.floor({{ stats.clicks }} * 0.25),
+                        Math.floor({{ stats.clicks }} * 0.1),
+                        Math.floor({{ stats.clicks }} * 0.2),
+                        Math.floor({{ stats.clicks }} * 0.1),
+                        Math.floor({{ stats.clicks }} * 0.1)
+                    ],
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Performance Over Time'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Export functionality (placeholder)
+        document.getElementById('exportCSV').addEventListener('click', function() {
+            alert('CSV export functionality would be implemented here');
+        });
+        
+        document.getElementById('exportPDF').addEventListener('click', function() {
+            alert('PDF export functionality would be implemented here');
+        });
+    });
+</script>
+{% endblock %}

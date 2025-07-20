@@ -1,153 +1,334 @@
-# 🚀 Sapyyn Healthcare Portal - Deployment Guide
+# Sapyyn Patient Referral System - Deployment Guide
 
-## ✅ Successfully Deployed Updates
+## Overview
+This guide provides step-by-step instructions for deploying the Sapyyn Patient Referral System in various environments.
 
-### 🎯 **Latest Changes (July 2025)**
-- **6-Digit Provider Codes**: Enhanced from 4-digit to 6-digit for better security
-- **Updated Pricing**: Starter $49.99, Professional $99.99, Enterprise $499/month
-- **Stripe Integration**: Full payment processing with 14-day free trials
-- **Multi-Portal System**: Separate interfaces for Dentists, Specialists, Patients, Admins
+## Prerequisites
 
----
+### System Requirements
+- Python 3.8 or higher
+- SQLite 3.0 or higher
+- Redis (for rate limiting)
+- Git
 
-## 📋 **Production Deployment Steps**
+### Environment Setup
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/idaltu-1/sapyyn.git
+   cd sapyyn
+   ```
 
-### 1. **Environment Setup**
+2. **Create virtual environment:**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Configuration
+
+### 1. Environment Variables
+Copy the example environment file:
 ```bash
-# Clone the repository
+cp .env.example .env
+```
+
+Edit `.env` with your actual values:
+```bash
+# Required - Change these values
+SECRET_KEY=your-very-secure-secret-key-here
+STRIPE_SECRET_KEY=sk_live_your_stripe_secret_key
+STRIPE_PUBLISHABLE_KEY=pk_live_your_stripe_publishable_key
+NOCODEBACKEND_SECRET_KEY=your_nocodebackend_secret_key
+
+# Optional - Update as needed
+DATABASE_NAME=sapyyn.db
+BASE_URL=https://yourdomain.com
+MAIL_USERNAME=your_email@gmail.com
+MAIL_PASSWORD=your_email_password
+```
+
+### 2. Database Initialization
+```bash
+python -c "from app import init_db; init_db()"
+```
+
+### 3. Create Admin User
+The system automatically creates an initial admin user on first run. Check the logs for the generated password.
+
+## Deployment Options
+
+### Option 1: Local Development
+```bash
+python app.py
+```
+Access at: http://localhost:5000
+
+### Option 2: Docker Deployment
+
+#### Using Docker Compose
+```bash
+docker-compose up -d
+```
+
+#### Manual Docker Build
+```bash
+docker build -t sapyyn:latest .
+docker run -d -p 5000:5000 --env-file .env sapyyn:latest
+```
+
+### Option 3: Production Deployment
+
+#### Using Gunicorn
+```bash
+gunicorn app:app -w 4 -b 0.0.0.0:5000 --timeout 120
+```
+
+#### Using systemd (Linux)
+Create `/etc/systemd/system/sapyyn.service`:
+```ini
+[Unit]
+Description=Sapyyn Patient Referral System
+After=network.target
+
+[Service]
+Type=exec
+User=sapyyn
+WorkingDirectory=/opt/sapyyn
+Environment="PATH=/opt/sapyyn/venv/bin"
+ExecStart=/opt/sapyyn/venv/bin/gunicorn app:app -w 4 -b 0.0.0.0:5000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start:
+```bash
+sudo systemctl enable sapyyn
+sudo systemctl start sapyyn
+```
+
+### Option 4: Cloud Deployment
+
+#### Heroku
+1. Create `Procfile`:
+   ```
+   web: gunicorn app:app
+   ```
+
+2. Deploy:
+   ```bash
+   heroku create your-app-name
+   git push heroku main
+   heroku config:set SECRET_KEY=your-secret-key
+   ```
+
+#### AWS EC2
+1. Launch EC2 instance (Ubuntu 20.04+)
+2. Install dependencies:
+   ```bash
+   sudo apt update && sudo apt install python3-pip python3-venv nginx redis-server
+   ```
+3. Follow production deployment steps above
+4. Configure Nginx reverse proxy
+
+#### DigitalOcean App Platform
+1. Create `.do/app.yaml`:
+   ```yaml
+   name: sapyyn
+   services:
+   - name: web
+     source_dir: /
+     environment_slug: python
+     run_command: gunicorn app:app
+     envs:
+     - key: SECRET_KEY
+       scope: RUN_AND_BUILD_TIME
+       value: ${SECRET_KEY}
+   ```
+
+## Security Configuration
+
+### 1. SSL/TLS Setup
+- Use Let's Encrypt for free SSL certificates
+- Configure automatic renewal
+
+### 2. Firewall Configuration
+```bash
+# UFW (Ubuntu)
+sudo ufw allow 22/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable
+```
+
+### 3. Rate Limiting
+Configure Redis for rate limiting:
+```bash
+sudo systemctl start redis
+sudo systemctl enable redis
+```
+
+## Monitoring & Logging
+
+### 1. Application Monitoring
+- Set up Sentry for error tracking
+- Configure log rotation
+
+### 2. Health Checks
+Add health check endpoint:
+```bash
+curl https://yourdomain.com/health
+```
+
+### 3. Backup Strategy
+```bash
+# Database backup
+sqlite3 sapyyn.db .dump > backup_$(date +%Y%m%d_%H%M%S).sql
+
+# Automated backup script
+0 2 * * * /opt/sapyyn/backup.sh
+```
+
+## Environment-Specific Configurations
+
+### Development
+```bash
+FLASK_ENV=development
+DEBUG=true
+```
+
+### Staging
+```bash
+FLASK_ENV=production
+DEBUG=false
+```
+
+### Production
+```bash
+FLASK_ENV=production
+DEBUG=false
+SESSION_COOKIE_SECURE=true
+SESSION_COOKIE_HTTPONLY=true
+SESSION_COOKIE_SAMESITE=Lax
+```
+
+## Database Migration
+
+### Adding New Tables
+1. Update `init_db()` function in app.py
+2. Run migration:
+   ```bash
+   python -c "from app import init_db; init_db()"
+   ```
+
+### Backup Before Migration
+```bash
+cp sapyyn.db sapyyn.db.backup
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Port already in use:**
+   ```bash
+   lsof -i :5000
+   kill -9 <PID>
+   ```
+
+2. **Permission denied:**
+   ```bash
+   chmod +x app.py
+   ```
+
+3. **Database locked:**
+   ```bash
+   fuser sapyyn.db
+   ```
+
+4. **Redis connection failed:**
+   ```bash
+   sudo systemctl restart redis
+   ```
+
+### Log Locations
+- Application logs: `/var/log/sapyyn/`
+- Nginx logs: `/var/log/nginx/`
+- System logs: `/var/log/syslog`
+
+## Performance Optimization
+
+### 1. Database Optimization
+```sql
+-- Create indexes
+CREATE INDEX idx_referrals_user_id ON referrals(user_id);
+CREATE INDEX idx_referrals_status ON referrals(status);
+CREATE INDEX idx_users_email ON users(email);
+```
+
+### 2. Caching
+- Implement Redis caching for frequently accessed data
+- Use CDN for static assets
+
+### 3. Connection Pooling
+- Configure database connection pooling
+- Set appropriate pool sizes
+
+## Security Checklist
+
+- [ ] Change default admin credentials
+- [ ] Enable HTTPS
+- [ ] Configure firewall
+- [ ] Set up monitoring
+- [ ] Regular security updates
+- [ ] Backup strategy
+- [ ] Rate limiting
+- [ ] Input validation
+- [ ] SQL injection prevention
+- [ ] XSS protection
+
+## Support
+
+For deployment issues:
+1. Check application logs
+2. Verify environment variables
+3. Test database connectivity
+4. Check firewall settings
+5. Review configuration files
+
+## Quick Start Commands
+
+```bash
+# 1. Setup
 git clone https://github.com/idaltu-1/sapyyn.git
 cd sapyyn
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
+python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-```
 
-### 2. **Database Initialization**
-```bash
-# Run the Flask app once to create database
+# 2. Configure
+cp .env.example .env
+# Edit .env with your values
+
+# 3. Initialize
+python -c "from app import init_db; init_db()"
+
+# 4. Run
 python app.py
-# Stop with Ctrl+C after database is created
-
-# Create demo users (optional)
-python create_demo_users.py
 ```
 
-### 3. **Stripe Configuration**
-Set these environment variables for production:
-```bash
-export STRIPE_SECRET_KEY="sk_live_your_secret_key"
-export STRIPE_PUBLISHABLE_KEY="pk_live_your_publishable_key" 
-export STRIPE_WEBHOOK_SECRET="whsec_your_webhook_secret"
-```
+## Next Steps
 
-### 4. **Production Server**
-```bash
-# Install production server
-pip install gunicorn
-
-# Run with Gunicorn
-gunicorn -w 4 -b 0.0.0.0:8000 app:app
-```
-
----
-
-## 🔧 **Configuration Checklist**
-
-### ✅ **Pre-Production Setup**
-- [ ] Set Stripe API keys (live keys for production)
-- [ ] Configure webhook endpoint: `https://yourdomain.com/stripe-webhook`
-- [ ] Set up SSL certificate for HTTPS
-- [ ] Configure domain name and DNS
-- [ ] Set up database backups
-- [ ] Configure email service for notifications
-
-### ✅ **Security Settings**
-- [ ] Change Flask secret key in production
-- [ ] Enable HTTPS only
-- [ ] Set up proper firewall rules
-- [ ] Configure rate limiting
-- [ ] Enable logging and monitoring
-
----
-
-## 🌐 **Hosting Options**
-
-### **Option 1: Railway/Render (Recommended)**
-1. Connect GitHub repository
-2. Set environment variables in dashboard
-3. Deploy automatically on push
-
-### **Option 2: DigitalOcean/AWS**
-1. Create droplet/EC2 instance
-2. Set up nginx reverse proxy
-3. Configure SSL with Let's Encrypt
-4. Set up systemd service
-
-### **Option 3: Heroku**
-1. Create Heroku app
-2. Set config vars for Stripe keys
-3. Deploy with git push
-
----
-
-## 📱 **Current Features**
-
-### **Multi-Role Portal System**
-- **Dentist Portal**: Practice management, provider codes, referrals
-- **Specialist Portal**: Receive referrals, manage appointments
-- **Patient Portal**: Find providers, submit referrals
-- **Admin Portal**: System management, analytics
-
-### **Payment System**
-- **14-Day Free Trial**: Auto-renews to Professional plan
-- **Stripe Integration**: Secure payment processing
-- **Subscription Management**: Upgrade/downgrade anytime
-- **Webhook Support**: Real-time payment status updates
-
-### **Provider Code System**
-- **6-Digit Codes**: Range 100000-999999 for enhanced security
-- **Instant Referrals**: Patients use codes for direct connection
-- **QR Code Support**: Generate QR codes for easy sharing
-- **HIPAA Compliant**: Secure, encrypted communications
-
----
-
-## 🔗 **Important URLs**
-
-- **GitHub Repository**: https://github.com/idaltu-1/sapyyn
-- **Demo Login**: doctor1/patient1/admin1 (password: password123)
-- **Local Development**: [http://localhost:5001](http://localhost:5001) *(Requires the application to be running locally)*
-
----
-
-## 📞 **Support & Maintenance**
-
-### **Regular Tasks**
-- Monitor Stripe dashboard for payments
-- Check application logs for errors
-- Backup database regularly
-- Update dependencies monthly
-- Review user feedback
-
-### **Troubleshooting**
-- Check Flask logs for application errors
-- Verify Stripe webhook delivery
-- Monitor database performance
-- Check SSL certificate expiry
-
----
-
-## 🎉 **Ready for Production!**
-
-The Sapyyn Healthcare Portal is now fully deployed with:
-- ✅ 6-digit provider codes
-- ✅ Updated pricing structure  
-- ✅ Stripe payment integration
-- ✅ Multi-role portal system
-- ✅ HIPAA-compliant workflow
-
-**Next Step**: Configure your Stripe account and deploy to your production server!
+1. Set up monitoring (Sentry, New Relic)
+2. Configure CI/CD pipeline
+3. Set up automated backups
+4. Implement A/B testing
+5. Add performance monitoring
+6. Set up SSL certificate renewal
+7. Configure log aggregation
+8. Set up alerting
