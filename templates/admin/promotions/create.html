@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Create Promotion{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Create Promotion</h1>
+        <a href="{{ url_for('admin_promotions.list_promotions') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Promotion Details</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" id="promotionForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="title" name="title" required maxlength="100">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="location" class="form-label">Location <span class="text-danger">*</span></label>
+                        <select class="form-select" id="location" name="location" required>
+                            <option value="" selected disabled>Select location</option>
+                            {% for location_value, location_name in locations %}
+                            <option value="{{ location_value }}">{{ location_name.replace('_', ' ').title() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" maxlength="500"></textarea>
+                    <div class="form-text">Optional. Maximum 500 characters.</div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="target_url" class="form-label">Target URL <span class="text-danger">*</span></label>
+                        <input type="url" class="form-control" id="target_url" name="target_url" required>
+                        <div class="form-text">Where users will be directed when they click the promotion.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="image" class="form-label">Image <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" id="image" name="image" accept=".jpg,.jpeg,.png" required>
+                        <div class="form-text">PNG or JPG, max 500KB. Recommended size depends on placement location.</div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="start_date" class="form-label">Start Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="end_date" class="form-label">End Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" required>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Target Audience (Optional)</label>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="card-text mb-3">Select which user roles can see this promotion. If none are selected, all users will see it.</p>
+                            <div class="row">
+                                {% for role in roles %}
+                                <div class="col-md-3 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="allowed_roles" value="{{ role }}" id="role_{{ role }}">
+                                        <label class="form-check-label" for="role_{{ role }}">
+                                            {{ role.title() }}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active" checked>
+                        <label class="form-check-label" for="is_active">Active</label>
+                    </div>
+                    <div class="form-text">Inactive promotions won't be displayed even if within the date range.</div>
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-outline-secondary me-2" onclick="window.location='{{ url_for('admin_promotions.list_promotions') }}'">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Promotion</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set minimum date for start_date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('start_date').setAttribute('min', today);
+        
+        // Ensure end_date is after start_date
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+        
+        startDateInput.addEventListener('change', function() {
+            endDateInput.setAttribute('min', this.value);
+            
+            // If end date is before start date, reset it
+            if (endDateInput.value && endDateInput.value < this.value) {
+                endDateInput.value = this.value;
+            }
+        });
+        
+        // Image preview
+        const imageInput = document.getElementById('image');
+        imageInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                // Check file size
+                const maxSizeKB = 500;
+                const fileSizeKB = file.size / 1024;
+                
+                if (fileSizeKB > maxSizeKB) {
+                    alert(`File size exceeds maximum allowed (${maxSizeKB} KB). Please choose a smaller image.`);
+                    this.value = '';
+                    return;
+                }
+                
+                // Check file type
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Invalid file type. Please select a JPG or PNG image.');
+                    this.value = '';
+                }
+            }
+        });
+        
+        // Form validation
+        const form = document.getElementById('promotionForm');
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            form.classList.add('was-validated');
+        });
+    });
+</script>
+{% endblock %}
