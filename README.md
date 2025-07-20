@@ -1,3 +1,4 @@
+
 # Sapyyn - Patient Referral System
 
 A comprehensive web-based patient referral management system built with Flask, featuring secure document handling, QR code generation, and HIPAA-compliant data management.
@@ -67,6 +68,7 @@ A comprehensive web-based patient referral management system built with Flask, f
    git clone https://github.com/idaltu-1/sapyyn.git
    cd sapyyn
    ```
+
 
 2. **Quick Build (Recommended)**
    ```bash
