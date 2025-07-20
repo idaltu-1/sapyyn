@@ -1,0 +1,368 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PATIENT
+  DENTIST
+  SPECIALIST
+  DENTIST_ADMIN
+  SPECIALIST_ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+  SUSPENDED
+}
+
+enum ReferralStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+enum DocumentType {
+  MEDICAL_REPORT
+  INSURANCE_DOCUMENT
+  QUALIFICATION_DOCUMENT
+  EXPERIENCE_DOCUMENT
+  SUPPORTING_DOCUMENT
+  PROFILE_PICTURE
+  BROADCAST_FILE
+  TESTIMONIAL_IMAGE
+  UPLOADED_FILE
+}
+
+enum RewardStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model User {
+  id                    String                @id @default(cuid())
+  email                 String                @unique
+  password              String
+  firstName             String
+  lastName              String
+  phone                 String?
+  role                  UserRole
+  status                UserStatus            @default(PENDING)
+  verificationToken     String?
+  resetPasswordToken    String?
+  resetPasswordExpires  DateTime?
+  profilePicture        String?
+  twoFactorEnabled      Boolean               @default(false)
+  lastLoginAt           DateTime?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  // Relationships
+  patientProfile        PatientProfile?
+  dentistProfile        DentistProfile?
+  specialistProfile     SpecialistProfile?
+  adminProfile          AdminProfile?
+  
+  sentReferrals         Referral[]            @relation("SentReferrals")
+  receivedReferrals     Referral[]            @relation("ReceivedReferrals")
+  documents             Document[]
+  messages              Message[]
+  notifications         Notification[]
+  auditLogs             AuditLog[]
+  rewards               Reward[]
+  
+  @@map("users")
+}
+
+model PatientProfile {
+  id                String              @id @default(cuid())
+  userId            String              @unique
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  dateOfBirth       DateTime?
+  gender            String?
+  address           String?
+  city              String?
+  state             String?
+  zipCode           String?
+  emergencyContact  String?
+  medicalHistory    Json?
+  insuranceInfo     Json?
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  @@map("patient_profiles")
+}
+
+model DentistProfile {
+  id                String              @id @default(cuid())
+  userId            String              @unique
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  licenseNumber     String              @unique
+  practiceId        String?
+  practice          Practice?           @relation(fields: [practiceId], references: [id])
+  specializations   String[]
+  yearsExperience   Int?
+  education         Json?
+  certifications    String[]
+  
+  dentistCode       String              @unique // 6-digit code for referrals
+  qrCode            String?             // QR code URL
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  @@map("dentist_profiles")
+}
+
+model SpecialistProfile {
+  id                String              @id @default(cuid())
+  userId            String              @unique
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  licenseNumber     String              @unique
+  practiceId        String?
+  practice          Practice?           @relation(fields: [practiceId], references: [id])
+  specialization    String
+  subSpecializations String[]
+  yearsExperience   Int?
+  education         Json?
+  certifications    String[]
+  
+  specialistCode    String              @unique // 6-digit code for referrals
+  qrCode            String?             // QR code URL
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  @@map("specialist_profiles")
+}
+
+model AdminProfile {
+  id                String              @id @default(cuid())
+  userId            String              @unique
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  practiceId        String?
+  practice          Practice?           @relation(fields: [practiceId], references: [id])
+  permissions       String[]
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  @@map("admin_profiles")
+}
+
+model Practice {
+  id                String              @id @default(cuid())
+  name              String
+  type              String              // DENTAL, SPECIALIST
+  address           String
+  city              String
+  state             String
+  zipCode           String
+  phone             String
+  email             String?
+  website           String?
+  
+  settings          Json?
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relationships
+  dentists          DentistProfile[]
+  specialists       SpecialistProfile[]
+  admins            AdminProfile[]
+  
+  @@map("practices")
+}
+
+model Referral {
+  id                String              @id @default(cuid())
+  referralNumber    String              @unique
+  
+  fromUserId        String
+  fromUser          User                @relation("SentReferrals", fields: [fromUserId], references: [id])
+  toUserId          String
+  toUser            User                @relation("ReceivedReferrals", fields: [toUserId], references: [id])
+  
+  patientData       Json                // Patient information
+  clinicalData      Json                // Clinical notes, treatment needed, etc.
+  urgency           String              @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  
+  status            ReferralStatus      @default(PENDING)
+  statusHistory     Json[]              // Status change history
+  
+  scheduledAt       DateTime?
+  completedAt       DateTime?
+  notes             String?
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relationships
+  documents         Document[]
+  messages          Message[]
+  
+  @@map("referrals")
+}
+
+model Document {
+  id                String              @id @default(cuid())
+  userId            String
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  referralId        String?
+  referral          Referral?           @relation(fields: [referralId], references: [id])
+  
+  fileName          String
+  originalName      String
+  filePath          String
+  fileSize          Int
+  mimeType          String
+  documentType      DocumentType
+  
+  metadata          Json?
+  isEncrypted       Boolean             @default(false)
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  @@map("documents")
+}
+
+model Message {
+  id                String              @id @default(cuid())
+  referralId        String
+  referral          Referral            @relation(fields: [referralId], references: [id])
+  
+  senderId          String
+  sender            User                @relation(fields: [senderId], references: [id])
+  
+  content           String
+  messageType       String              @default("TEXT") // TEXT, FILE, IMAGE
+  attachments       String[]
+  
+  isRead            Boolean             @default(false)
+  readAt            DateTime?
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  @@map("messages")
+}
+
+model Notification {
+  id                String              @id @default(cuid())
+  userId            String
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title             String
+  message           String
+  type              String              // INFO, WARNING, ERROR, SUCCESS
+  category          String              // REFERRAL, SYSTEM, REWARD, etc.
+  
+  data              Json?               // Additional notification data
+  
+  isRead            Boolean             @default(false)
+  readAt            DateTime?
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  @@map("notifications")
+}
+
+model Reward {
+  id                String              @id @default(cuid())
+  userId            String
+  user              User                @relation(fields: [userId], references: [id])
+  
+  type              String              // REFERRAL_BONUS, COMPLETION_BONUS, etc.
+  amount            Float
+  currency          String              @default("USD")
+  
+  provider          String              // TANGO, TREMENDOUS, MANUAL
+  externalId        String?             // External reward provider ID
+  
+  status            RewardStatus        @default(PENDING)
+  statusHistory     Json[]
+  
+  rewardData        Json?               // Provider-specific data
+  failureReason     String?
+  
+  processedAt       DateTime?
+  completedAt       DateTime?
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  @@map("rewards")
+}
+
+model AuditLog {
+  id                String              @id @default(cuid())
+  userId            String?
+  user              User?               @relation(fields: [userId], references: [id])
+  
+  action            String              // LOGIN, CREATE_REFERRAL, UPDATE_PROFILE, etc.
+  resource          String              // USER, REFERRAL, DOCUMENT, etc.
+  resourceId        String?
+  
+  oldData           Json?
+  newData           Json?
+  
+  ipAddress         String?
+  userAgent         String?
+  
+  createdAt         DateTime            @default(now())
+  
+  @@map("audit_logs")
+}
+
+model SystemSettings {
+  id                String              @id @default(cuid())
+  key               String              @unique
+  value             Json
+  description       String?
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  @@map("system_settings")
+}
+
+model Integration {
+  id                String              @id @default(cuid())
+  name              String              @unique
+  type              String              // ZAPIER, N8N, SMS_IT, etc.
+  
+  config            Json                // Integration configuration
+  credentials       Json?               // Encrypted credentials
+  
+  isActive          Boolean             @default(true)
+  lastSync          DateTime?
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  @@map("integrations")
+}
