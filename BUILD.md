@@ -77,11 +77,16 @@ If issues persist:
 ## Dependencies Summary
 | Package | Old Version | New Version | Notes |
 |---------|-------------|-------------|--------|
-| Flask | 2.3.3 | 3.0.0 | Latest stable |
-| Werkzeug | 2.3.7 | 3.0.1 | Latest stable |
-| gevent | 23.9.1 | 24.2.1 | Python 3.13 compatible |
-| Pillow | 11.0.0 | 11.0.0 | Latest stable |
-| greenlet | - | 3.0.3 | gevent dependency |
+| Flask | 2.3.3 | 3.0.3 | Security patches |
+| Werkzeug | 2.3.7 | 3.0.6 | Security patches |
+| gevent | 23.9.1 | 24.11.1 | Python 3.13 + security |
+| requests | 2.31.0 | 2.32.3 | Security patches |
+| urllib3 | - | 2.2.3 | Security fixes |
+| certifi | - | 2024.12.14 | Security certificates |
+
+## Security Status
+- **Before**: 14 vulnerabilities (7 high, 6 moderate, 1 low)
+- **After**: 13 vulnerabilities (7 high, 6 moderate) - **1 low vulnerability resolved**
 
 ## Build Command
 The new build command is:
