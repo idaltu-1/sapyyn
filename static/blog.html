@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sapyyn Blog - Dental Industry Insights & Referral Best Practices</title>
+    <meta name="description" content="Stay updated with the latest dental industry insights, referral best practices, and platform updates from Sapyyn">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #0A2463;
+            --secondary: #3E92CC;
+            --accent: #D8315B;
+            --gold: #F4D35E;
+            --light: #FFFAFF;
+            --dark: #1E1B18;
+            --gray: #6C757D;
+            --success: #28A745;
+            --white: #FFFFFF;
+            --glass: rgba(255, 255, 255, 0.25);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 16px 64px rgba(0, 0, 0, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo img {
+            height: 45px;
+            margin-right: 12px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+            gap: 2.5rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-links a:hover {
+            color: var(--secondary);
+            background: rgba(62, 146, 204, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .nav-links a.active {
+            color: var(--secondary);
+            background: rgba(62, 146, 204, 0.1);
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 8px 24px rgba(10, 36, 99, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(10, 36, 99, 0.4);
+        }
+        
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 6rem 5% 4rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: breathe 4s ease-in-out infinite;
+        }
+        
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 5% 2rem;
+        }
+        
+        .blog-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 4rem;
+        }
+        
+        /* Featured Posts */
+        .featured-posts {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .featured-post {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .featured-post:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .featured-post img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        
+        .post-content {
+            padding: 2rem;
+        }
+        
+        .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .post-category {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .post-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+        
+        .post-excerpt {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+        
+        .read-more {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .read-more:hover {
+            color: var(--primary);
+            transform: translateX(4px);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .sidebar-widget {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .widget-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid rgba(62, 146, 204, 0.1);
+        }
+        
+        /* Search Widget */
+        .search-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid rgba(62, 146, 204, 0.2);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+        
+        .search-btn {
+            padding: 0.75rem 1rem;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .search-btn:hover {
+            background: var(--primary);
+            transform: scale(1.05);
+        }
+        
+        /* Categories Widget */
+        .category-list {
+            list-style: none;
+        }
+        
+        .category-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .category-item:last-child {
+            border-bottom: none;
+        }
+        
+        .category-link {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .category-link:hover {
+            color: var(--secondary);
+            transform: translateX(4px);
+        }
+        
+        .category-count {
+            background: var(--secondary);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        /* Recent Posts Widget */
+        .recent-posts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .recent-post {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .recent-post:last-child {
+            border-bottom: none;
+        }
+        
+        .recent-post:hover {
+            transform: translateX(8px);
+            background: rgba(62, 146, 204, 0.05);
+            margin: 0 -1rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            border-radius: 8px;
+        }
+        
+        .recent-post-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        
+        .recent-post-content h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            line-height: 1.3;
+        }
+        
+        .recent-post-date {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        /* Newsletter Widget */
+        .newsletter-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .newsletter-input {
+            padding: 0.75rem;
+            border: 2px solid rgba(62, 146, 204, 0.2);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .newsletter-input:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+        
+        .newsletter-btn {
+            padding: 0.75rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .newsletter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        /* Tags Widget */
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .tag {
+            background: rgba(62, 146, 204, 0.1);
+            color: var(--secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .tag:hover {
+            background: var(--secondary);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .blog-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .main-content {
+                padding: 2rem 5%;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero {
+                padding: 4rem 5% 2rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .post-content {
+                padding: 1.5rem;
+            }
+            
+            .sidebar-widget {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <a href="./index.html" class="logo">
+                <img src="./assets/logo.svg" alt="Sapyyn">
+                Sapyyn
+            </a>
+            <ul class="nav-links">
+                <li><a href="./index.html">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="./blog.html" class="active">Blog</a></li>
+                <li><a href="./about.html">About</a></li>
+                <li><a href="./contact.html">Contact</a></li>
+            </ul>
+            <div class="cta-buttons">
+                <a href="./sapyyn-portal.html" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Portal
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Dental Industry Insights</h1>
+            <p>Stay informed with the latest trends, best practices, and innovations in dental referrals and patient care</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="blog-grid">
+            <!-- Featured Posts -->
+            <section class="featured-posts">
+                <article class="featured-post">
+                    <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800&h=300&fit=crop" alt="Digital Transformation in Dentistry" loading="lazy">
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">Technology</span>
+                            <span><i class="fas fa-calendar"></i> December 15, 2024</span>
+                            <span><i class="fas fa-user"></i> Dr. Sarah Johnson</span>
+                        </div>
+                        <h2 class="post-title">The Digital Transformation of Dental Referrals: A 2024 Perspective</h2>
+                        <p class="post-excerpt">Explore how digital platforms are revolutionizing the way dental professionals collaborate and share patient information. Learn about the benefits of streamlined referral processes and improved patient outcomes through technology.</p>
+                        <a href="./blog-article.html" class="read-more">
+                            Read More <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="featured-post">
+                    <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=300&fit=crop" alt="HIPAA Compliance" loading="lazy">
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">Compliance</span>
+                            <span><i class="fas fa-calendar"></i> December 12, 2024</span>
+                            <span><i class="fas fa-user"></i> Legal Team</span>
+                        </div>
+                        <h2 class="post-title">HIPAA Compliance in Digital Dental Referrals: What You Need to Know</h2>
+                        <p class="post-excerpt">Understanding the critical importance of patient data protection in digital referral systems. This comprehensive guide covers HIPAA requirements, best practices, and how to ensure your practice stays compliant.</p>
+                        <a href="./blog-article.html" class="read-more">
+                            Read More <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="featured-post">
+                    <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=300&fit=crop" alt="Patient Experience" loading="lazy">
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">Patient Care</span>
+                            <span><i class="fas fa-calendar"></i> December 8, 2024</span>
+                            <span><i class="fas fa-user"></i> Dr. Michael Chen</span>
+                        </div>
+                        <h2 class="post-title">Improving Patient Experience Through Seamless Referral Networks</h2>
+                        <p class="post-excerpt">Discover how efficient referral systems enhance patient satisfaction, reduce wait times, and improve treatment outcomes. Real case studies from dental practices across the country.</p>
+                        <a href="./blog-article.html" class="read-more">
+                            Read More <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <!-- Search Widget -->
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Search</h3>
+                    <form class="search-form">
+                        <input type="text" class="search-input" placeholder="Search articles...">
+                        <button type="submit" class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Categories Widget -->
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Categories</h3>
+                    <ul class="category-list">
+                        <li class="category-item">
+                            <a href="./blog.html" class="category-link">Technology & Innovation</a>
+                            <span class="category-count">12</span>
+                        </li>
+                        <li class="category-item">
+                            <a href="./blog.html" class="category-link">Patient Care</a>
+                            <span class="category-count">8</span>
+                        </li>
+                        <li class="category-item">
+                            <a href="./blog.html" class="category-link">HIPAA & Compliance</a>
+                            <span class="category-count">6</span>
+                        </li>
+                        <li class="category-item">
+                            <a href="./blog.html" class="category-link">Practice Management</a>
+                            <span class="category-count">10</span>
+                        </li>
+                        <li class="category-item">
+                            <a href="./blog.html" class="category-link">Industry Trends</a>
+                            <span class="category-count">15</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Recent Posts Widget -->
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Recent Posts</h3>
+                    <div class="recent-posts-list">
+                        <article class="recent-post">
+                            <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=60&h=60&fit=crop" alt="Recent post" class="recent-post-image">
+                            <div class="recent-post-content">
+                                <h4>5 Tips for Faster Referral Processing</h4>
+                                <div class="recent-post-date">Dec 10, 2024</div>
+                            </div>
+                        </article>
+                        <article class="recent-post">
+                            <img src="https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=60&h=60&fit=crop" alt="Recent post" class="recent-post-image">
+                            <div class="recent-post-content">
+                                <h4>Building Strong Specialist Networks</h4>
+                                <div class="recent-post-date">Dec 7, 2024</div>
+                            </div>
+                        </article>
+                        <article class="recent-post">
+                            <img src="https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d?w=60&h=60&fit=crop" alt="Recent post" class="recent-post-image">
+                            <div class="recent-post-content">
+                                <h4>The Future of Teledentistry</h4>
+                                <div class="recent-post-date">Dec 5, 2024</div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+
+                <!-- Newsletter Widget -->
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Newsletter</h3>
+                    <p style="color: var(--gray); margin-bottom: 1rem;">Stay updated with our latest insights and industry news.</p>
+                    <form class="newsletter-form">
+                        <input type="email" class="newsletter-input" placeholder="Your email address" required>
+                        <button type="submit" class="newsletter-btn">
+                            <i class="fas fa-paper-plane"></i> Subscribe
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Tags Widget -->
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Popular Tags</h3>
+                    <div class="tags-list">
+                        <a href="./blog.html" class="tag">Digital Dentistry</a>
+                        <a href="./blog.html" class="tag">HIPAA</a>
+                        <a href="./blog.html" class="tag">Referrals</a>
+                        <a href="./blog.html" class="tag">Patient Care</a>
+                        <a href="./blog.html" class="tag">Technology</a>
+                        <a href="./blog.html" class="tag">Practice Growth</a>
+                        <a href="./blog.html" class="tag">Specialist Network</a>
+                        <a href="./blog.html" class="tag">Workflow</a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script>
+        // Newsletter subscription
+        document.querySelector('.newsletter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = this.querySelector('.newsletter-input').value;
+            if (email) {
+                alert('Thank you for subscribing! You\'ll receive our latest updates.');
+                this.querySelector('.newsletter-input').value = '';
+            }
+        });
+
+        // Search functionality
+        document.querySelector('.search-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const query = this.querySelector('.search-input').value;
+            if (query) {
+                alert(`Searching for: "${query}"`);
+            }
+        });
+
+        // Smooth scrolling for internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+                header.style.backdropFilter = 'blur(25px)';
+                header.style.borderBottom = '1px solid rgba(0,0,0,0.1)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(20px)';
+                header.style.borderBottom = '1px solid rgba(255, 255, 255, 0.2)';
+            }
+        });
+
+        // Initialize page animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add fade-in animation to blog posts
+            const posts = document.querySelectorAll('.featured-post');
+            posts.forEach((post, index) => {
+                post.style.opacity = '0';
+                post.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    post.style.transition = 'all 0.6s ease';
+                    post.style.opacity = '1';
+                    post.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+
+            // Add stagger animation to sidebar widgets
+            const widgets = document.querySelectorAll('.sidebar-widget');
+            widgets.forEach((widget, index) => {
+                widget.style.opacity = '0';
+                widget.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    widget.style.transition = 'all 0.6s ease';
+                    widget.style.opacity = '1';
+                    widget.style.transform = 'translateY(0)';
+                }, 400 + (index * 100));
+            });
+        });
+    </script>
+</body>
+</html>

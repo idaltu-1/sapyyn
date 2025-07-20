@@ -1,0 +1,42 @@
+# SPA routing redirects for Sapyyn Patient Referral System
+# This file handles client-side routing for single page application behavior
+
+# Redirect all routes to index.html for SPA handling
+# (except for files with extensions, which should be served directly)
+/*    /index.html   200
+
+# API routes should go to the Flask backend
+/api/*  /api/:splat  200
+
+# Static assets should be served directly (already handled by default)
+# /static/*  /static/:splat  200
+
+# Health check endpoint
+/health  /health  200
+
+# Admin routes
+/admin/*  /admin/:splat  200
+
+# Portal routes
+/portal/*  /portal/:splat  200
+
+# Specific pages that should be handled by Flask backend
+/referrals  /referrals  200
+/about  /about  200
+/pricing  /pricing  200
+/resources  /resources  200
+/surgicalInstruction  /surgicalInstruction  200
+/contact  /contact  200
+/connectproviders  /connectproviders  200
+/sendpatientdocuments  /sendpatientdocuments  200
+/casestudies  /casestudies  200
+/tutorials  /tutorials  200
+/howtoguides  /howtoguides  200
+/loyaltyrewards  /loyaltyrewards  200
+/hippa  /hippa  200
+/privacy  /privacy  200
+/faq  /faq  200
+
+# Fallback for any other routes - serve the main index.html for SPA
+# This ensures that direct URLs work when the app is served as an SPA
+/:path*  /index.html  200

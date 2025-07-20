@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Sapyyn{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h2 class="mb-4">
+                <i class="bi bi-gear me-2"></i>Settings
+            </h2>
+            
+            <!-- Password Change Section -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-warning bg-opacity-15 border-0">
+                    <h5 class="card-title mb-0 text-warning-emphasis">
+                        <i class="bi bi-shield-lock me-2"></i>Change Password
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('change_password') }}">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="current_password" class="form-label">Current Password *</label>
+                                <input type="password" class="form-control" id="current_password" name="current_password" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="new_password" class="form-label">New Password *</label>
+                                <input type="password" class="form-control" id="new_password" name="new_password" required minlength="6">
+                                <div class="form-text">Minimum 6 characters</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="confirm_password" class="form-label">Confirm New Password *</label>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required minlength="6">
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-key me-2"></i>Change Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Account Information -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-info bg-opacity-15 border-0">
+                    <h5 class="card-title mb-0 text-info-emphasis">
+                        <i class="bi bi-person-gear me-2"></i>Account Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">PROFILE</h6>
+                            <p class="mb-2">
+                                <i class="bi bi-person me-2"></i>
+                                <a href="{{ url_for('profile') }}" class="text-decoration-none">View & Edit Profile</a>
+                            </p>
+                            <p class="mb-0 text-muted small">Update your personal information and profile details</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">DASHBOARD</h6>
+                            <p class="mb-2">
+                                <i class="bi bi-speedometer2 me-2"></i>
+                                <a href="{{ url_for('dashboard') }}" class="text-decoration-none">Go to Dashboard</a>
+                            </p>
+                            <p class="mb-0 text-muted small">Access your referrals and system overview</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Privacy & Security -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-success bg-opacity-15 border-0">
+                    <h5 class="card-title mb-0 text-success-emphasis">
+                        <i class="bi bi-shield-check me-2"></i>Privacy & Security
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
+                                <div>
+                                    <h6 class="mb-1">Data Protection</h6>
+                                    <p class="mb-0 text-muted small">Your data is protected under HIPAA compliance standards</p>
+                                </div>
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
+                                <div>
+                                    <h6 class="mb-1">Secure Communication</h6>
+                                    <p class="mb-0 text-muted small">All referrals and documents are encrypted in transit and at rest</p>
+                                </div>
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Support -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-secondary bg-opacity-15 border-0">
+                    <h5 class="card-title mb-0 text-secondary-emphasis">
+                        <i class="bi bi-headset me-2"></i>Support & Help
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">Need assistance? Our support team is here to help you.</p>
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <a href="mailto:support@sapyyn.com" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-envelope me-2"></i>Email Support
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="#" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-question-circle me-2"></i>Help Center
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Password confirmation validation
+document.getElementById('confirm_password').addEventListener('input', function() {
+    const newPassword = document.getElementById('new_password').value;
+    const confirmPassword = this.value;
+    
+    if (confirmPassword && newPassword !== confirmPassword) {
+        this.setCustomValidity('Passwords do not match');
+    } else {
+        this.setCustomValidity('');
+    }
+});
+
+document.getElementById('new_password').addEventListener('input', function() {
+    const confirmField = document.getElementById('confirm_password');
+    if (confirmField.value) {
+        confirmField.dispatchEvent(new Event('input'));
+    }
+});
+</script>
+{% endblock %}
