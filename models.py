@@ -155,7 +155,6 @@ class Document(db.Model):
     file_type = db.Column(db.String(50), nullable=False)
     file_name = db.Column(db.String(255), nullable=False)
 l_language = db.Column(db.Text)
-=======
     file_path = db.Column(db.String(255), nullable=False)
     file_size = db.Column(db.Integer)
     upload_date = db.Column(db.DateTime, default=datetime.utcnow)
