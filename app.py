@@ -4655,9 +4655,8 @@ def my_referrals_page():
     
     return render_template('my_referrals.html', user_role=session.get('role'))
 
-if __name__ == '__main__':
-    # Initialize database
-    init_db()
-    
-    # Run application
-    app.run(debug=config_class.DEBUG, host='0.0.0.0', port=5000)
+import os
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
