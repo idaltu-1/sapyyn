@@ -23,7 +23,7 @@ stripe==11.3.0
 qrcode[pil]==7.4.2
 Pillow==11.0.0
 python-dotenv==1.0.1
-requests==2.32.3
+requests==2.32.4
 jsonschema==4.23.0
 
 # Testing with security patches
@@ -31,12 +31,12 @@ pytest==8.3.4
 pytest-flask==1.4.0
 
 # Development tools with security fixes
-black==24.10.0
+black==24.3.0
 flake8==7.1.1
 selenium==4.27.1
 
 # Additional security-focused dependencies
-cryptography==44.0.0
+cryptography==44.0.1
 urllib3==2.5.0
 certifi==2024.12.14
 idna==3.10
