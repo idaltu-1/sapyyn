@@ -8,8 +8,8 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from routes.nocode_routes import nocode_api
-from controllers.nocodebackend_controller import nocodebackend_api
+from routes.supabase_routes import supabase_routes  # Replace nocode_routes
+from controllers.supabase_controller import supabase_api  # Replace nocodebackend_controller
 from controllers.promotion_controller import promotions
 from controllers.admin_promotion_controller import admin_promotions
 from config.app_config import get_config, INITIAL_ADMIN, generate_secure_password
@@ -38,10 +38,10 @@ app.config.from_object(config_class)
 # Initialize security features
 csrf = CSRFProtect(app)
 limiter = Limiter(
-    app,
     key_func=get_remote_address,
     default_limits=["200 per day", "50 per hour"]
 )
+limiter.init_app(app)
 
 # Apply configuration settings
 app.secret_key = config_class.SECRET_KEY
@@ -3520,128 +3520,6 @@ def create_provider_code(user_id, provider_type, practice_name, specialization):
             conn.close()
             continue
 
-# Routes
-@app.route('/')
-def index():
-    """Home page"""
-    return render_template('index.html', analytics_config=ANALYTICS_CONFIG)
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    """User login"""
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        
-        conn = sqlite3.connect(config_class.DATABASE_NAME)
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
-        user = cursor.fetchone()
-        conn.close()
-        
-        if user and check_password_hash(user[3], password):
-            if user[6]:  # is_paused
-                flash('Your account has been suspended. Please contact support.', 'error')
-                return redirect(url_for('login'))
-                
-            session['user_id'] = user[0]
-            session['username'] = user[1]
-            session['full_name'] = user[4]
-            session['role'] = user[5]
-            
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid username or password', 'error')
-    
-    return render_template('login.html', analytics_config=ANALYTICS_CONFIG)
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    """User registration"""
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        full_name = request.form['full_name']
-        role = request.form.get('role', 'patient')
-        
-        conn = sqlite3.connect(config_class.DATABASE_NAME)
-        cursor = conn.cursor()
-        
-        # Check if user exists
-        cursor.execute('SELECT id FROM users WHERE username = ? OR email = ?', (username, email))
-        if cursor.fetchone():
-            flash('Username or email already exists', 'error')
-            conn.close()
-            return redirect(url_for('register'))
-        
-        # Create user
-        password_hash = generate_password_hash(password)
-        cursor.execute('''
-            INSERT INTO users (username, email, password_hash, full_name, role)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (username, email, password_hash, full_name, role))
-        
-        user_id = cursor.lastrowid
-        
-        # Create provider code for dentists/specialists
-        if role in ['dentist', 'specialist', 'dentist_admin', 'specialist_admin']:
-            create_provider_code(user_id, role, f"{full_name} Practice", 'General')
-        
-        conn.commit()
-        conn.close()
-        
-        flash('Registration successful! Please log in.', 'success')
-        return redirect(url_for('login'))
-    
-    return render_template('register.html', analytics_config=ANALYTICS_CONFIG)
-
-@app.route('/dashboard')
-def dashboard():
-    """User dashboard"""
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
-    conn = sqlite3.connect(config_class.DATABASE_NAME)
-    cursor = conn.cursor()
-    
-    # Get user stats
-    cursor.execute('SELECT COUNT(*) FROM referrals WHERE user_id = ?', (session['user_id'],))
-    total_referrals = cursor.fetchone()[0]
-    
-    cursor.execute('SELECT COUNT(*) FROM referrals WHERE user_id = ? AND status = "pending"', (session['user_id'],))
-    pending_referrals = cursor.fetchone()[0]
-    
-    conn.close()
-    
-    return render_template('dashboard.html', 
-                         total_referrals=total_referrals,
-                         pending_referrals=pending_referrals,
-                         analytics_config=ANALYTICS_CONFIG)
-
-@app.route('/logout')
-def logout():
-    """User logout"""
-    session.clear()
-    flash('You have been logged out.', 'info')
-    return redirect(url_for('index'))
-
-# API Routes
-@app.route('/api/referrals', methods=['GET'])
-def get_referrals():
-    """Get user referrals"""
-    if 'user_id' not in session:
-        return jsonify({'error': 'Not authenticated'}), 401
-    
-    conn = sqlite3.connect(config_class.DATABASE_NAME)
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM referrals WHERE user_id = ? ORDER BY created_at DESC', (session['user_id'],))
-    referrals = cursor.fetchall()
-    conn.close()
-
-
-
-
 # ============================================================================
 # STATIC PAGE ROUTES & NAVIGATION LINKS
 # ============================================================================
@@ -4305,8 +4183,8 @@ def internal_error(e):
     return render_template('500.html'), 500
 
 # Register blueprints
-app.register_blueprint(nocode_api, url_prefix='/api/nocode')
-app.register_blueprint(nocodebackend_api, url_prefix='/api/nocodebackend')
+app.register_blueprint(supabase_routes, url_prefix='/api/supabase')  # Replace nocode_api
+app.register_blueprint(supabase_api, url_prefix='/api/supabase')  # Replace nocodebackend_api
 app.register_blueprint(promotions, url_prefix='/promotions')
 app.register_blueprint(admin_promotions, url_prefix='/admin/promotions')
 

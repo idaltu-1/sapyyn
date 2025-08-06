@@ -61,3 +61,8 @@ numpy>=1.24.0,<2.0.0
 
 # HTTP clients
 httpx>=0.25.0,<1.0.0
+
+# Supabase integration (replaces NoCodeBackend)
+supabase>=2.18.0,<3.0.0
+postgrest>=1.1.1,<2.0.0
+storage3>=0.12.1,<1.0.0

@@ -71,11 +71,13 @@ class DevelopmentConfig(Config):
     """Development configuration"""
     DEBUG = True
     TESTING = False
+    FLASK_ENV = 'development'
     
 class TestingConfig(Config):
     """Testing configuration"""
     DEBUG = False
     TESTING = True
+    FLASK_ENV = 'testing'
     DATABASE_NAME = ':memory:'  # In-memory database for tests
     WTF_CSRF_ENABLED = False  # Disable CSRF for testing
     
@@ -83,6 +85,7 @@ class ProductionConfig(Config):
     """Production configuration"""
     DEBUG = False
     TESTING = False
+    FLASK_ENV = 'production'
     SESSION_COOKIE_SECURE = True  # Force HTTPS in production
     
     # Override defaults for production
