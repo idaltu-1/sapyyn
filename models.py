@@ -146,15 +146,14 @@ class Referral(db.Model):
         return f'<Referral {self.referral_id}>'
 
 class Document(db.Model):
-    """Document model"""
     __tablename__ = 'documents'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     referral_id = db.Column(db.Integer, db.ForeignKey('referrals.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     file_type = db.Column(db.String(50), nullable=False)
     file_name = db.Column(db.String(255), nullable=False)
-l_language = db.Column(db.Text)
+    language = db.Column(db.Text)
     file_path = db.Column(db.String(255), nullable=False)
     file_size = db.Column(db.Integer)
     upload_date = db.Column(db.DateTime, default=datetime.utcnow)
