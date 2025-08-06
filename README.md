@@ -5,6 +5,16 @@ A comprehensive web-based patient referral management system built with Flask, f
 
 **Copyright © 2025 Sapyyn. All rights reserved.**
 
+## 📋 Recent Updates
+
+### MongoDB Migration (January 2025)
+- **Replaced NoCodeBackend** with native MongoDB integration for better performance and cost efficiency
+- **Added new features**: Full-text search, advanced querying, and improved file storage with GridFS
+- **Maintained backward compatibility**: All existing API endpoints continue to work unchanged
+- **Enhanced capabilities**: Real-time analytics, improved scalability, and no external API dependencies
+
+For detailed migration information, see [MONGODB_MIGRATION.md](MONGODB_MIGRATION.md).
+
 ## 🚀 Features
 
 ### Core Functionality
