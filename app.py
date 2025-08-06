@@ -9,7 +9,7 @@ from flask_limiter.util import get_remote_address
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from routes.nocode_routes import nocode_api
-from controllers.nocodebackend_controller import nocodebackend_api
+from controllers.mongodb_controller import mongodb_api
 from controllers.promotion_controller import promotions
 from controllers.admin_promotion_controller import admin_promotions
 from config.app_config import get_config, INITIAL_ADMIN, generate_secure_password
@@ -4306,7 +4306,7 @@ def internal_error(e):
 
 # Register blueprints
 app.register_blueprint(nocode_api, url_prefix='/api/nocode')
-app.register_blueprint(nocodebackend_api, url_prefix='/api/nocodebackend')
+app.register_blueprint(mongodb_api, url_prefix='/api/nocodebackend')
 app.register_blueprint(promotions, url_prefix='/promotions')
 app.register_blueprint(admin_promotions, url_prefix='/admin/promotions')
 
