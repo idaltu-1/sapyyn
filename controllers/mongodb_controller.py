@@ -1,5 +1,5 @@
 """
-MongoDB API endpoints for Sapyyn application (formerly NoCodeBackend)
+MongoDB API endpoints for Sapyyn application (replaces NoCodeBackend controller)
 """
 
 from flask import Blueprint, request, jsonify, current_app, session
@@ -7,7 +7,7 @@ from services.mongodb_service import MongoDBService
 import logging
 
 # Create blueprint - keeping same URL prefix for compatibility
-nocodebackend_api = Blueprint('mongodb_api', __name__, url_prefix='/api/nocodebackend')
+mongodb_api = Blueprint('mongodb_api', __name__, url_prefix='/api/nocodebackend')
 
 # Initialize logger
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ def require_auth(f):
     """Decorator to require authentication"""
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
-            return jsonify({'error': 'Authentication required'}), 401
+            return jsonify({'success': False, 'error': 'Authentication required'}), 401
         return f(*args, **kwargs)
     
     # Preserve the original function's name and docstring
@@ -26,7 +26,7 @@ def require_auth(f):
     
     return decorated_function
 
-@nocodebackend_api.route('/referrals', methods=['GET'])
+@mongodb_api.route('/referrals', methods=['GET'])
 @require_auth
 def get_referrals():
     """Get referrals from MongoDB"""
@@ -55,7 +55,7 @@ def get_referrals():
         logger.error(f"Error getting referrals: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@nocodebackend_api.route('/referrals', methods=['POST'])
+@mongodb_api.route('/referrals', methods=['POST'])
 @require_auth
 def create_referral():
     """Create a new referral in MongoDB"""
@@ -76,7 +76,7 @@ def create_referral():
         logger.error(f"Error creating referral: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@nocodebackend_api.route('/referrals/<referral_id>', methods=['PUT'])
+@mongodb_api.route('/referrals/<referral_id>', methods=['PUT'])
 @require_auth
 def update_referral(referral_id):
     """Update a referral in MongoDB"""
@@ -94,7 +94,7 @@ def update_referral(referral_id):
         logger.error(f"Error updating referral: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@nocodebackend_api.route('/documents', methods=['POST'])
+@mongodb_api.route('/documents', methods=['POST'])
 @require_auth
 def upload_document():
     """Upload a document to MongoDB"""
@@ -143,7 +143,7 @@ def upload_document():
         logger.error(f"Error uploading document: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@nocodebackend_api.route('/documents', methods=['GET'])
+@mongodb_api.route('/documents', methods=['GET'])
 @require_auth
 def get_documents():
     """Get documents from MongoDB"""
@@ -173,7 +173,7 @@ def get_documents():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 # Add new endpoints for enhanced functionality
-@nocodebackend_api.route('/referrals/<referral_id>', methods=['GET'])
+@mongodb_api.route('/referrals/<referral_id>', methods=['GET'])
 @require_auth
 def get_referral_detail(referral_id):
     """Get a single referral by ID"""
@@ -185,7 +185,7 @@ def get_referral_detail(referral_id):
         logger.error(f"Error getting referral {referral_id}: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@nocodebackend_api.route('/referrals/<referral_id>/documents', methods=['GET'])
+@mongodb_api.route('/referrals/<referral_id>/documents', methods=['GET'])
 @require_auth
 def get_referral_documents(referral_id):
     """Get all documents for a specific referral"""
@@ -197,7 +197,7 @@ def get_referral_documents(referral_id):
         logger.error(f"Error getting documents for referral {referral_id}: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@nocodebackend_api.route('/search/referrals', methods=['GET'])
+@mongodb_api.route('/search/referrals', methods=['GET'])
 @require_auth
 def search_referrals():
     """Search referrals by text"""
@@ -217,7 +217,7 @@ def search_referrals():
         logger.error(f"Error searching referrals: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@nocodebackend_api.route('/stats', methods=['GET'])
+@mongodb_api.route('/stats', methods=['GET'])
 @require_auth
 def get_stats():
     """Get database statistics"""
