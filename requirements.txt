@@ -17,6 +17,7 @@ Flask-SQLAlchemy==3.1.1
 gevent==24.11.1
 greenlet==3.1.1
 gunicorn==23.0.0
+bleach==6.1.0
 
 # Core dependencies with security patches
 stripe==11.3.0
